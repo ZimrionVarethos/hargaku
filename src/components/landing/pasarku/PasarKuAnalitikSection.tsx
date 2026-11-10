@@ -46,7 +46,7 @@ export function PasarKuAnalitikSection() {
   const maxPrice = highest ? highest.price * 1.1 : 100000;
 
   return (
-    <section id="analitikSection" className="scroll-mt-20 border-b-2 border-[var(--border-ink)] py-12 bg-[var(--bg-muted)]">
+    <section id="analitikSection" className="scroll-mt-20 py-10 bg-[var(--bg-muted)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

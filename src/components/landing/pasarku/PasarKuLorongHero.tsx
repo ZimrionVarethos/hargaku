@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { ArrowDown, Sparkle } from '@phosphor-icons/react';
+import { ArrowDown } from '@phosphor-icons/react';
 import { useHeroAnimation } from './useHeroAnimation';
 import { useMarketWalk } from './useMarketWalk';
 import {
@@ -141,7 +141,7 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
       id="heroSection"
       className="relative w-full min-h-[420vh] sm:min-h-[480vh] bg-[#F9F3EE]"
     >
-      <div className="sticky top-[62px] sm:top-[66px] h-[calc(100dvh-62px)] sm:h-[calc(100dvh-66px)] w-full overflow-hidden border-b-2 border-[var(--border-ink)]">
+      <div className="sticky top-[62px] sm:top-[66px] h-[calc(100dvh-62px)] sm:h-[calc(100dvh-66px)] w-full overflow-hidden">
 
         <div
           inert={isInsideMarket || undefined}
