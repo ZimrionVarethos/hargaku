@@ -26,7 +26,7 @@ export function LorongEntranceGate({
 
   return (
     <div
-      className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden transition-opacity duration-200"
+      className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none select-none overflow-hidden transition-opacity duration-200"
       style={{ opacity: gateOpacity }}
     >
       <canvas
@@ -106,7 +106,7 @@ export function LorongEntranceGate({
       </div>
 
       <div
-        className="relative z-20 max-w-xl mx-auto text-center flex flex-col items-center px-4 pt-16 transition-all duration-200"
+        className="relative z-20 max-w-xl mx-auto text-center flex flex-col items-center px-4 pt-8 sm:pt-12 pb-4 transition-all duration-200"
         style={{
           opacity: heroTextOpacity,
           transform: `translateY(-${(1 - heroTextOpacity) * 70}px)`,
@@ -136,9 +136,9 @@ export function LorongEntranceGate({
         <button
           type="button"
           onClick={onEnterMarket}
-          className="pasarku-cta-btn inline-flex items-center justify-center gap-3 px-8 sm:px-10 py-3.5 text-base sm:text-lg font-bold"
+          className="pasarku-cta-btn inline-flex items-center justify-center gap-3 px-9 sm:px-11 py-3.5 text-base sm:text-lg font-bold"
         >
-          <span>Masuk ke Lorong Pasar</span>
+          <span>Mulai</span>
           <span className="text-xl animate-bounce">&darr;</span>
         </button>
 
