@@ -55,6 +55,7 @@ export function LaporContainer({ commodities, markets }: Props) {
         marketId: data.marketId,
         reportedPrice: data.price,
         unit: data.unit,
+        normalizedPrice: data.normalizedPrice,
         purchaseDate: data.purchaseDate,
         photoFile: data.photoFile,
         notes: data.notes,
@@ -72,27 +73,33 @@ export function LaporContainer({ commodities, markets }: Props) {
           : 0;
       const isAnomaly = Math.abs(diffPercent) > 25;
 
-      // Real-time synchronization to Admin Moderation Queue
-      addReport({
-        id: res.data.reportId,
-        commodityName: matchedCommodity?.name || 'Komoditas Pangan',
-        marketName: matchedMarket?.name || 'Pasar Tradisional',
-        reportedPrice: data.price,
-        unit: data.unit,
-        normalizedPricePerKg: data.normalizedPrice,
-        officialHapPrice: hapPrice,
-        cityAvgPrice: matchedCommodity?.currentAvgPrice || hapPrice,
-        diffPercent,
-        submittedAt: 'Baru saja',
-        hasPhoto: Boolean(data.photoFile),
-        photoUrl: data.photoFile ? URL.createObjectURL(data.photoFile) : undefined,
-        citizenNotes: data.notes || undefined,
-        status: isAnomaly ? 'ANOMALY' : 'PENDING',
-        anomalyReason: isAnomaly
-          ? `Deviasi ${diffPercent > 0 ? '+' : ''}${diffPercent}% melampaui ambang batas toleransi MAD (±25%).`
-          : undefined,
-        exifSanitized: true,
-      });
+      const recordToAdd = res.data.reportRecord
+        ? {
+            ...res.data.reportRecord,
+            photoUrl: data.photoFile ? URL.createObjectURL(data.photoFile) : undefined,
+          }
+        : {
+            id: res.data.reportId,
+            commodityName: matchedCommodity?.name || 'Komoditas Pangan',
+            marketName: matchedMarket?.name || 'Pasar Tradisional',
+            reportedPrice: data.price,
+            unit: data.unit,
+            normalizedPricePerKg: data.normalizedPrice,
+            officialHapPrice: hapPrice,
+            cityAvgPrice: matchedCommodity?.currentAvgPrice || hapPrice,
+            diffPercent,
+            submittedAt: 'Baru saja',
+            hasPhoto: Boolean(data.photoFile),
+            photoUrl: data.photoFile ? URL.createObjectURL(data.photoFile) : undefined,
+            citizenNotes: data.notes || undefined,
+            status: (isAnomaly ? 'ANOMALY' : 'PENDING') as 'ANOMALY' | 'PENDING',
+            anomalyReason: isAnomaly
+              ? `Deviasi ${diffPercent > 0 ? '+' : ''}${diffPercent}% melampaui ambang batas toleransi MAD (25%).`
+              : undefined,
+            exifSanitized: true,
+          };
+
+      addReport(recordToAdd, Boolean(res.data.reportRecord));
 
       setSubmittedReport({
         reportId: res.data.reportId,

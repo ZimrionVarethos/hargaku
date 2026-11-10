@@ -1,4 +1,4 @@
-# ENV_SPEC.md — Environment Variables Specification
+# ENV_SPEC.md: Environment Variables Specification
 
 Dokumen ini adalah spesifikasi resmi seluruh variabel lingkungan (**Environment Variables**) yang digunakan oleh aplikasi **HargaKu** di sisi frontend maupun backend.
 
@@ -11,48 +11,26 @@ Dokumen ini adalah spesifikasi resmi seluruh variabel lingkungan (**Environment 
 
 | Nama Variabel | Wajib/Opsional | Scope | Deskripsi & Contoh Nilai |
 | :--- | :--- | :--- | :--- |
-| `DATABASE_URL` | **Wajib** | Backend / Server | Connection string PostgreSQL (contoh: `postgresql://user:pass@localhost:5432/hargaku_db?schema=public`) |
-| `DIRECT_URL` | Opsional | Backend / Server | Direct database connection untuk Prisma migrations saat memakai serverless pooler (Neon/Supabase) |
+| `DATABASE_URL` | **Wajib** | Backend / Server | Connection string PostgreSQL / Supabase Session Pooler (`postgresql://postgres.[REF]:[PASS]@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require`) |
+| `NEXT_PUBLIC_SUPABASE_URL` | **Wajib** | Universal | URL project Supabase (`https://[PROJECT-REF].supabase.co`) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Wajib** | Universal | Publishable / anon key Supabase untuk koneksi SDK publik |
 | `NODE_ENV` | **Wajib** | Universal | `development`, `test`, atau `production` |
-| `NEXT_PUBLIC_APP_URL` | **Wajib** | Universal / Client | URL root website HargaKu (contoh: `http://localhost:3000` atau `https://hargaku.id`) |
-| `NEXT_PUBLIC_API_URL` | Opsional | Client | Base URL endpoint API backend (contoh: `/api/v1` atau `https://api.hargaku.id/api/v1`) |
-| `NEXT_PUBLIC_USE_MOCK` | Opsional | Client | Toggle data mock simulasi untuk pengembangan frontend (`true` / `false`, Default: `true` saat backend belum aktif) |
-| `JWT_SECRET` | **Wajib** | Backend / Server | Kunci rahasia minimal 32 karakter untuk menandatangani token sesi login admin/moderator |
-| `UPLOAD_DIR` | Opsional | Backend / Server | Lokasi penyimpanan sementara foto laporan warga di filesystem lokal (`./public/uploads/reports`) |
-| `RATE_LIMIT_MAX_REPORTS` | Opsional | Backend / Server | Batas maksimal laporan warga per hash IP per hari (Default: `10`) |
-| `GEMINI_API_KEY` | Opsional | Backend / Server | API Key Google Gemini (AI Studio / Vertex AI) untuk powering endpoint Asisten Pangan AI (`POST /api/v1/assistant/chat`) |
+| `NEXT_PUBLIC_APP_URL` | **Wajib** | Universal / Client | URL root website HargaKu (contoh: `http://localhost:3000`) |
+| `NEXT_PUBLIC_API_URL` | Opsional | Client | Base URL endpoint API backend (default: `/api/v1`) |
+| `NEXT_PUBLIC_USE_MOCK` | Opsional | Client | Toggle mode mock (`false` saat Supabase aktif, `true` saat offline demo) |
+| `ADMIN_SESSION_SECRET` | **Wajib** | Backend / Server | Kunci rahasia minimal 32 karakter untuk token sesi admin |
+| `GEMINI_API_KEY` | Opsional | Backend / Server | Cadangan opsional jika kunci Gemini belum tersimpan di tabel `system_settings` Supabase |
 
 ---
 
-## 2. File Template `.env.example`
+## 2. Pengelolaan Dinamis Kunci API di Database Supabase
 
-Simpan file `.env.example` di root repository dengan format berikut:
-
-```bash
-# Database Connection (PostgreSQL)
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/hargaku?schema=public"
-
-# Environment
-NODE_ENV="development"
-
-# App Public URL & API Fetcher Config
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-NEXT_PUBLIC_API_URL="/api/v1"
-NEXT_PUBLIC_USE_MOCK="true"
-
-# Admin Authentication Secret
-JWT_SECRET="ganti_dengan_random_string_aman_minimal_32_karakter"
-
-# Upload & Rate Limiting
-UPLOAD_DIR="./public/uploads/reports"
-RATE_LIMIT_MAX_REPORTS=10
-
-# AI Assistant Integration (Backend Gemini Service)
-GEMINI_API_KEY="AIzaSy_ganti_dengan_api_key_gemini_resmi"
-```
+1. Kredensial API Gemini (`gemini_api_key`) dan konfigurasi model (`gemini_model`, misal `gemini-3.8-flash`) **wajib disimpan di tabel `system_settings` database Supabase**, tidak boleh di-hardcode di kode sumber frontend/backend.
+2. Administrator dapat memperbarui kunci API Gemini dan menguji koneksi secara langsung melalui menu **Integrasi AI & DB** di Konsol Admin (`/admin`).
+3. Nilai `value` bertanda `is_secret = true` selalu disamarkan (*masked*) pada respons API ke antarmuka admin dan hanya dibaca secara utuh di sisi server saat memanggil endpoint Google Gemini API.
 
 ---
 
 ## 3. Aturan Keamanan Variabel
-1. Hanya variabel yang memiliki prefix `NEXT_PUBLIC_` yang boleh terekspos ke bundle browser client.
-2. Variabel sensitif seperti `DATABASE_URL` dan `JWT_SECRET` **dilarang keras** menggunakan prefix `NEXT_PUBLIC_`.
+1. Hanya variabel dengan prefix `NEXT_PUBLIC_` yang boleh terekspos ke bundle browser client.
+2. Variabel sensitif seperti `DATABASE_URL`, `ADMIN_SESSION_SECRET`, dan `GEMINI_API_KEY` **dilarang keras** menggunakan prefix `NEXT_PUBLIC_`.

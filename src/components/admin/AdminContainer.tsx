@@ -9,6 +9,7 @@ import { AdminReportsView } from './AdminReportsView';
 import { AdminCommoditiesView } from './AdminCommoditiesView';
 import { AdminMarketsView } from './AdminMarketsView';
 import { AdminDailyPricesView } from './AdminDailyPricesView';
+import { AdminSettingsView } from './AdminSettingsView';
 import type { AdminModule } from '@/lib/types/admin';
 
 function AdminWorkspace() {
@@ -40,6 +41,7 @@ function AdminWorkspace() {
             {activeModule === 'commodities' && <AdminCommoditiesView />}
             {activeModule === 'markets' && <AdminMarketsView />}
             {activeModule === 'daily-prices' && <AdminDailyPricesView />}
+            {activeModule === 'settings' && <AdminSettingsView />}
           </main>
         </div>
       </div>

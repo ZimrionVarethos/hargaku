@@ -69,12 +69,13 @@ Dokumen ini adalah buku catatan "Jebakan Batman" (**Pitfall Vault**) proyek **Ha
   * Gunakan `border border-[#...]` alih-alih `outline`.
   * Berikan padding horizontal yang cukup (`pl-3.5 sm:pl-4` di kolom pertama dan `pr-6` di kolom terakhir/aksi).
 
-### 5.2. Kehilangan State Keranjang saat Berpindah Halaman
-- **Gejala**: Pengguna menekan `[+ Masukkan ke Keranjang]` di Cek Harga Wajar, namun daftar belanja kosong saat membuka `/keranjang`.
-- **Penyebab**: Menyimpan daftar item keranjang pada `useState` lokal komponen container halaman yang ter-unmount saat rute berganti.
-- **Solusi Terverifikasi**:
-  * Bungkus seluruh rute publik dengan `CartProvider` (`src/lib/store/cart-store.tsx`) di level root `PublicLayoutWrapper`.
-  * Sinkronkan state keranjang ke `localStorage` (`hargaku_user_cart_items`) sehingga data persisten melintasi refresh browser dan navigasi.
+### 5.2. Persistensi Konsultasi AI & Kompatibilitas SSR Next.js + Supabase Pooler
+- **Gejala A (State AI Terputus)**: Riwayat tanya jawab AI hilang saat pengguna berpindah dari `/rekomendasi-ai` ke `/cek-harga` atau membuka laci `AssistantDrawer`.
+  * *Solusi*: Pusatkan state di `AssistantProvider` (`src/lib/store/assistant-store.tsx`) pada `PublicLayoutWrapper` agar sinkron lintas halaman.
+- **Gejala B (`Failed to parse URL` saat `next build`)**: Ketika `NEXT_PUBLIC_USE_MOCK="false"`, Server Components di Node SSR mengeksekusi `fetch('/api/v1/...')` relatif saat build time.
+  * *Solusi*: Di `src/lib/api/*.api.ts`, gunakan fallback baseline saat `IS_MOCK || typeof window === 'undefined'` serta `try/catch` defensif saat offline.
+- **Gejala C (`MaxClientsInSessionMode` Supabase di Production)**: Membuat instance `new Pool()` baru di setiap request produksi menghabiskan batas koneksi Session Pooler Supabase.
+  * *Solusi*: Simpan singleton pool di `globalForPg.hargakuPgPool` secara persisten baik di dev maupun production dengan `max: 3` di `src/lib/server/db.ts`.
 
 
 ### 4.1. Layout Shift (CLS) saat Angka Harga Beranimasi

@@ -43,29 +43,29 @@ const CITIZEN_REPORTS: ReportRow[] = [
 
 export function RecentCitizenReportsTable() {
   return (
-    <div className="bg-white rounded-[18px] outline outline-1 outline-[#E5E3DE] p-6 sm:p-7 shadow-xs flex flex-col gap-6">
+    <div className="market-card p-6 sm:p-7 flex flex-col gap-6">
       {/* Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h3 className="text-[16px] font-bold text-[#1B1A18] tracking-tight">
+          <h3 className="text-[16px] font-bold text-[var(--text-primary)] tracking-tight">
             Laporan Terbaru Warga (Agregat per Pasar)
           </h3>
-          <p className="text-[12px] text-[#6E6D67]">
+          <p className="text-[12px] text-[var(--text-secondary)]">
             Transparansi harga riil lapak pedagang tanpa mengekspos identitas perorangan pedagang.
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF9F5] outline outline-1 outline-[#E5E3DE] text-[11px] font-semibold text-[#1B1A18] w-fit">
-          <ShieldCheck size={14} weight="bold" className="text-[#FF7714]" />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--bg-muted)] border border-[var(--border-subtle)] text-[11px] font-bold text-[var(--text-primary)] w-fit">
+          <ShieldCheck size={14} weight="bold" className="text-[var(--accent-chili)]" />
           <span>Terverifikasi Sistem &amp; TPID</span>
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto border-t border-[#E5E3DE]">
+      <div className="overflow-x-auto border-t border-[var(--border-subtle)]">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-[#E5E3DE] text-[11px] font-bold text-[#78716C] uppercase tracking-wider">
+            <tr className="border-b border-[var(--border-subtle)] text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
               <th className="py-3 px-3 sm:px-4">Pasar Tradisional</th>
               <th className="py-3 px-3">Harga Lapak</th>
               <th className="py-3 px-3">Waktu Lapor</th>
@@ -73,27 +73,27 @@ export function RecentCitizenReportsTable() {
               <th className="py-3 px-3 sm:px-4 text-right">Status Verifikasi</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#E5E3DE] text-[13px]">
+          <tbody className="divide-y divide-[var(--border-subtle)] text-[13px]">
             {CITIZEN_REPORTS.map((r, idx) => (
-              <tr key={idx} className="hover:bg-[#FAF9F5] transition-colors">
-                <td className="py-3 px-3 sm:px-4 font-bold text-[#1B1A18]">
+              <tr key={idx} className="hover:bg-[var(--bg-muted)]/40 transition-colors">
+                <td className="py-3 px-3 sm:px-4 font-bold text-[var(--text-primary)]">
                   {r.marketLocation}
                 </td>
-                <td className="py-3 px-3 font-bold text-[#1B1A18] tabular-nums">
+                <td className="py-3 px-3 font-extrabold text-[var(--forest-ink)] tabular-nums font-mono-num">
                   {r.price}
                 </td>
-                <td className="py-3 px-3 text-[#6E6D67] text-[12px]">
+                <td className="py-3 px-3 text-[var(--text-secondary)] text-[12px]">
                   {r.time}
                 </td>
-                <td className="py-3 px-3 text-[#6E6D67] text-[12px]">
+                <td className="py-3 px-3 text-[var(--text-secondary)] text-[12px]">
                   {r.proofType}
                 </td>
                 <td className="py-3 px-3 sm:px-4 text-right">
                   <span
-                    className={`inline-block text-[11px] font-bold px-2 py-0.5 rounded-[4px] outline outline-1 ${
+                    className={`inline-block text-[11px] font-bold px-2 py-0.5 rounded ${
                       r.status === 'Terverifikasi Warga'
-                        ? 'bg-[#EEF773] text-[#1B1A18] outline-[#1B1A18]'
-                        : 'bg-[#FEF3C7] text-[#92400E] outline-[#FDE68A]'
+                        ? 'bg-[#E2EFE6] text-[#245034] border border-[#245034]'
+                        : 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]'
                     }`}
                   >
                     {r.status}
@@ -106,8 +106,8 @@ export function RecentCitizenReportsTable() {
       </div>
 
       {/* Ethics Note Footer */}
-      <div className="pt-2 border-t border-[#E5E3DE] text-[12px] text-[#6E6D67] leading-[18px]">
-        <strong className="text-[#1B1A18] font-semibold">Kode etik perlindungan pedagang:</strong> Nama toko dan identitas perseorangan pedagang tidak dicantumkan di platform publik. Seluruh data diverifikasi agregat oleh sistem dan relawan TPID demi transparansi pasar yang saling menghormati.
+      <div className="pt-2 border-t border-[var(--border-subtle)] text-[12px] text-[var(--text-secondary)] leading-[18px]">
+        <strong className="text-[var(--text-primary)] font-bold">Kode etik perlindungan pedagang:</strong> Nama toko dan identitas perseorangan pedagang tidak dicantumkan di platform publik. Seluruh data diverifikasi agregat oleh sistem dan relawan TPID demi transparansi pasar yang saling menghormati.
       </div>
     </div>
   );

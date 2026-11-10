@@ -67,14 +67,14 @@ export function DashboardFilterBar({
           <MagnifyingGlass
             size={16}
             weight="bold"
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8C8B85]"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
           />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Cari komoditas (cth: beras, telur, cabai)..."
-            className="w-full pl-9 pr-3.5 py-2.5 rounded-[10px] bg-white outline outline-1 outline-[#E5E3DE] text-[13px] text-[#1B1A18] placeholder:text-[#A8A29E] focus:outline-[#1B1A18] shadow-xs transition-all"
+            className="w-full pl-9 pr-3.5 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-ink)] text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:ring-2 focus:ring-[var(--accent-chili)] shadow-xs transition-all"
           />
         </div>
 
@@ -83,7 +83,7 @@ export function DashboardFilterBar({
           <select
             value={selectedMarket}
             onChange={(e) => onMarketChange(e.target.value)}
-            className="w-full appearance-none pl-3.5 pr-8 py-2.5 rounded-[10px] bg-white outline outline-1 outline-[#E5E3DE] text-[13px] text-[#1B1A18] font-medium shadow-xs focus:outline-[#1B1A18] cursor-pointer"
+            className="w-full appearance-none pl-3.5 pr-8 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-ink)] text-[13px] text-[var(--text-primary)] font-semibold shadow-xs focus:ring-2 focus:ring-[var(--accent-chili)] cursor-pointer"
           >
             <option value="ALL">
               Semua Pasar {markets.length > 0 ? `(${markets.length} Pasar)` : ''}
@@ -107,7 +107,7 @@ export function DashboardFilterBar({
           <CaretDown
             size={13}
             weight="bold"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8B85] pointer-events-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
           />
         </div>
 
@@ -116,7 +116,7 @@ export function DashboardFilterBar({
           <select
             value={selectedSort}
             onChange={(e) => onSortChange(e.target.value as DashboardSort)}
-            className="w-full appearance-none pl-3.5 pr-8 py-2.5 rounded-[10px] bg-white outline outline-1 outline-[#E5E3DE] text-[13px] text-[#1B1A18] font-medium shadow-xs focus:outline-[#1B1A18] cursor-pointer"
+            className="w-full appearance-none pl-3.5 pr-8 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-ink)] text-[13px] text-[var(--text-primary)] font-semibold shadow-xs focus:ring-2 focus:ring-[var(--accent-chili)] cursor-pointer"
           >
             <option value="CHANGE_DESC">Urutkan: Perubahan Terbesar</option>
             <option value="PRICE_ASC">Harga Terendah</option>
@@ -126,7 +126,7 @@ export function DashboardFilterBar({
           <CaretDown
             size={13}
             weight="bold"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8B85] pointer-events-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
           />
         </div>
 
@@ -135,11 +135,7 @@ export function DashboardFilterBar({
           <button
             type="button"
             onClick={onToggleLightMode}
-            className={`inline-flex items-center gap-2 px-3 py-2 rounded-[10px] outline outline-1 text-[12px] font-medium transition-all ${
-              isLightMode
-                ? 'bg-[#1B1A18] text-white outline-[#1B1A18] shadow-xs'
-                : 'bg-white text-[#6E6D67] outline-[#E5E3DE] hover:bg-[#F4F3F0] hover:text-[#1B1A18]'
-            }`}
+            className="market-btn-secondary inline-flex items-center gap-2 px-3 py-2 text-[12px] font-bold"
             title="Beralih ke format tabel hemat data"
           >
             {isLightMode ? (
@@ -166,10 +162,10 @@ export function DashboardFilterBar({
               key={cat.id}
               type="button"
               onClick={() => onCategoryChange(cat.id)}
-              className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium whitespace-nowrap transition-all ${
+              className={`px-3.5 py-1.5 rounded-full text-[12px] font-bold whitespace-nowrap transition-all border ${
                 isActive
-                  ? 'bg-[#1B1A18] text-white shadow-xs'
-                  : 'bg-white text-[#6E6D67] outline outline-1 outline-[#E5E3DE] hover:text-[#1B1A18] hover:bg-[#F4F3F0]'
+                  ? 'bg-[#A92717] text-white border-[var(--border-ink)] shadow-[var(--shadow-hard-sm)]'
+                  : 'bg-[var(--bg-card)] text-[var(--text-primary)] border-[var(--border-ink)] hover:bg-[var(--bg-muted)]'
               }`}
             >
               {cat.label}

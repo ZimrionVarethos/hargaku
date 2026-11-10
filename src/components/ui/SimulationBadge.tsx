@@ -47,7 +47,7 @@ const TICKER_ITEMS: TickerItem[] = [
     price: 'Rp 13.500/kg',
     market: 'Kebon Kembang',
     trend: 'STABLE',
-    diffText: '— Stabil',
+    diffText: '~ Stabil',
   },
   {
     name: 'Daging Ayam Broiler',
@@ -68,7 +68,7 @@ const TICKER_ITEMS: TickerItem[] = [
     price: 'Rp 27.500/kg',
     market: 'Pasar Sukasari',
     trend: 'STABLE',
-    diffText: '— Stabil',
+    diffText: '~ Stabil',
   },
   {
     name: 'Minyak Goreng Curah',

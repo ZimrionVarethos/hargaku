@@ -11,7 +11,7 @@ Dokumen ini adalah **Single Source of Truth (SSOT)** untuk seluruh struktur data
 
 | Aspek | Standar yang Digunakan | Keterangan |
 | :--- | :--- | :--- |
-| **Engine** | PostgreSQL 16+ | Kompatibel dengan Neon Serverless / Supabase / Local Docker |
+| **Engine** | PostgreSQL 17 (Supabase) | Diakses melalui Supavisor Session Pooler (`pg`) + `@supabase/supabase-js` |
 | **Penamaan Tabel** | `snake_case`, plural | `commodities`, `markets`, `official_prices`, `citizen_reports` |
 | **Penamaan Kolom** | `snake_case` | `commodity_id`, `reported_price`, `recorded_date` |
 | **Primary Key** | CUID / UUIDv7 string (`VARCHAR(36)`) | `id String @id @default(cuid())` |
@@ -120,6 +120,14 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
+
+    SYSTEM_SETTINGS {
+        string key PK
+        string value
+        string description
+        boolean is_secret
+        timestamp updated_at
+    }
 ```
 
 ---
@@ -204,6 +212,14 @@ Akun internal tim moderator / admin HargaKu.
 * `password_hash` (VARCHAR(255), NOT NULL).
 * `full_name` (VARCHAR(100), NOT NULL).
 * `role` (VARCHAR(20), DEFAULT 'MODERATOR'): `SUPERADMIN` atau `MODERATOR`.
+
+### 3.8. Tabel `system_settings` (Integrasi API & AI Dinamis)
+Menyimpan kredensial API eksternal dan konfigurasi layanan AI Gemini secara dinamis agar tidak di-hardcode di kode sumber dan dapat diganti langsung melalui Konsol Admin (`/admin`). Dilindungi Row Level Security (RLS) ketat sehingga hanya route server-side Next.js yang dapat membacanya.
+* `key` (VARCHAR(100), PK): Kunci pengaturan (misal: `gemini_api_key`, `gemini_model`, `ai_system_instruction`, `price_sources_config`).
+* `value` (TEXT, NOT NULL): Nilai pengaturan atau API key aktif.
+* `description` (TEXT, NULL): Keterangan fungsi parameter.
+* `is_secret` (BOOLEAN, DEFAULT false): Penanda apakah nilai harus disamarkan (`masked`) saat dikirim ke UI Admin.
+* `updated_at` (TIMESTAMPTZ, DEFAULT NOW()).
 
 ---
 

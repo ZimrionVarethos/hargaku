@@ -18,7 +18,7 @@ Membangun aplikasi perlombaan sering gagal bukan karena kekurangan ide, melainka
 | :--- | :--- | :--- |
 | **Klaim "Real-Time" Palsu** | Data resmi pemerintah (PIHPS/Bapanas) diperbarui secara harian, bukan per detik. Mengklaim "real-time" adalah misinformasi publik. | Tidak akan pernah (gunakan "harga harian / diperbarui harian"). |
 | **Penyebutan Nama Pedagang / Kios Perorangan** | Menghindari konflik horizontal, fitnah persaingan usaha, dan menjaga privasi pedagang pasar. | Tidak akan diterapkan (data diagregasi per pasar). |
-| **E-Commerce & Transaksi Jual-Beli Online** | HargaKu adalah platform informasi dan pendukung keputusan (*decision support*), bukan marketplace belanja/checkout. | Roadmap Pasca Lomba (Fase 3). |
+| **E-Commerce, Keranjang Belanja, & Transaksi Jual-Beli Online** | HargaKu adalah platform cek harga dan pendukung keputusan multi-sumber (*decision support*), bukan toko atau simulasi keranjang belanja. Fitur keranjang belanja digantikan oleh **Rekomendasi AI Multi-Sumber & Tanya Jawab**. | Tidak akan diterapkan. |
 | **Scraping Liar / Agresif Tanpa Izin** | Rentan terblokir IP, melanggar ToS sumber resmi, dan tidak etis. Lebih baik gunakan ekspor resmi atau data simulasi berlabel. | Jika ada API resmi terbuka dari Bapanas/Disperindag. |
 | **Bot WhatsApp / Telegram Otomatis** | Memerlukan infrastruktur webhook, token berbayar Meta, dan pemeliharaan server tersendiri yang memecah fokus frontend/backend. | Roadmap Pitch (Konsep Masa Depan). |
 | **Ekspansi Kota Liar Tanpa Acuan Bapanas** | Penambahan kota wajib berakar pada 21 provinsi resmi Bapanas dalam 6 koridor pulau yang sudah terstandarisasi. Dilarang menambah kota acak tanpa basis data logistik resmi. | Sesuai rilis koridor zonasi pangan nasional. |
@@ -34,7 +34,7 @@ Membangun aplikasi perlombaan sering gagal bukan karena kekurangan ide, melainka
 | **State Management** | Redux / MobX | Zustand / React Context bawaan | Redux terlalu berbelit (*boilerplate bloat*) untuk skala aplikasi HargaKu. |
 | **Styling Library** | Styled Components / Emotion | Tailwind CSS | Runtime CSS overhead dan sering konflik dengan Next.js Server Components. |
 | **UI Component Bloat** | Ant Design / MUI | Tailwind CSS + Lucide Icons (atau Radix headless jika perlu) | Styling bawaan AntD/MUI sulit di-override dan membuat bundle membengkak. |
-| **Database ORM** | Raw SQL queries tanpa ORM / TypeORM | Prisma ORM | Prisma menjamin *type-safety* end-to-end yang ketat antara DB dan TypeScript. |
+| **Database ORM** | Query SQL tak terstruktur tanpa helper koneksi aman | `@supabase/supabase-js` + parameterized SQL (`pg` Pool) | Kompatibel langsung dengan Supabase Pooler & RLS tanpa overhead migration lock serverless. |
 | **Geospatial Library** | Google Maps API berbayar / Mapbox GL berat | **Leaflet.js** (OpenStreetMap / CartoDB) | Ringan, open-source tanpa billing credit card, kompatibel dengan Next.js client-side. |
 | **Setup Library Liar** | Instalasi paket tanpa verifikasi Context7 | **Context7 MCP** (`resolve-library-id` & `query-docs`) | Menghindari API deprecated atau breaking changes antar versi paket. |
 

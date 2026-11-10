@@ -60,7 +60,7 @@ export function CommodityDashboardView({ initialCommodities }: Props) {
     }
 
     return list;
-  }, [initialCommodities, selectedCategory, searchQuery, selectedSort]);
+  }, [currentCommodities, selectedCategory, searchQuery, selectedSort]);
 
   return (
     <div className="flex flex-col gap-8">

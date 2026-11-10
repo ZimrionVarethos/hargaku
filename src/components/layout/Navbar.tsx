@@ -1,234 +1,145 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { List, X, ChatCircleDots } from '@phosphor-icons/react';
-import { RegionSelector } from '@/components/common/RegionSelector';
+import { Robot } from '@phosphor-icons/react';
 import { useAssistant } from '@/lib/store/assistant-store';
+import { useTheme } from '@/lib/store/theme-store';
 
-const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Harga' },
+const NAV_LINKS = [
+  { href: '/#heroSection', label: 'Lorong Pasar' },
+  { href: '/#etagStageSection', label: 'Timbangan' },
+  { href: '/#sorotanSection', label: 'Papan Pokok' },
+  { href: '/#unitPasarSection', label: '13 Unit Pasar' },
   { href: '/cek-harga', label: 'Cek Harga' },
   { href: '/peta', label: 'Peta' },
-  { href: '/lapor', label: 'Lapor Harga' },
-  { href: '/keranjang', label: 'Keranjang' },
+  { href: '/lapor', label: 'Lapor' },
+  { href: '/rekomendasi-ai', label: 'AI Harga' },
 ];
 
 export function Navbar() {
   const { openAssistant } = useAssistant();
+  const { theme, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
-  const [activeHref, setActiveHref] = useState(pathname);
-  const [hoveredHref, setHoveredHref] = useState<string | null>(null);
-  const navRef = useRef<HTMLElement>(null);
 
-  const [activeRect, setActiveRect] = useState<{
-    left: number;
-    width: number;
-    opacity: number;
-  }>({ left: 0, width: 0, opacity: 0 });
-
-  const [hoverRect, setHoverRect] = useState<{
-    left: number;
-    width: number;
-    opacity: number;
-  }>({ left: 0, width: 0, opacity: 0 });
-
-  // Sync activeHref when pathname changes externally (e.g. back button)
-  useEffect(() => {
-    setActiveHref(pathname);
-  }, [pathname]);
-
-  // Update active pill position
-  useEffect(() => {
-    if (!navRef.current) return;
-
-    const updateActivePill = () => {
-      if (!navRef.current) return;
-      const activeLink = navRef.current.querySelector<HTMLAnchorElement>(
-        `[data-nav-href="${activeHref}"]`
-      );
-
-      if (activeLink) {
-        const navRect = navRef.current.getBoundingClientRect();
-        const linkRect = activeLink.getBoundingClientRect();
-        setActiveRect({
-          left: Math.round(linkRect.left - navRect.left),
-          width: Math.round(linkRect.width),
-          opacity: 1,
-        });
-      } else {
-        setActiveRect((prev) => ({ ...prev, opacity: 0 }));
-      }
-    };
-
-    updateActivePill();
-    window.addEventListener('resize', updateActivePill);
-    return () => window.removeEventListener('resize', updateActivePill);
-  }, [activeHref]);
-
-  // Update hover ghost pill position
-  useEffect(() => {
-    if (!navRef.current || !hoveredHref || hoveredHref === activeHref) {
-      setHoverRect((prev) => ({ ...prev, opacity: 0 }));
-      return;
+  const handleQuickSearch = () => {
+    const input = document.getElementById('heroSearchInput') || document.querySelector('input[type="text"]');
+    if (input) {
+      input.focus();
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-
-    const hoveredLink = navRef.current.querySelector<HTMLAnchorElement>(
-      `[data-nav-href="${hoveredHref}"]`
-    );
-
-    if (hoveredLink) {
-      const navRect = navRef.current.getBoundingClientRect();
-      const linkRect = hoveredLink.getBoundingClientRect();
-      setHoverRect({
-        left: Math.round(linkRect.left - navRect.left),
-        width: Math.round(linkRect.width),
-        opacity: 1,
-      });
-    }
-  }, [hoveredHref, activeHref]);
+  };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#FAF9F5]/90 backdrop-blur-md border-b border-[#E5E3DE] transition-all px-4 sm:px-8 lg:px-12">
-      <div className="max-w-[1400px] mx-auto h-[72px] flex items-center justify-between relative">
-        {/* Left: Brand */}
-        <Link href="/" className="flex items-center gap-3 group shrink-0">
-          <div className="w-7 h-7 rounded-[8px] bg-[#EEF773] outline outline-[1.5px] outline-[#1B1A18] -outline-offset-[0.75px] flex items-center justify-center font-bold text-[16px] text-[#1B1A18] shadow-xs transition-transform group-hover:scale-105">
-            H
-          </div>
-          <div className="flex items-baseline">
-            <span className="font-bold text-[20px] tracking-tight text-[#1B1A18]">
-              HargaKu
-            </span>
-            <span className="font-bold text-[22px] text-[#FF7714]">.</span>
-          </div>
+    <header className="sticky top-0 z-40 bg-[var(--bg-paper)]/95 backdrop-blur-xs border-b-2 border-[var(--border-ink)] transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[64px] py-2 flex items-center justify-between gap-3">
+        
+        {/* Brand / Logo */}
+        <Link href="/" className="flex items-center gap-2.5 no-underline shrink-0">
+          <Image
+            src="/images/pasarku/logo-nav.webp"
+            alt="Logo PasarKu"
+            width={110}
+            height={48}
+            priority
+            className="h-9 w-auto object-contain"
+          />
+          <span className="text-xs font-bold px-2 py-0.5 rounded bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-ink)]">
+            Kota Bogor
+          </span>
         </Link>
 
-        {/* Center: Desktop Navigation Pill with Magnetic Slide (True Center) */}
-        <nav
-          ref={navRef}
-          onMouseLeave={() => setHoveredHref(null)}
-          className="absolute left-1/2 -translate-x-1/2 hidden lg:inline-flex items-center p-1 rounded-full bg-white/90 backdrop-blur-xs outline outline-1 outline-[#E5E3DE] shadow-xs"
-        >
-          {/* Subtle Hover Ghost Pill */}
-          <span
-            aria-hidden="true"
-            className="absolute top-1 bottom-1 left-0 rounded-full bg-[#FAF9F5] pointer-events-none transition-[transform,width,opacity] duration-250 ease-[cubic-bezier(0.16,1,0.3,1)]"
-            style={{
-              transform: `translate3d(${hoverRect.left}px, 0, 0)`,
-              width: `${hoverRect.width}px`,
-              opacity: hoverRect.opacity,
-            }}
-          />
-
-          {/* Active Magnetic Dark Pill (GPU Accelerated) */}
-          <span
-            aria-hidden="true"
-            className="absolute top-1 bottom-1 left-0 rounded-full bg-[#1B1A18] pointer-events-none shadow-xs transition-[transform,width,opacity] duration-350 ease-[cubic-bezier(0.16,1,0.3,1)]"
-            style={{
-              transform: `translate3d(${activeRect.left}px, 0, 0)`,
-              width: `${activeRect.width}px`,
-              opacity: activeRect.opacity,
-            }}
-          />
-
-          {NAV_ITEMS.map((item) => {
-            const isActive = activeHref === item.href;
+        {/* Desktop Navigation Links */}
+        <nav aria-label="Navigasi Utama" className="hidden xl:flex items-center gap-1">
+          {NAV_LINKS.map((link) => {
+            const isActive = pathname === link.href || (link.href.startsWith('/#') && pathname === '/');
             return (
               <Link
-                key={item.label}
-                href={item.href}
-                data-nav-href={item.href}
-                onClick={() => setActiveHref(item.href)}
-                onMouseEnter={() => setHoveredHref(item.href)}
-                className={`relative z-10 px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors duration-200 select-none ${
+                key={link.href}
+                href={link.href}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                   isActive
-                    ? 'text-white'
-                    : 'text-[#6E6D67] hover:text-[#1B1A18]'
+                    ? 'text-[var(--accent-chili)] hover:bg-[var(--bg-muted)]'
+                    : 'text-[var(--text-primary)] hover:bg-[var(--bg-muted)]'
                 }`}
               >
-                {item.label}
+                {link.label}
               </Link>
             );
           })}
         </nav>
 
-        {/* Right CTA & Region Selector */}
-        <div className="hidden sm:flex items-center gap-2.5 shrink-0">
-          <RegionSelector variant="pill" />
+        {/* Right Actions: Cari, Mode Subuh/Siang, Tanya AI */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleQuickSearch}
+            aria-label="Fokus ke pencarian komoditas"
+            className="market-btn-secondary px-3 py-1.5 text-xs min-h-[40px] inline-flex items-center gap-1.5"
+          >
+            <svg aria-hidden="true" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <circle cx="11" cy="11" r="7" />
+              <line x1="20" y1="20" x2="16.2" y2="16.2" />
+            </svg>
+            <span className="hidden sm:inline">Cari</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label="Ganti tema tampilan terang atau gelap"
+            className="market-btn-secondary px-3 py-1.5 text-xs min-h-[40px] inline-flex items-center gap-1.5"
+          >
+            <span className="font-bold">
+              {theme === 'dark' ? 'Mode Siang' : 'Mode Subuh'}
+            </span>
+          </button>
+
           <button
             type="button"
             onClick={() => openAssistant()}
-            className="inline-flex items-center justify-center gap-1.5 px-[16px] py-[9px] rounded-[8px] bg-[#EEF773] text-[#1B1A18] outline outline-1 outline-[#1B1A18] -outline-offset-1 text-[13px] font-semibold shadow-[0_2px_0_#1B1A18] hover:bg-[#dce663] active:translate-y-[1px] transition-all cursor-pointer"
+            className="market-btn-primary px-3.5 py-1.5 text-xs min-h-[40px] inline-flex items-center gap-1.5"
           >
-            <ChatCircleDots size={16} weight="fill" className="text-[#1B1A18]" />
-            <span>Tanya Asisten</span>
+            <Robot size={15} weight="bold" />
+            <span className="hidden sm:inline">Rekomendasi AI</span>
+            <span className="sm:hidden">AI</span>
+          </button>
+
+          {/* Mobile hamburger toggle */}
+          <button
+            type="button"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Buka navigasi seluler"
+            className="xl:hidden market-btn-secondary p-2 min-h-[40px]"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              {mobileOpen ? (
+                <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" />
+              ) : (
+                <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
+              )}
+            </svg>
           </button>
         </div>
 
-        {/* Mobile Header Controls */}
-        <div className="flex sm:hidden items-center gap-2">
-          <button
-            type="button"
-            onClick={() => openAssistant()}
-            className="w-8 h-8 rounded-full bg-[#EEF773] outline outline-1 outline-[#1B1A18] flex items-center justify-center text-[#1B1A18] cursor-pointer shadow-xs"
-            title="Tanya Asisten Pangan"
-          >
-            <ChatCircleDots size={16} weight="fill" className="text-[#1B1A18]" />
-          </button>
-          <RegionSelector variant="compact" />
-          <button
-            type="button"
-            aria-label={mobileOpen ? 'Tutup menu' : 'Buka menu'}
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-2 text-[#1B1A18] hover:text-[#FF7714] transition-colors"
-          >
-            {mobileOpen ? <X size={24} weight="bold" /> : <List size={24} weight="bold" />}
-          </button>
-        </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer Menu */}
       {mobileOpen && (
-        <div className="lg:hidden border-b border-[#E5E3DE] bg-[#FAF9F5] px-6 py-4 space-y-3 shadow-lg">
-          <div className="pb-2 border-b border-[#E5E3DE]">
-            <p className="text-[11px] font-bold text-[#8C8B85] uppercase tracking-wider mb-1.5">
-              Wilayah Acuan Belanja
-            </p>
-            <RegionSelector variant="card" />
-          </div>
-          {NAV_ITEMS.map((item) => (
+        <div className="xl:hidden border-t-2 border-[var(--border-ink)] bg-[var(--bg-paper)] px-4 py-3 space-y-1">
+          {NAV_LINKS.map((link) => (
             <Link
-              key={item.label}
-              href={item.href}
+              key={link.href}
+              href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="block px-3 py-2 rounded-[8px] text-[14px] font-medium text-[#1B1A18] hover:bg-[#F4F3F0]"
+              className="block px-3 py-2 rounded-lg text-sm font-bold text-[var(--text-primary)] hover:bg-[var(--bg-muted)]"
             >
-              {item.label}
+              {link.label}
             </Link>
           ))}
-          <div className="pt-2 border-t border-[#E5E3DE] mt-2 space-y-2">
-            <Link
-              href="/tentang"
-              onClick={() => setMobileOpen(false)}
-              className="block px-3 py-2 rounded-[8px] text-[13px] font-medium text-[#6E6D67] hover:text-[#1B1A18] hover:bg-[#F4F3F0]"
-            >
-              Tentang &amp; Sumber Data
-            </Link>
-            <button
-              type="button"
-              onClick={() => {
-                setMobileOpen(false);
-                openAssistant();
-              }}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[8px] bg-[#EEF773] text-[#1B1A18] outline outline-1 outline-[#1B1A18] text-[13px] font-semibold cursor-pointer"
-            >
-              <ChatCircleDots size={17} weight="fill" className="text-[#1B1A18]" />
-              <span>Tanya Asisten Pangan</span>
-            </button>
-          </div>
         </div>
       )}
     </header>

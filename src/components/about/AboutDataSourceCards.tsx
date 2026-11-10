@@ -20,7 +20,7 @@ const DATA_SOURCES: DataSourceItem[] = [
     name: 'Badan Pangan Nasional (Bapanas)',
     institution: 'Republik Indonesia',
     badge: 'Pemerintah Pusat',
-    badgeClass: 'bg-[#FFF3ED] text-[#FF7714] outline-[#FFD9C7]',
+    badgeClass: 'bg-[#FBE9E6] text-[var(--accent-chili)] border border-[var(--accent-chili)]',
     role: 'Lapis 1: Harga Acuan Penjualan (HAP) & HET',
     cadence: 'Regulasi Berkala (Perbadan No. 11/2022 & Update 2024)',
     description:
@@ -34,9 +34,9 @@ const DATA_SOURCES: DataSourceItem[] = [
     name: 'PIHPS Nasional (Bank Indonesia)',
     institution: 'Bank Sentral Republik Indonesia',
     badge: 'Bank Sentral',
-    badgeClass: 'bg-[#FAF9F5] text-[#1B1A18] outline-[#E5E3DE]',
+    badgeClass: 'bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)]',
     role: 'Lapis 2: Rerata Harian Pasar Tradisional Terkalibrasi Wilayah',
-    cadence: 'Pembaruan Harian Pukul 06:00 – 09:00 WIB',
+    cadence: 'Pembaruan Harian Pukul 06:00 s.d. 09:00 WIB',
     description:
       'Survei harga harian terstandar langsung dari pasar-pasar tradisional strategis untuk mengukur tekanan inflasi pangan bergejolak (volatile foods).',
     linkText: 'Kunjungi PIHPS Nasional',
@@ -48,7 +48,7 @@ const DATA_SOURCES: DataSourceItem[] = [
     name: 'Laporan Lapak Warga (Crowdsourcing)',
     institution: 'Komunitas Konsumen & Pembeli Cerdas Indonesia',
     badge: 'Partisipasi Publik',
-    badgeClass: 'bg-[#EEF773]/30 text-[#1B1A18] outline-[#D4DE4B]',
+    badgeClass: 'bg-[#E2EFE6] text-[#245034] border border-[#245034]',
     role: 'Lapis 3: Harga Riil di Kios Lapak Harian',
     cadence: 'Real-time Terverifikasi Konsensus 7 Hari',
     description:
@@ -62,7 +62,7 @@ const DATA_SOURCES: DataSourceItem[] = [
     name: 'TPID & Dinas Perdagangan Daerah',
     institution: 'Pemerintah Daerah & Satgas Pangan',
     badge: 'Pemerintah Daerah',
-    badgeClass: 'bg-[#FAF9F5] text-[#1B1A18] outline-[#E5E3DE]',
+    badgeClass: 'bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)]',
     role: 'Konteks Wilayah: Distribusi & Sentra Pasar Daerah',
     cadence: 'Mingguan & Pemantauan Khusus Hari Besar',
     description:
@@ -76,19 +76,19 @@ const DATA_SOURCES: DataSourceItem[] = [
 export function AboutDataSourceCards() {
   return (
     <section id="sumber-data" className="space-y-5 scroll-mt-24">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pb-1 border-b border-[#E5E3DE]">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pb-1 border-b-2 border-[var(--border-ink)]">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <Database size={18} weight="bold" className="text-[#FF7714]" />
-            <span className="text-[11px] font-bold text-[#FF7714] uppercase tracking-wider">
+            <Database size={18} weight="bold" className="text-[var(--accent-chili)]" />
+            <span className="text-[11px] font-bold text-[var(--accent-chili)] uppercase tracking-wider">
               Katalog Integritas
             </span>
           </div>
-          <h2 className="text-[22px] sm:text-[24px] font-medium text-[#1B1A18] tracking-tight">
+          <h2 className="text-[22px] sm:text-[24px] font-bold text-[var(--text-primary)] tracking-tight">
             Sumber Data Resmi yang Dirujuk
           </h2>
         </div>
-        <div className="text-[12px] text-[#6E6D67]">
+        <div className="text-[12px] text-[var(--text-secondary)]">
           4 pilar data terintegrasi tanpa manipulasi sepihak
         </div>
       </div>
@@ -101,45 +101,45 @@ export function AboutDataSourceCards() {
           return (
             <div
               key={source.id}
-              className="p-6 rounded-[24px] bg-white outline outline-1 outline-[#E5E3DE] flex flex-col justify-between gap-5 shadow-xs hover:outline-[#1B1A18]/30 transition-colors"
+              className="market-card p-6 flex flex-col justify-between gap-5"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <span
-                    className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full outline outline-1 ${source.badgeClass}`}
+                    className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${source.badgeClass}`}
                   >
                     {source.badge}
                   </span>
-                  <div className="w-8 h-8 rounded-[8px] bg-[#FAF9F5] outline outline-1 outline-[#E5E3DE] flex items-center justify-center text-[#1B1A18]">
+                  <div className="w-8 h-8 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-primary)]">
                     <Icon size={18} weight="bold" />
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-[17px] font-bold text-[#1B1A18] leading-snug">
+                  <h3 className="text-[17px] font-bold text-[var(--text-primary)] leading-snug">
                     {source.name}
                   </h3>
-                  <p className="text-[12px] font-medium text-[#FF7714] mt-0.5">
+                  <p className="text-[12px] font-bold text-[var(--accent-chili)] mt-0.5">
                     {source.role}
                   </p>
                 </div>
 
-                <div className="p-2.5 rounded-[12px] bg-[#FAF9F5] outline outline-1 outline-[#E5E3DE] text-[11px] text-[#6E6D67]">
-                  <span className="font-semibold text-[#1B1A18]">Pembaruan: </span>
+                <div className="p-2.5 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)]">
+                  <span className="font-bold text-[var(--text-primary)]">Pembaruan: </span>
                   {source.cadence}
                 </div>
 
-                <p className="text-[13px] text-[#6E6D67] leading-relaxed">
+                <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed">
                   {source.description}
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-[#E5E3DE]">
+              <div className="pt-3 border-t border-[var(--border-subtle)]">
                 <a
                   href={source.href}
                   target={isExternal ? '_blank' : undefined}
                   rel={isExternal ? 'noopener noreferrer' : undefined}
-                  className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#1B1A18] hover:text-[#FF7714] transition-colors"
+                  className="inline-flex items-center gap-1.5 text-[12px] font-bold text-[var(--text-primary)] hover:text-[var(--accent-chili)] transition-colors"
                 >
                   <span>{source.linkText}</span>
                   <ArrowSquareOut size={14} weight="bold" />

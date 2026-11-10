@@ -93,7 +93,7 @@ export function CommodityHeroHeader({ detail, changePercentage = 8.5 }: Props) {
                 : 'bg-[#F4F3F0] text-[#1B1A18]'
             }`}
           >
-            {isRising ? `▲ +${changePercentage}%` : isDropping ? `▼ ${changePercentage}%` : '— 0.0%'}
+            {isRising ? `▲ +${changePercentage}%` : isDropping ? `▼ ${changePercentage}%` : '~ 0.0% Stabil'}
           </span>
           <span className="text-[#78716C]">dibanding 7 hari lalu di {selectedRegion.name}</span>
         </div>

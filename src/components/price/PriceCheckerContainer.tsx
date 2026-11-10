@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { CommoditySummary, Market, PriceCheckResult } from '@/types';
 import { submitPriceCheck } from '@/lib/api/price-check.api';
 import { useRegion } from '@/lib/store/region-store';
+import { useLiveCatalog } from '@/lib/store/use-live-catalog';
 import { PriceCheckForm, TAKARAN_UNITS } from './PriceCheckForm';
 import { PriceEvaluationResultCard } from './PriceEvaluationResultCard';
 import { PriceMethodologyCard } from './PriceMethodologyCard';
@@ -23,6 +24,10 @@ export function PriceCheckerContainer({
   initialMarketId,
 }: Props) {
   const { selectedRegion, regionMarkets } = useRegion();
+  const { commodities: liveCommodities, markets: liveMarkets } = useLiveCatalog(selectedRegion.id);
+
+  const currentCommodities =
+    liveCommodities.length > 0 ? liveCommodities : initialCommodities;
 
   const [selectedCommodityId, setSelectedCommodityId] = useState<string>(
     () => {
@@ -36,7 +41,17 @@ export function PriceCheckerContainer({
     }
   );
 
-  const activeMarkets = regionMarkets.length > 0 ? regionMarkets : initialMarkets;
+  const liveRegionMarkets = useMemo(() => {
+    const filtered = liveMarkets.filter((m) => m.regionId === selectedRegion.id);
+    return filtered.length > 0 ? filtered : liveMarkets;
+  }, [liveMarkets, selectedRegion.id]);
+
+  const activeMarkets =
+    liveRegionMarkets.length > 0
+      ? liveRegionMarkets
+      : regionMarkets.length > 0
+      ? regionMarkets
+      : initialMarkets;
 
   const [takaranAmount, setTakaranAmount] = useState<number>(2);
   const [selectedUnitId, setSelectedUnitId] = useState<string>('ons');
@@ -74,15 +89,15 @@ export function PriceCheckerContainer({
   // Selected commodity object
   const selectedCommodity = useMemo(() => {
     return (
-      initialCommodities.find((c) => c.id === selectedCommodityId) ||
-      initialCommodities[0]
+      currentCommodities.find((c) => c.id === selectedCommodityId) ||
+      currentCommodities[0]
     );
-  }, [initialCommodities, selectedCommodityId]);
+  }, [currentCommodities, selectedCommodityId]);
 
   // Selected market object
   const selectedMarket = useMemo(() => {
-    return initialMarkets.find((m) => m.id === selectedMarketId);
-  }, [initialMarkets, selectedMarketId]);
+    return activeMarkets.find((m) => m.id === selectedMarketId) || initialMarkets.find((m) => m.id === selectedMarketId);
+  }, [activeMarkets, initialMarkets, selectedMarketId]);
 
   // Formatted price handler
   const handlePriceChange = (val: string) => {
@@ -132,7 +147,7 @@ export function PriceCheckerContainer({
       {/* Top Interactive Row: Form + Evaluation Result */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         <PriceCheckForm
-          commodities={initialCommodities}
+          commodities={currentCommodities}
           markets={activeMarkets}
           selectedCommodityId={selectedCommodityId}
           onCommodityChange={setSelectedCommodityId}

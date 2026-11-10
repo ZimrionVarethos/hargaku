@@ -82,7 +82,7 @@ export function CommodityLedgerTable({ commodities }: Props) {
                         ? `▲ +${item.changePercentage}%`
                         : isDropping
                         ? `▼ ${item.changePercentage}%`
-                        : '— 0.0%'}
+                        : '~ 0.0% Stabil'}
                     </span>
                   </td>
 

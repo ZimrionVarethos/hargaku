@@ -1,6 +1,5 @@
 import { ApiResponse, Region } from '@/types';
 import { AssistantChatRequest, AssistantChatResponse, AssistantMessage } from '@/types/assistant';
-import { apiClient, IS_MOCK } from './client';
 import { processAssistantMessage } from '@/lib/assistant/assistant-engine';
 
 export async function sendAssistantMessage(
@@ -13,10 +12,6 @@ export async function sendAssistantMessage(
     minute: '2-digit',
   });
 
-  if (IS_MOCK) {
-    return processAssistantMessage(userText, region);
-  }
-
   try {
     const payload: AssistantChatRequest = {
       message: userText,
@@ -27,21 +22,29 @@ export async function sendAssistantMessage(
       })),
     };
 
-    const res = await apiClient<ApiResponse<AssistantChatResponse>>('/assistant/chat', {
+    const res = await fetch('/api/v1/assistant/chat', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
+
+    const json = (await res.json()) as ApiResponse<AssistantChatResponse>;
+    if (!res.ok || !json.success || !json.data) {
+      throw new Error(json.message || 'Gagal menerima respons asisten');
+    }
 
     return {
       id: `bot_${Date.now()}`,
       role: 'assistant',
       timestamp,
-      content: res.data.reply,
-      suggestedActions: res.data.suggestedActions,
-      referencedCommodities: res.data.referencedCommodities,
+      content: json.data.reply,
+      provider: json.data.provider,
+      model: json.data.model,
+      sourceComparisons: json.data.sourceComparisons,
+      suggestedActions: json.data.suggestedActions,
+      referencedCommodities: json.data.referencedCommodities,
     };
-  } catch (error) {
-    console.warn('Backend assistant API failed, falling back to local grounded engine:', error);
+  } catch {
     return processAssistantMessage(userText, region);
   }
 }

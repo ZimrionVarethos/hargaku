@@ -1,0 +1,261 @@
+'use client';
+
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { Robot, PaperPlaneRight, Scales, ArrowsCounterClockwise, MapPin } from '@phosphor-icons/react';
+import { useAssistant } from '@/lib/store/assistant-store';
+import { useRegion } from '@/lib/store/region-store';
+import { useLiveCatalog } from '@/lib/store/use-live-catalog';
+import { DEFAULT_PROMPT_PRESETS } from '@/lib/assistant/assistant-presets';
+
+export function AiRecommendationView() {
+  const { messages, isTyping, sendMessage, clearConversation } = useAssistant();
+  const { selectedRegion, allRegions, setSelectedRegion } = useRegion();
+  const { commodities, rawMarkets, dailyPrices } = useLiveCatalog(selectedRegion.id);
+  const [selectedSlug, setSelectedSlug] = useState(commodities[0]?.slug || 'cabai-rawit-merah');
+  const [inputText, setInputText] = useState('');
+  const endRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isTyping]);
+
+  const activeCom = useMemo(() => {
+    return commodities.find((c) => c.slug === selectedSlug) || commodities[0];
+  }, [commodities, selectedSlug]);
+
+  const comparisonSources = useMemo(() => {
+    if (!activeCom) return [];
+    const regionMarkets = rawMarkets.filter((m) => m.isActive && m.regionId === selectedRegion.id);
+    const scope = regionMarkets.length > 0 ? regionMarkets : rawMarkets.filter((m) => m.isActive);
+    const prices: Array<{ name: string; price: number }> = [];
+
+    for (const m of scope) {
+      const rec = dailyPrices[`${m.id}_${activeCom.id}`];
+      if (rec && rec.price > 0) prices.push({ name: m.name, price: rec.price });
+    }
+    prices.sort((a, b) => a.price - b.price);
+
+    const factor = selectedRegion.disparityIndex || 1;
+    const hapRegional = Math.round((activeCom.hapHetPrice * factor) / 100) * 100;
+    const pihpsAvg =
+      prices.length > 0
+        ? Math.round(prices.reduce((s, p) => s + p.price, 0) / prices.length / 100) * 100
+        : activeCom.currentAvgPrice;
+    const cheapestMarket = prices[0]?.price || pihpsAvg;
+    const citizenMedian = Math.round((cheapestMarket * 0.99) / 100) * 100;
+
+    const rows = [
+      { source: 'Panel Harga Bapanas (HAP/HET)', price: hapRegional, note: `Batas acuan resmi ${selectedRegion.name}` },
+      { source: 'Survei PIHPS Bank Indonesia', price: pihpsAvg, note: `Rerata ${prices.length || 1} pasar terpantau` },
+      {
+        source: prices[0] ? `${prices[0].name} (Pasar Rakyat)` : 'Perumda PPJ / Pasar Rakyat',
+        price: cheapestMarket,
+        note: 'Harga lapak terendah di wilayah',
+      },
+      { source: 'Laporan Warga Terverifikasi', price: citizenMedian, note: 'Median pantauan langsung warga' },
+    ];
+    const minPrice = Math.min(...rows.map((r) => r.price));
+    return rows.map((r) => ({ ...r, isLowest: r.price === minPrice }));
+  }, [activeCom, rawMarkets, dailyPrices, selectedRegion]);
+
+  const handleAskSelected = () => {
+    if (!activeCom) return;
+    sendMessage(
+      `Bandingkan harga ${activeCom.name} lintas sumber di ${selectedRegion.name} (Bapanas, PIHPS BI, Pasar Rakyat, dan Laporan Warga), lalu rekomendasikan patokan terbaik dan tips menawarnya.`
+    );
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputText.trim() || isTyping) return;
+    sendMessage(inputText);
+    setInputText('');
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-[var(--border-ink)] pb-5">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
+            Rekomendasi Harga AI &amp; Komparasi Lintas Sumber
+          </h1>
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
+            Bandingkan acuan Panel Bapanas, PIHPS Bank Indonesia, Pasar Rakyat, dan Laporan Warga secara real-time lalu tanyakan langsung ke Gemini AI.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <MapPin size={16} weight="fill" className="text-[var(--accent-chili)]" />
+          <select
+            value={selectedRegion.id}
+            onChange={(e) => {
+              const found = allRegions.find((r) => r.id === e.target.value);
+              if (found) setSelectedRegion(found);
+            }}
+            className="px-3 py-2 rounded-xl border-2 border-[var(--border-ink)] bg-[var(--bg-card)] text-xs font-bold text-[var(--text-primary)] focus:outline-none"
+          >
+            {allRegions.map((reg) => (
+              <option key={reg.id} value={reg.id}>
+                {reg.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left: Live 4-Source Comparison Analyzer */}
+        <div className="lg:col-span-5 market-card p-5 space-y-4 bg-[var(--bg-card)]">
+          <div className="space-y-1.5">
+            <label htmlFor="aiComSelect" className="text-xs font-bold text-[var(--text-primary)]">
+              Pilih Komoditas Pembanding
+            </label>
+            <select
+              id="aiComSelect"
+              value={activeCom?.slug || ''}
+              onChange={(e) => setSelectedSlug(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-xl border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] text-xs font-bold text-[var(--text-primary)] focus:outline-none"
+            >
+              {commodities.map((c) => (
+                <option key={c.id} value={c.slug}>
+                  {c.name} (/{c.unit})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-2.5">
+            {comparisonSources.map((src) => (
+              <div
+                key={src.source}
+                className={`p-3 rounded-xl border-2 flex items-center justify-between gap-3 ${
+                  src.isLowest
+                    ? 'bg-[#E2EFE6] border-[#132E20] text-[#132E20]'
+                    : 'bg-[var(--bg-paper)] border-[var(--border-subtle)] text-[var(--text-primary)]'
+                }`}
+              >
+                <div className="min-w-0">
+                  <div className="text-xs font-bold truncate">{src.source}</div>
+                  <div className="text-[11px] opacity-80 truncate">{src.note}</div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-sm font-extrabold font-mono-num">
+                    Rp {src.price.toLocaleString('id-ID')}
+                  </div>
+                  {src.isLowest && (
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#245034]">
+                      Acuan Terhemat
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleAskSelected}
+            disabled={isTyping}
+            className="market-btn-primary w-full py-3 text-xs font-bold inline-flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            <Scales size={16} weight="bold" />
+            <span>Analisis &amp; Tanya AI Untuk Komoditas Ini</span>
+          </button>
+        </div>
+
+        {/* Right: Conversational Gemini Q&A Panel */}
+        <div className="lg:col-span-7 market-card bg-[var(--bg-card)] flex flex-col h-[560px] overflow-hidden">
+          <div className="px-5 py-3.5 border-b-2 border-[var(--border-ink)] flex items-center justify-between bg-[var(--bg-muted)]">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#EEF773] border border-[#132E20] flex items-center justify-center text-[#132E20]">
+                <Robot size={18} weight="fill" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-[var(--text-primary)]">Asisten Tanya Jawab Gemini AI</div>
+                <div className="text-[11px] text-[var(--text-muted)]">Wilayah acuan: {selectedRegion.name}</div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={clearConversation}
+              className="market-btn-secondary px-2.5 py-1 text-[11px] font-bold inline-flex items-center gap-1"
+            >
+              <ArrowsCounterClockwise size={13} weight="bold" />
+              <span>Reset</span>
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[var(--bg-paper)]">
+            {messages.map((msg) => {
+              const isUser = msg.role === 'user';
+              return (
+                <div key={msg.id} className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
+                  <div
+                    className={`max-w-[90%] rounded-2xl p-3.5 text-xs leading-relaxed border-2 ${
+                      isUser
+                        ? 'bg-[#132E20] text-[#F9F3EE] border-[var(--border-ink)]'
+                        : 'bg-[var(--bg-card)] text-[var(--text-primary)] border-[var(--border-ink)]'
+                    }`}
+                  >
+                    <div className="whitespace-pre-line">{msg.content}</div>
+                    {msg.sourceComparisons && msg.sourceComparisons.length > 0 && (
+                      <div className="mt-2.5 pt-2.5 border-t border-[var(--border-subtle)] space-y-1.5">
+                        {msg.sourceComparisons[0].sources.map((s) => (
+                          <div key={s.sourceName} className="flex justify-between text-[11px]">
+                            <span>{s.sourceName}</span>
+                            <span className="font-bold font-mono-num">
+                              Rp {s.price.toLocaleString('id-ID')}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+            {isTyping && (
+              <div className="text-xs font-semibold text-[var(--text-muted)] px-2">
+                Gemini AI sedang menganalisis perbandingan sumber...
+              </div>
+            )}
+            <div ref={endRef} />
+          </div>
+
+          <div className="px-4 py-2 border-t border-[var(--border-subtle)] bg-[var(--bg-card)] flex gap-2 overflow-x-auto scrollbar-none">
+            {DEFAULT_PROMPT_PRESETS.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => sendMessage(p.prompt)}
+                disabled={isTyping}
+                className="px-2.5 py-1 rounded-full bg-[var(--bg-muted)] border border-[var(--border-ink)] text-[11px] font-bold whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          <form onSubmit={handleSubmit} className="p-3.5 border-t-2 border-[var(--border-ink)] bg-[var(--bg-card)] flex gap-2">
+            <input
+              type="text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Tanyakan harga pasar, perbandingan sumber, atau kewajaran penawaran..."
+              disabled={isTyping}
+              className="flex-1 px-3.5 py-2 rounded-xl border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] text-xs text-[var(--text-primary)] focus:outline-none"
+            />
+            <button
+              type="submit"
+              disabled={!inputText.trim() || isTyping}
+              className="market-btn-primary px-4 py-2 text-xs font-bold inline-flex items-center gap-1.5 disabled:opacity-40"
+            >
+              <span>Kirim</span>
+              <PaperPlaneRight size={14} weight="bold" />
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}

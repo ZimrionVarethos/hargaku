@@ -27,10 +27,10 @@ export function AssistantProvider({ children }: { children: React.ReactNode }) {
       id: 'welcome_1',
       role: 'assistant',
       timestamp: '06:00',
-      content: `Halo! Saya **Asisten Pangan HargaKu**. Saya siap membantu menghitung resep masakan, membedah budget belanja, atau mengecek apakah tawaran harga pedagang di pasar wajar atau lebih mahal dari rata-rata.`,
+      content: `Halo! Saya **Asisten Rekomendasi Harga HargaKu** (Gemini AI). Saya membandingkan data **Panel Harga Bapanas**, **PIHPS BI**, **Pasar Rakyat / Perumda PPJ**, dan **Laporan Warga Terverifikasi** untuk menilai kewajaran harga dan menjawab pertanyaanmu.`,
       suggestedActions: [
         { label: 'Cek Harga Wajar', href: '/cek-harga' },
-        { label: 'Keranjang Belanja', href: '/keranjang' },
+        { label: 'Halaman AI Multi-Sumber', href: '/rekomendasi-ai' },
       ],
     },
   ]);

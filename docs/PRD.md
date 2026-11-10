@@ -26,8 +26,8 @@ HargaKu hadir sebagai **pendamping belanja pangan cerdas** yang memberikan acuan
 3. **Lapis 3 — Laporan Partisipatif Warga (Crowdsourcing)**: Harga riil di level lapak pasar lokal yang dilaporkan langsung oleh warga dengan bukti foto nota/timbangan terverifikasi.
 
 #### Dua Momen Kunci Penggunaan (*The Two Critical Moments*)
-* **Momen 1 — Dari Rumah (Pra-Belanja)**: Sebelum berangkat ke pasar, warga mengecek apakah komoditas tertentu sedang naik atau turun hari ini di provinsinya, melihat estimasi anggaran di Keranjang Belanja, dan memilih pasar tradisional mana yang paling hemat.
-* **Momen 2 — Di Depan Lapak (Saat Belanja)**: Saat pedagang menawarkan harga ("Cabai Rp 80.000/kg"), warga langsung memasukkan nominal tersebut ke fitur **Cek Harga Wajar** di HP $\rightarrow$ dalam hitungan detik sistem mendeteksi apakah harga tersebut wajar atau pedagang mematok harga berlebihan di atas acuan provinsi bersangkutan, dan dapat langsung menyimpannya ke Keranjang Belanja.
+* **Momen 1: Dari Rumah (Pra-Belanja)**: Sebelum berangkat ke pasar, warga mengecek apakah komoditas tertentu sedang naik atau turun hari ini di provinsinya, meminta rekomendasi multi-sumber kepada **AI HargaKu**, dan memilih pasar tradisional yang paling wajar.
+* **Momen 2: Di Depan Lapak (Saat Belanja)**: Saat pedagang menawarkan harga ("Cabai Rp 80.000/kg"), warga langsung memasukkan nominal tersebut ke fitur **Cek Harga Wajar** di HP -> dalam hitungan detik sistem mendeteksi apakah harga tersebut wajar atau melampaui acuan provinsi, dan warga bisa langsung berkonsultasi ke **AI HargaKu** untuk saran tawar dan perbandingan sumber.
 
 ### 1.3. Cakupan Wilayah & Penempatan UI Selector
 * **Cakupan Wilayah**: **Standarisasi Tingkat Provinsi Berbasis 6 Koridor Pulau**. Pengguna dapat memilih provinsi dengan acuan resmi Bapanas.
@@ -58,7 +58,7 @@ HargaKu hadir sebagai **pendamping belanja pangan cerdas** yang memberikan acuan
 * **Key Flow**:
   1. **Sebelum Berangkat (Dari Rumah)**: Membuka HargaKu, memilih daerahnya (misal: "Kota Bogor"), melihat grafik tren harian di Dashboard apakah cabai atau telur sedang naik atau turun minggu ini.
   2. **Saat di Pasar (Depan Lapak)**: Ditawari cabai rawit Rp 75.000/kg oleh pedagang. Bu Retno membuka **Cek Harga Wajar**, memilih komoditas dan pasar tempat ia belanja, lalu memasukkan harga Rp 75.000.
-  3. **Hasil Instan**: Sistem menampilkan status: **"▲ Agak Mahal (+15% di atas acuan wajar daerah)"** dengan acuan HAP terkalibrasi Rp 65.000, serta tombol instan untuk menyimpannya ke Keranjang Belanja.
+  3. **Hasil Instan**: Sistem menampilkan status: **"▲ Agak Mahal (+15% di atas acuan wajar daerah)"** dengan acuan HAP terkalibrasi Rp 65.000, serta tombol instan untuk menanyakan rekomendasi lintas sumber ke AI HargaKu.
   4. Bu Retno dapat menawar dengan percaya diri menggunakan acuan resmi atau beralih ke lapak/pasar lain.
 
 ### Persona 2: Pak Jajang (Pedagang Sayur Keliling / Warung)
@@ -105,7 +105,7 @@ HargaKu hadir sebagai **pendamping belanja pangan cerdas** yang memberikan acuan
      * Deviasi `[+10% s.d. +25%]`: **Agak Mahal** (Badge Oranye/Amber — Terindikasi di atas harga rata-rata).
      * Deviasi `> +25%`: **Terlalu Mahal** (Badge Merah — Peringatan harga terlalu tinggi).
      * Deviasi `< -15%`: **Jauh Lebih Murah** (Badge Biru — Peringatan cek kesegaran atau akurasi timbangan pedagang).
-  3. **Integrasi ke Keranjang**: Tombol instan `[+ Masukkan ke Keranjang Belanja]` untuk menyimpan komoditas yang dicek ke daftar belanja mingguan.
+  3. **Konsultasi AI Multi-Sumber**: Tombol instan `[Tanya Rekomendasi AI Multi-Sumber]` untuk meminta Gemini AI membandingkan acuan PIHPS, Bapanas, Perumda PPJ, dan laporan warga.
 
 ### Modul 4: Halaman Tentang & Sumber Data (Fase A)
 * Pernyataan transparansi metodologi data.
@@ -123,31 +123,22 @@ HargaKu hadir sebagai **pendamping belanja pangan cerdas** yang memberikan acuan
 * Tabel peringkat pasar terurut dari paling hemat ke tertinggi dengan kolom berdampingan: `Harga Lapak`, `Rerata Wilayah`, dan `Selisih (%)`.
 * Mode Ringan (*Tabel Langsung*) untuk akses cepat dan rute navigasi langsung ke Google Maps.
 
-### Modul 7: Kalkulator Keranjang Belanja & Bagikan Catatan (Fase B)
-* Pengguna dapat memilih beberapa bahan belanjaan sekaligus (misal: 5 kg beras, 1 kg telur, 250 gr cabai, 2 liter minyak).
-* Komparasi dinamis multi-wilayah: sistem otomatis menghitung total belanja di pasar-pasar terdaftar pada wilayah/provinsi aktif.
-* Rekomendasi pasar paling hemat dan potensi penghematan nominal.
-* **Fitur Berbagi WhatsApp**: Satu klik untuk menyalin format catatan belanja rapi ke clipboard dan membuka aplikasi WhatsApp.
+### Modul 7: Rekomendasi AI Multi-Sumber & Tanya Jawab Harga (Menggantikan Keranjang)
+* Karena HargaKu berfokus penuh pada transparansi & pengecekan harga (bukan e-commerce), fitur keranjang belanja dihapus dan digantikan oleh **Rekomendasi AI HargaKu** (`/rekomendasi-ai` & Drawer Tanya AI).
+* AI (didukung Google Gemini API dengan kunci dinamis dari Supabase `system_settings`) membandingkan harga dari **beberapa sumber resmi dan warga** (`PIHPS Bank Indonesia`, `Panel Harga Bapanas`, `Perumda Pasar Pakuan Jaya / Pasar Rakyat`, dan `Laporan Warga Terverifikasi`) sesuai wilayah aktif (`selectedRegion`).
+* Pengguna dapat langsung **bertanya secara bebas** (contoh: *"Lebih hemat beli Cabai Rawit berdasarkan acuan mana?"*, *"Ayam 45rb/kg di pasar wajar gak?"*, atau *"Bandingkan sumber harga beras & minyak minggu ini"*).
 
-### Modul 8: Portal Admin Moderasi & CRUD Dashboard Terpadu (Fase B)
+### Modul 8: Portal Admin Moderasi, Supabase CRUD, & Pengaturan AI Dinamis
+* **Integrasi Supabase PostgreSQL**: Seluruh CRUD komoditas, pasar tradisional, entri harga harian (`daily_prices`), moderasi laporan warga (`citizen_reports`), dan konfigurasi API tersimpan langsung di database Supabase.
+* **Modul Pengaturan & Integrasi AI Dinamis (`system_settings`)**: Admin dapat mengganti **Gemini API Key**, memilih model aktif (misal `gemini-3.8-flash`), mengatur instruksi dasar, serta menguji koneksi API Gemini langsung dari Dashboard Admin tanpa mengubah kode sumber atau deploy ulang.
 * **Tata Letak Sidebar SaaS**: Konsol kerja terpadu bagi administrator & tim pemantau pasar.
-* **Modul Moderasi Laporan Warga**: Peninjauan antrean laporan warga, inspeksi foto nota berlabel privasi, pendeteksian anomali statistik MAD, dan aksi persetujuan/penolakan.
-* **CRUD Master Komoditas Pangan**: Tambah, edit, aktifkan/nonaktifkan komoditas, penyesuaian harga acuan HAP/HET Bapanas, dan pengaturan ambang batas toleransi.
-* **CRUD Pasar Tradisional**: Tambah, edit, kelola titik koordinat peta GPS Leaflet, jam operasional bongkar muat, dan komoditas sentra unggulan pasar di 21 wilayah.
-* **Fast-Entry Entri Harga Resmi Harian**: Matriks input cepat harga survei resmi harian (06:00 WIB) per pasar untuk memperbarui data rata-rata kota yang langsung tampil di website publik.
-* **Ringkasan Kesehatan Data**: Monitoring kelengkapan input harga harian dan antrean moderasi.
-* **Profil Petugas & Manajemen Sesi**: Dropdown identitas akun, modal profil & keamanan kata sandi, dan mekanisme logout/keluar aman.
+* **Modul Moderasi Laporan Warga**: Peninjauan antrean laporan warga, pendeteksian anomali statistik MAD, dan aksi persetujuan/penolakan.
+* **CRUD Master Komoditas & Pasar Tradisional**: Pengelolaan lengkap komoditas dan pasar di seluruh koridor wilayah.
+* **Fast-Entry Entri Harga Resmi Harian**: Matriks input cepat harga survei harian per pasar yang langsung memperbarui data publik dan harga lapak 3D.
 
-### Modul 9: Asisten Pangan AI (Konsultan Belanja & Anggaran Dapur Interaktif)
-* **Persona & Peran**: "Asisten Pangan Cerdas HargaKu" — bot konsultasi belanja pangan ramah keluarga dan pedagang yang *grounded* pada dataset resmi Bapanas, PIHPS BI, dan koridor wilayah aktif (`selectedRegion`).
-* **Kapabilitas Utama**:
-  1. **Simulasi Anggaran & Resep Masakan**: Menghitung estimasi rincian harga bahan untuk resep tertentu (misal sop ayam, rendang, sambal goreng) dengan budget yang dimiliki pengguna.
-  2. **Evaluasi Penawaran Lapak Conversational**: Pengguna mengetik tawaran pedagang (misal *"cabai rawit 25rb seperempat kilo kemahalan gak?"*), bot menormalisasi harga per kg dan membandingkan terhadap acuan wajar wilayah secara instan.
-  3. **Rekomendasi Lauk & Komoditas Hemat**: Memberikan saran bahan masakan yang sedang berstatus `Murah` / tren turun di pasar tradisional hari ini.
-  4. **Cek Harga Cepat Berbasis Teks**: Menjawab pertanyaan harga komoditas terkini di pasar tanpa harus mencari manual di tabel.
-* **Integrasi UI & Penempatan**:
-  * Menggantikan tombol redundan `[ Cek Harga ]` di Top Navbar dengan signature button **`[ ✨ Asisten Pangan ]`**.
-  * Dilengkapi **Slide-over Drawer** (panel geser samping mulus) serta quick prompt suggestion chips untuk memudahkan interaksi dengan satu ketukan jari.
+### Modul 9: Slide-Over Drawer Konsultasi Harga AI (`/api/v1/assistant/chat`)
+* Menggantikan tombol Keranjang di Top Navbar dengan tombol primer **`[ Rekomendasi AI ]`** yang membuka **Slide-over Drawer** interaktif maupun halaman penuh `/rekomendasi-ai`.
+* Grounded 100% pada data Supabase (`commodities`, `daily_prices`, `citizen_reports`) dan komparasi multi-sumber real-time.
 
 ---
 

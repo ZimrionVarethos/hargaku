@@ -82,7 +82,7 @@ export function TactileCommodityCard({ commodity }: Props) {
               ? `▲ +${commodity.changePercentage}%`
               : isDropping
               ? `▼ ${commodity.changePercentage}%`
-              : '— 0.0%'}
+              : '~ 0.0% Stabil'}
           </span>
           <span className="text-[#8C8B85]">dibanding 7 hari lalu</span>
         </div>

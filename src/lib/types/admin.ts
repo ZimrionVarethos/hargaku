@@ -64,7 +64,8 @@ export type AdminModule =
   | 'reports'
   | 'commodities'
   | 'markets'
-  | 'daily-prices';
+  | 'daily-prices'
+  | 'settings';
 
 export interface AdminUserProfile {
   id: string;

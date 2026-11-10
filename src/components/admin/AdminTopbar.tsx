@@ -2,13 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { List, ArrowSquareOut } from '@phosphor-icons/react';
+import { List, ArrowSquareOut, Database } from '@phosphor-icons/react';
+import { useAdminStore } from '@/lib/store/admin-store';
 
 interface AdminTopbarProps {
   onOpenMobileSidebar: () => void;
 }
 
 export function AdminTopbar({ onOpenMobileSidebar }: AdminTopbarProps) {
+  const { dataSource } = useAdminStore();
+
   return (
     <header className="w-full bg-white border border-[#E5E3DE] rounded-[20px] px-4 sm:px-6 py-3.5 shadow-sm flex items-center justify-between gap-4">
       {/* Brand & Mobile Toggle */}
@@ -42,8 +45,18 @@ export function AdminTopbar({ onOpenMobileSidebar }: AdminTopbarProps) {
         </div>
       </div>
 
-      {/* Public Site Shortcut */}
-      <div className="flex items-center gap-3">
+      {/* DB Status & Public Site Shortcut */}
+      <div className="flex items-center gap-2.5">
+        <span
+          className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold border ${
+            dataSource === 'supabase'
+              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+              : 'bg-amber-50 text-amber-800 border-amber-200'
+          }`}
+        >
+          <Database size={13} weight="bold" />
+          <span>{dataSource === 'supabase' ? 'Supabase DB Live' : 'Mode Fallback Lokal'}</span>
+        </span>
         <Link
           href="/"
           className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#FAF9F5] hover:bg-[#F4F3F0] text-[#1B1A18] border border-[#E5E3DE] text-xs font-semibold transition-colors shadow-2xs"

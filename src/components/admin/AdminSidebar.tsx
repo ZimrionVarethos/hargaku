@@ -15,6 +15,7 @@ import {
   Plant,
   Storefront,
   Lightning,
+  GearSix,
   ArrowsCounterClockwise,
   SignOut,
   Question,
@@ -48,73 +49,30 @@ export function AdminSidebar({
     router.push('/admin/login');
   };
 
-  const rawName = user?.name || user?.fullName || 'Admin';
-  const displayName = rawName.toLowerCase().includes('hendra') ? 'Admin' : rawName;
-  const avatarSrc =
-    user?.avatarUrl ||
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80';
+  const pendingReportsCount = reports.filter((r) => r.status === 'PENDING').length;
 
-  const pendingReportsCount = reports.filter(
-    (r) => r.status === 'PENDING' || r.status === 'ANOMALY'
-  ).length;
-
-  const menuItems: Array<{
-    id: AdminModule;
-    label: string;
-    description: string;
-    icon: React.ComponentType<{ size?: number; weight?: 'regular' | 'bold' | 'fill' }>;
-    badge?: number;
-    badgeColor?: string;
-  }> = [
-    {
-      id: 'overview',
-      label: 'Ringkasan',
-      description: 'Kesehatan & metrik pangan',
-      icon: ChartBar,
-    },
+  const menuItems: { id: AdminModule; label: string; icon: React.ReactNode; badge?: number }[] = [
+    { id: 'overview', label: 'Ringkasan Eksekutif', icon: <ChartBar size={18} weight="bold" /> },
     {
       id: 'reports',
       label: 'Moderasi Laporan',
-      description: 'Verifikasi nota & anomali',
-      icon: ShieldCheck,
-      badge: pendingReportsCount,
-      badgeColor: 'bg-[#FF7714] text-white',
+      icon: <ShieldCheck size={18} weight="bold" />,
+      badge: pendingReportsCount > 0 ? pendingReportsCount : undefined,
     },
-    {
-      id: 'commodities',
-      label: 'Katalog Komoditas',
-      description: 'Master data & batas harga',
-      icon: Plant,
-    },
-    {
-      id: 'markets',
-      label: 'Pasar Tradisional',
-      description: 'Titik pantau & koordinat GPS',
-      icon: Storefront,
-    },
-    {
-      id: 'daily-prices',
-      label: 'Entri Harga Harian',
-      description: 'Matriks survei 06:00 WIB',
-      icon: Lightning,
-    },
+    { id: 'commodities', label: 'Katalog Komoditas', icon: <Plant size={18} weight="bold" />, badge: commodities.length },
+    { id: 'markets', label: 'Sentra Pasar', icon: <Storefront size={18} weight="bold" />, badge: markets.length },
+    { id: 'daily-prices', label: 'Entri Harga Harian', icon: <Lightning size={18} weight="bold" /> },
+    { id: 'settings', label: 'Integrasi AI & API', icon: <GearSix size={18} weight="bold" /> },
   ];
 
-  const handleReset = () => {
-    setIsResetConfirmOpen(true);
-  };
-
   const navContent = (
-    <div className="flex flex-col h-full justify-between gap-6">
-      <div className="space-y-1.5">
-        <div className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-[#A8A29E]">
-          Menu Utama Admin
+    <div className="flex flex-col justify-between h-full space-y-4">
+      <div className="space-y-1">
+        <div className="px-3 pb-2 text-[11px] font-bold tracking-wider text-[#A8A29E] uppercase">
+          Menu Operasional
         </div>
-
         {menuItems.map((item) => {
           const isActive = activeModule === item.id;
-          const Icon = item.icon;
-
           return (
             <button
               key={item.id}
@@ -123,40 +81,20 @@ export function AdminSidebar({
                 onSelectModule(item.id);
                 onCloseMobile();
               }}
-              className={`w-full text-left px-3.5 py-3 rounded-2xl border transition-all flex items-center justify-between group ${
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
                 isActive
-                  ? 'bg-white border-[#1B1A18] shadow-[2px_2px_0px_#1B1A18] text-[#1B1A18]'
-                  : 'bg-transparent border-transparent hover:bg-white hover:border-[#E5E3DE] text-[#44403C]'
+                  ? 'bg-[#1B1A18] text-white shadow-xs'
+                  : 'text-[#706E6A] hover:bg-white hover:text-[#1B1A18]'
               }`}
             >
-              <div className="flex items-center gap-3 min-w-0">
-                <div
-                  className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                    isActive
-                      ? 'bg-[#EEF773] text-[#1B1A18] border border-[#1B1A18]'
-                      : 'bg-[#F4F3F0] text-[#706E6A] group-hover:bg-[#FAF9F5]'
-                  }`}
-                >
-                  <Icon size={18} weight={isActive ? 'bold' : 'regular'} />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span
-                    className={`text-sm font-medium truncate ${
-                      isActive ? 'text-[#1B1A18] font-semibold' : 'text-[#292524]'
-                    }`}
-                  >
-                    {item.label}
-                  </span>
-                  <span className="text-[11px] text-[#A8A29E] truncate">
-                    {item.description}
-                  </span>
-                </div>
+              <div className="flex items-center gap-2.5">
+                <span className={isActive ? 'text-[#FF7714]' : 'text-[#706E6A]'}>{item.icon}</span>
+                <span>{item.label}</span>
               </div>
-
-              {item.badge !== undefined && item.badge > 0 && (
+              {item.badge !== undefined && (
                 <span
-                  className={`ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
-                    item.badgeColor || 'bg-[#1B1A18] text-white'
+                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                    isActive ? 'bg-white/20 text-white' : 'bg-[#FAF9F5] text-[#706E6A] border border-[#E5E3DE]'
                   }`}
                 >
                   {item.badge}
@@ -167,63 +105,47 @@ export function AdminSidebar({
         })}
       </div>
 
-      {/* Pinned Bottom Area: Profile & Utility */}
-      <div className="pt-3 border-t border-[#E5E3DE] mt-auto flex flex-col gap-2 shrink-0">
-        {/* User Profile Card */}
-        <div className="p-2 rounded-2xl bg-white border border-[#E5E3DE] flex items-center justify-between gap-2 shadow-2xs">
-          <button
-            type="button"
-            onClick={() => setIsProfileOpen(true)}
-            className="flex items-center gap-2.5 min-w-0 flex-1 text-left hover:opacity-85 transition-opacity cursor-pointer"
-            title="Buka Profil & Pengaturan Akun"
-          >
-            <div className="relative w-8 h-8 rounded-full overflow-hidden border border-[#E5E3DE] bg-neutral-100 shrink-0">
-              <img
-                src={avatarSrc}
-                alt={displayName}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-xs font-bold text-[#1B1A18] truncate leading-tight">
-                {displayName}
-              </span>
-              <span className="text-[10px] text-[#706E6A] truncate">
-                Petugas Pengawas
-              </span>
-            </div>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsLogoutModalOpen(true)}
-            className="p-1.5 rounded-lg text-[#A8A29E] hover:text-[#DC2626] hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
-            title="Keluar dari Konsol Admin"
-          >
-            <SignOut size={16} weight="bold" />
-          </button>
-        </div>
-
-        {/* Reset Demo & Help Utilities */}
-        <div className="px-2 flex items-center justify-between text-[11px] text-[#A8A29E]">
-          <button
-            type="button"
-            onClick={handleReset}
-            className="hover:text-[#1B1A18] transition-colors flex items-center gap-1.5 cursor-pointer"
-            title="Kembalikan data ke simulasi awal"
-          >
-            <ArrowsCounterClockwise size={12} weight="bold" />
-            <span>Reset Demo</span>
-          </button>
-
+      <div className="space-y-2 pt-3 border-t border-[#E5E3DE]">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setIsHelpOpen(true)}
-            className="hover:text-[#1B1A18] transition-colors flex items-center gap-1 cursor-pointer"
-            title="Panduan Operasional & Bantuan Admin"
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#706E6A] bg-white border border-[#E5E3DE] hover:text-[#1B1A18] hover:border-[#1B1A18] transition-colors cursor-pointer"
           >
-            <Question size={12} weight="bold" />
+            <Question size={14} weight="bold" />
             <span>Bantuan</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsResetConfirmOpen(true)}
+            title="Reset Data Simulasi"
+            className="p-2 rounded-xl text-[#706E6A] bg-white border border-[#E5E3DE] hover:text-[#DC2626] hover:border-[#DC2626] transition-colors cursor-pointer"
+          >
+            <ArrowsCounterClockwise size={14} weight="bold" />
+          </button>
+        </div>
+
+        <div className="p-3 rounded-2xl bg-white border border-[#E5E3DE] shadow-2xs flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => setIsProfileOpen(true)}
+            className="flex items-center gap-2.5 min-w-0 text-left hover:opacity-80 transition-opacity cursor-pointer"
+          >
+            <div className="w-8 h-8 rounded-full bg-[#1B1A18] text-white font-bold text-xs flex items-center justify-center shrink-0">
+              {user.name.charAt(0)}
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs font-bold text-[#1B1A18] truncate">{user.name}</div>
+              <div className="text-[10px] text-[#A8A29E] truncate">{user.email}</div>
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsLogoutModalOpen(true)}
+            title="Keluar Akun"
+            className="p-1.5 text-[#706E6A] hover:text-[#DC2626] rounded-lg transition-colors cursor-pointer"
+          >
+            <SignOut size={16} weight="bold" />
           </button>
         </div>
       </div>
@@ -232,23 +154,16 @@ export function AdminSidebar({
 
   return (
     <>
-      {/* Desktop Sticky Full-Height Sidebar - Perfectly sized to fit viewport on load */}
-      <aside className="hidden lg:flex flex-col justify-between w-[240px] shrink-0 bg-[#FAF9F5] p-2.5 border border-[#E5E3DE] rounded-[24px] sticky top-6 h-[calc(100vh-8.5rem)] min-h-[480px] shadow-2xs">
+      <aside className="hidden lg:block w-[240px] shrink-0 sticky top-24 self-start bg-[#FAF9F5] rounded-3xl p-4 border border-[#E5E3DE] shadow-xs">
         {navContent}
       </aside>
 
-      {/* Mobile Drawer Overlay */}
       {isOpenMobile && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
-          <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
-            onClick={onCloseMobile}
-          />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity" onClick={onCloseMobile} />
           <div className="relative w-[280px] max-w-[85vw] bg-[#FAF9F5] h-full p-5 shadow-2xl flex flex-col justify-between border-r border-[#E5E3DE] z-10">
             <div className="flex items-center justify-between pb-4 border-b border-[#E5E3DE]">
-              <span className="font-semibold text-sm text-[#1B1A18]">
-                Navigasi Admin
-              </span>
+              <span className="font-semibold text-sm text-[#1B1A18]">Navigasi Admin</span>
               <button
                 type="button"
                 onClick={onCloseMobile}
@@ -262,19 +177,8 @@ export function AdminSidebar({
         </div>
       )}
 
-      {/* Profile Management Modal */}
-      <AdminProfileModal
-        isOpen={isProfileOpen}
-        onClose={() => setIsProfileOpen(false)}
-      />
-
-      {/* Help & Support Modal */}
-      <AdminHelpModal
-        isOpen={isHelpOpen}
-        onClose={() => setIsHelpOpen(false)}
-      />
-
-      {/* Logout Confirmation Modal */}
+      <AdminProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
+      <AdminHelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <AdminConfirmModal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
@@ -285,8 +189,6 @@ export function AdminSidebar({
         cancelLabel="Batal"
         variant="warning"
       />
-
-      {/* Reset Confirmation Modal */}
       <AdminConfirmModal
         isOpen={isResetConfirmOpen}
         onClose={() => setIsResetConfirmOpen(false)}

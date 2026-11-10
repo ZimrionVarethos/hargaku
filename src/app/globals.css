@@ -1,123 +1,284 @@
 @import "tailwindcss" source(none);
 @source "../";
 
-@font-face {
-  font-family: 'Roobertvf';
-  src: url('/fonts/clay.com/647b16174b38dc95.woff2') format('woff2');
-  font-display: swap;
-  font-weight: 300 900;
+:root,
+html[data-theme="light"] {
+  --bg-paper: #F9F3EE;
+  --bg-card: #FFFFFF;
+  --bg-muted: #EFE4D4;
+  --bg-stage: #132A1E;
+  --bg-stage-card: #F9F3EE;
+  --text-primary: #132E20;
+  --text-secondary: #263E30;
+  --text-muted: #566B5D;
+  --forest-ink: #245034;
+  --forest-surface: #E2EFE6;
+  --earth-ochre: #A68F6D;
+  --ochre-surface: #F5E9D4;
+  --accent-chili: #A92717;
+  --accent-chili-hover: #8C1E10;
+  --accent-chili-soft: #FBE9E6;
+  --border-ink: #132E20;
+  --border-subtle: #D8C8B0;
+  --wave-line-gold: #B39C7A;
+  --wave-line-dark: #132E20;
+  --shadow-hard: 3px 3px 0px #132E20;
+  --shadow-hard-sm: 2px 2px 0px #132E20;
+}
+
+html[data-theme="dark"] {
+  --bg-paper: #0F1914;
+  --bg-card: #16241D;
+  --bg-muted: #1E3127;
+  --bg-stage: #0A120E;
+  --bg-stage-card: #16241D;
+  --text-primary: #F9F3EE;
+  --text-secondary: #D0DDD4;
+  --text-muted: #9AB0A1;
+  --forest-ink: #6EE7A0;
+  --forest-surface: #1E3829;
+  --earth-ochre: #D8C098;
+  --ochre-surface: #2C2418;
+  --accent-chili: #E54D37;
+  --accent-chili-hover: #FF6650;
+  --accent-chili-soft: #3B1A15;
+  --border-ink: #4E6B59;
+  --border-subtle: #2A3F33;
+  --wave-line-gold: #9E8866;
+  --wave-line-dark: #6EE7A0;
+  --shadow-hard: 3px 3px 0px #060B08;
+  --shadow-hard-sm: 2px 2px 0px #060B08;
 }
 
 @theme {
-  --color-clay-canvas: #FAF9F5;
-  --color-clay-warm: #F4F3F0;
-  --color-clay-surface: #FFFFFF;
-  --color-clay-border: #E5E3DE;
-  --color-clay-dark: #1B1A18;
-  --color-clay-text: #1B1A18;
-  --color-clay-muted: #6E6D67;
-
-  --color-clay-orange: #FF7714;
-  --color-clay-orange-dark: #B53D0A;
-  --color-clay-orange-light: #FFF3ED;
+  --color-clay-canvas: var(--bg-paper);
+  --color-clay-warm: var(--bg-muted);
+  --color-clay-surface: var(--bg-card);
+  --color-clay-border: var(--border-ink);
+  --color-clay-dark: var(--bg-stage);
+  --color-clay-text: var(--text-primary);
+  --color-clay-muted: var(--text-muted);
+  --color-clay-orange: var(--accent-chili);
+  --color-clay-orange-dark: var(--accent-chili-hover);
+  --color-clay-orange-light: var(--accent-chili-soft);
   --color-clay-lime: #EEF773;
   --color-clay-lime-dark: #102B03;
-
-  --color-fair: #15803D;
-  --color-fair-subtle: #DCFCE7;
-  --color-fair-border: #BBF7D0;
-
-  --color-warning: #D97706;
-  --color-warning-subtle: #FEF3C7;
-  --color-warning-border: #FDE68A;
-
-  --color-danger: #DC2626;
-  --color-danger-subtle: #FEE2E2;
-  --color-danger-border: #FECACA;
-
-  --color-anomaly: #395AFA;
-  --color-anomaly-subtle: #E0E7FF;
-  --color-anomaly-border: #C7D2FE;
-
-  --font-sans: 'Roobertvf', var(--font-sans), system-ui, sans-serif;
-  --font-display: var(--font-display), 'Roobertvf', var(--font-sans), sans-serif;
+  --color-fair: #245034;
+  --color-fair-subtle: #E2EFE6;
+  --color-fair-border: var(--border-ink);
+  --color-warning: #B47B38;
+  --color-warning-subtle: #F5E9D4;
+  --color-warning-border: var(--border-ink);
+  --color-danger: var(--accent-chili);
+  --color-danger-subtle: var(--accent-chili-soft);
+  --color-danger-border: var(--border-ink);
+  --color-anomaly: #1D4ED8;
+  --color-anomaly-subtle: #BFDBFE;
+  --color-anomaly-border: var(--border-ink);
+  --font-sans: var(--font-ubuntu), 'Ubuntu', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-:root {
-  --background: #FAF9F5;
-  --surface: #FFFFFF;
-  --text-main: #1B1A18;
-  --text-muted: #6E6D67;
-}
-
-::selection {
-  background-color: #EEF773;
-  color: #1B1A18;
+*, body, h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea, table, th, td, .font-mono-num {
+  font-family: var(--font-ubuntu), 'Ubuntu', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  box-sizing: border-box;
 }
 
 body {
-  background-color: #FAF9F5;
-  color: #1B1A18;
-  min-height: 100vh;
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-paper);
+  color: var(--text-primary);
+  margin: 0;
+  overflow-x: hidden;
+  line-height: 1.5;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.tabular-nums {
+.font-mono-num, .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-@keyframes ticker-marquee {
-  0% {
-    transform: translate3d(0, 0, 0);
+a[href], button, summary, select, input[type="range"], input[type="checkbox"], input[type="radio"], label[for], [role="button"], [role="tab"], [role="switch"] {
+  cursor: pointer;
+}
+button:disabled, input:disabled, select:disabled, [aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+  outline: 2.5px solid var(--accent-chili) !important;
+  outline-offset: 2px !important;
+}
+
+.pasarku-cta-btn {
+  background-color: #A92717;
+  color: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 10px 24px -4px rgba(169, 39, 23, 0.42);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.18s ease, box-shadow 0.2s ease;
+}
+.pasarku-cta-btn:hover {
+  background-color: #8E1E10;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 16px 30px -6px rgba(169, 39, 23, 0.52);
+}
+.pasarku-cta-btn:active { transform: translateY(0px) scale(0.99); }
+
+.market-card {
+  background-color: var(--bg-card);
+  border: 2px solid var(--border-ink);
+  border-radius: 14px;
+  box-shadow: var(--shadow-hard);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.market-card-interactive:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px var(--border-ink);
+}
+
+.market-btn-primary {
+  background-color: var(--accent-chili);
+  color: #FFFFFF;
+  border: 2px solid var(--border-ink);
+  border-radius: 10px;
+  box-shadow: var(--shadow-hard-sm);
+  font-weight: 700;
+  transition: transform 0.12s ease, background-color 0.12s ease, box-shadow 0.12s ease;
+}
+.market-btn-primary:hover {
+  background-color: var(--accent-chili-hover);
+  transform: translate(-1px, -1px);
+}
+.market-btn-primary:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+.market-btn-secondary {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 2px solid var(--border-ink);
+  border-radius: 10px;
+  box-shadow: var(--shadow-hard-sm);
+  font-weight: 500;
+  transition: transform 0.12s ease, background-color 0.12s ease;
+}
+.market-btn-secondary:hover {
+  background-color: var(--bg-muted);
+  transform: translate(-1px, -1px);
+}
+
+.ledger-leader {
+  flex: 1;
+  border-bottom: 1.5px dotted var(--border-subtle);
+  margin: 0 10px;
+  position: relative;
+  top: -4px;
+}
+
+@keyframes marketLeftBreeze { 0%, 100% { transform: scale(1) translate(0px, 0px); } 50% { transform: scale(1.018) translate(4px, -3px); } }
+@keyframes marketRightBreeze { 0%, 100% { transform: scale(1) translate(0px, 0px); } 50% { transform: scale(1.018) translate(-4px, -3px); } }
+@keyframes lampWarmPulse { 0%, 100% { opacity: 0.45; transform: scale(0.92); } 50% { opacity: 0.85; transform: scale(1.14); } }
+@keyframes pinGentleBob { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
+@keyframes logoGentleFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-5px); } }
+@keyframes specimenBobSlow { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-10px) rotate(1.5deg); } }
+@keyframes specimenBobMed { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-13px) rotate(-2deg); } }
+@keyframes scalePanBounce { 0%, 100% { transform: translateY(0) scale(1); } 35% { transform: translateY(6px) scale(1.04); } 70% { transform: translateY(-3px) scale(0.98); } }
+
+.animate-market-left { animation: marketLeftBreeze 7.5s ease-in-out infinite; transform-origin: bottom left; }
+.animate-market-right { animation: marketRightBreeze 8.2s ease-in-out infinite; transform-origin: bottom right; }
+.animate-lamp-glow { animation: lampWarmPulse 3.4s ease-in-out infinite; }
+.animate-pin-bob { animation: pinGentleBob 3.2s ease-in-out infinite; }
+.animate-logo-float { animation: logoGentleFloat 4.5s ease-in-out infinite; }
+.specimen-float-1 { animation: specimenBobSlow 4.8s ease-in-out infinite; }
+.specimen-float-2 { animation: specimenBobMed 4.1s ease-in-out infinite; }
+.specimen-float-3 { animation: specimenBobSlow 3.6s ease-in-out infinite; }
+.animate-scale-hit { animation: scalePanBounce 0.45s ease-out; }
+
+.market-hotspot-pin {
+  background-color: rgba(255, 253, 249, 0.94);
+  color: #132E20;
+  border: 1.5px solid #132E20;
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(19, 46, 32, 0.22);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s ease;
+}
+.market-hotspot-pin:hover {
+  transform: scale(1.12) translateY(-4px) !important;
+  background-color: #FFFFFF;
+  border-color: #A92717;
+  z-index: 30;
+}
+
+/* Authentic Market Alley (Lorong Pasar) Styles */
+.market-awning-stripes {
+  background: repeating-linear-gradient(
+    90deg,
+    #A92717 0px,
+    #A92717 24px,
+    #FFFFFF 24px,
+    #FFFFFF 48px
+  );
+}
+html[data-theme="dark"] .market-awning-stripes {
+  background: repeating-linear-gradient(
+    90deg,
+    #7F1D1D 0px,
+    #7F1D1D 24px,
+    #2A1D1B 24px,
+    #2A1D1B 48px
+  );
+}
+
+.market-tampah {
+  background: radial-gradient(circle, #F7EAD7 20%, #E8D3B9 80%, #C4A57B 100%);
+  border: 2px dashed #997444;
+  box-shadow: inset 0 2px 4px rgba(78, 54, 25, 0.22), 0 3px 6px rgba(19, 46, 32, 0.12);
+}
+html[data-theme="dark"] .market-tampah {
+  background: radial-gradient(circle, #2A241C 20%, #201B14 80%, #15110B 100%);
+  border: 2px dashed #664E30;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.market-chalkboard {
+  background: #1A2820;
+  color: #F9F3EE;
+  border: 1.5px solid #2E4537;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5), 1px 1px 0px rgba(255, 255, 255, 0.1);
+}
+
+.market-walkway-floor {
+  background: linear-gradient(180deg, var(--bg-muted) 0%, var(--bg-paper) 60%, var(--bg-muted) 100%);
+  background-size: 100% 48px;
+}
+
+.paused-motion, .paused-motion * { animation-play-state: paused !important; }
+.perspective-market { perspective: 850px; perspective-origin: 50% 50%; }
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-  100% {
-    transform: translate3d(-50%, 0, 0);
-  }
 }
 
-.animate-ticker {
-  display: flex;
-  width: max-content;
-  animation: ticker-marquee 40s linear infinite;
-  will-change: transform;
-}
-
-.animate-ticker:hover,
-.group:hover .animate-ticker {
-  animation-play-state: paused;
-}
-
-/* Leaflet Neo-Brutalist Clay Customization */
 .leaflet-container {
   font-family: inherit;
-  background-color: #FAF9F5;
+  background-color: var(--bg-paper);
   width: 100%;
   height: 100%;
   z-index: 1;
 }
-
 .leaflet-popup-content-wrapper {
-  background: #FFFFFF !important;
-  color: #1B1A18 !important;
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
   border-radius: 12px !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
-  border: 1px solid #E5E3DE !important;
+  box-shadow: var(--shadow-hard) !important;
+  border: 2px solid var(--border-ink) !important;
   padding: 0 !important;
 }
-
-.leaflet-popup-content {
-  margin: 10px 14px !important;
-  line-height: 1.4 !important;
-}
-
-.leaflet-popup-tip {
-  background: #FFFFFF !important;
-  border: 1px solid #E5E3DE !important;
-}
-
-.clay-custom-marker-wrapper {
-  background: transparent !important;
-  border: none !important;
-}
+.leaflet-popup-content { margin: 10px 14px !important; line-height: 1.4 !important; }
+.leaflet-popup-tip { background: var(--bg-card) !important; border: 2px solid var(--border-ink) !important; }

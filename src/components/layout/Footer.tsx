@@ -1,164 +1,77 @@
-import Link from 'next/link';
+import React from 'react';
 
 export function Footer() {
   return (
-    <footer className="w-full bg-[#FAF9F5] border-t border-[#E5E3DE] py-16 px-4 sm:px-8 lg:px-12">
-      <div className="max-w-[1240px] mx-auto">
-        <div className="flex flex-col lg:flex-row justify-between items-start gap-12 pb-12 border-b border-[#E5E3DE]">
-          {/* Brand Info */}
-          <div className="max-w-sm space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-[6px] bg-[#EEF773] outline outline-[1.5px] outline-[#1B1A18] -outline-offset-[0.75px] flex items-center justify-center font-bold text-[13px] text-[#1B1A18]">
-                H
-              </div>
-              <div className="flex items-baseline">
-                <span className="font-bold text-[18px] text-[#1B1A18]">
-                  HargaKu
-                </span>
-                <span className="font-bold text-[20px] text-[#FF7714]">.</span>
-              </div>
+    <footer className="bg-[var(--bg-muted)] border-t-2 border-[var(--border-ink)] mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          
+          {/* Brand & Purpose */}
+          <div className="md:col-span-5 space-y-2">
+            <div className="font-bold text-2xl text-[var(--text-primary)]">
+              Pasar<span className="text-[var(--accent-chili)]">Ku</span>{' '}
+              <span className="text-sm font-medium text-[var(--text-secondary)]">Kota Bogor</span>
             </div>
-            <p className="text-[13px] leading-[20px] text-[#6E6D67]">
-              Platform transparansi harga komoditas pangan tradisional berbasis acuan nasional Bapanas terkalibrasi daerah. Membantu warga belanja cerdas dengan transparansi harga riil di lapangan.
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-sm">
+              Platform digital untuk menjelajahi, membandingkan, dan memantau harga komoditas pasar di Kota Bogor secara real-time berdasarkan publikasi resmi Perumda Pasar Pakuan Jaya Kota Bogor.
             </p>
-            <div className="text-[12px] text-[#8C8B85]">
-              © 2026 HargaKu. Kolaborasi Terbuka WIA 2026.
-            </div>
           </div>
 
-          {/* Link Columns */}
-          <div className="flex flex-wrap gap-12 sm:gap-16">
-            {/* Menu Utama (100% Publik) */}
-            <div className="space-y-3 min-w-[140px]">
-              <div className="text-[11px] font-bold text-[#1B1A18] uppercase tracking-wider">
-                Menu Utama
-              </div>
-              <ul className="space-y-2 text-[13px] text-[#6E6D67]">
-                <li>
-                  <Link href="/dashboard" className="hover:text-[#1B1A18] transition-colors">
-                    Harga Komoditas
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/cek-harga" className="hover:text-[#1B1A18] transition-colors">
-                    Cek Harga Wajar
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/peta" className="hover:text-[#1B1A18] transition-colors">
-                    Peta Pasar
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/lapor" className="hover:text-[#1B1A18] transition-colors">
-                    Lapor Harga
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/keranjang" className="hover:text-[#1B1A18] transition-colors">
-                    Keranjang Belanja
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/tentang" className="hover:text-[#1B1A18] transition-colors">
-                    Tentang HargaKu
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Sumber Data (Khusus Website Resmi Eksternal) */}
-            <div className="space-y-3 min-w-[140px]">
-              <div className="text-[11px] font-bold text-[#1B1A18] uppercase tracking-wider">
-                Sumber Data Resmi
-              </div>
-              <ul className="space-y-2 text-[13px] text-[#6E6D67]">
-                <li>
-                  <a
-                    href="https://www.bi.go.id/hargapangan"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-[#1B1A18] transition-colors inline-flex items-center gap-1"
-                  >
-                    <span>PIHPS Bank Indonesia</span>
-                    <span className="text-[11px] text-[#8E8D86]">↗</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://panelharga.badanpangan.go.id"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-[#1B1A18] transition-colors inline-flex items-center gap-1"
-                  >
-                    <span>Panel Harga Bapanas</span>
-                    <span className="text-[11px] text-[#8E8D86]">↗</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://badanpangan.go.id"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-[#1B1A18] transition-colors inline-flex items-center gap-1"
-                  >
-                    <span>Badan Pangan Nasional</span>
-                    <span className="text-[11px] text-[#8E8D86]">↗</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://sp2kp.kemendag.go.id"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-[#1B1A18] transition-colors inline-flex items-center gap-1"
-                  >
-                    <span>SP2KP Kemendag</span>
-                    <span className="text-[11px] text-[#8E8D86]">↗</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Koridor Wilayah Pantauan */}
-            <div className="space-y-3 min-w-[140px]">
-              <div className="text-[11px] font-bold text-[#1B1A18] uppercase tracking-wider">
-                Koridor Pantauan
-              </div>
-              <ul className="space-y-2 text-[13px] text-[#6E6D67]">
-                <li>
-                  <Link href="/peta" className="hover:text-[#1B1A18] transition-colors">
-                    Koridor Jawa (Jabar, DKI, Jatim, Jateng)
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/peta" className="hover:text-[#1B1A18] transition-colors">
-                    Koridor Sumatera
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/peta" className="hover:text-[#1B1A18] transition-colors">
-                    Koridor Kalimantan
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/peta" className="hover:text-[#1B1A18] transition-colors">
-                    Koridor Sulawesi
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/peta" className="hover:text-[#1B1A18] transition-colors">
-                    Koridor Bali, Nusa Tenggara, Maluku &amp; Papua
-                  </Link>
-                </li>
-              </ul>
-            </div>
+          {/* Perumda PPJ Office Information */}
+          <div className="md:col-span-4 space-y-1.5 text-xs text-[var(--text-secondary)]">
+            <h3 className="font-bold text-sm text-[var(--text-primary)]">
+              Kantor Pusat Perumda Pasar Pakuan Jaya
+            </h3>
+            <p className="leading-relaxed">
+              Blok F Trade Center Pasar Kebon Kembang Lantai 3, Jl. Dewi Sartika, Kel. Cibogor, Kec. Bogor Tengah, Kota Bogor 16124
+            </p>
+            <p>Telepon: (0251) 8330313 | Email: info@pasarpakuanjaya.co.id</p>
           </div>
+
+          {/* Verified Data References */}
+          <div className="md:col-span-3 space-y-1.5 text-xs">
+            <h3 className="font-bold text-sm text-[var(--text-primary)]">
+              Referensi Data Terverifikasi
+            </h3>
+            <ul className="space-y-1.5">
+              <li>
+                <a
+                  href="https://pasarpakuanjaya.co.id/komoditas/index/view-all"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold underline text-[var(--text-primary)] hover:text-[var(--accent-chili)]"
+                >
+                  Tabel Index Harga Perumda PPJ
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.pasarpakuanjaya.co.id/pasar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold underline text-[var(--text-primary)] hover:text-[var(--accent-chili)]"
+                >
+                  Daftar 13 Unit Pasar Kota Bogor
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://pasarpakuanjaya.co.id/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold underline text-[var(--text-primary)] hover:text-[var(--accent-chili)]"
+                >
+                  Portal Resmi Perumda PPJ
+                </a>
+              </li>
+            </ul>
+          </div>
+
         </div>
 
-        {/* Footnote */}
-        <div className="pt-8 text-[12px] text-[#8C8B85]">
-          <div>Inisiatif transparansi pangan publik — Tanpa bias komersial.</div>
+        <div className="mt-8 pt-6 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between text-[11px] text-[var(--text-muted)] gap-2">
+          <span>&copy; {new Date().getFullYear()} PasarKu Kota Bogor. Hak cipta dilindungi.</span>
+          <span>Inisiatif transparansi pangan publik: Tanpa bias komersial.</span>
         </div>
       </div>
     </footer>

@@ -7,11 +7,11 @@ export function PetaHeader() {
 
   return (
     <div className="flex flex-col gap-2 pb-2">
-      <h1 className="text-[32px] sm:text-[40px] font-medium text-[#1B1A18] leading-[1.12] tracking-tight">
+      <h1 className="text-[32px] sm:text-[40px] font-bold text-[var(--text-primary)] leading-[1.12] tracking-tight">
         Peta Harga Pasar Tradisional
       </h1>
 
-      <p className="text-[14px] sm:text-[15px] text-[#6E6D67] max-w-[680px] leading-[1.5]">
+      <p className="text-[14px] sm:text-[15px] text-[var(--text-secondary)] max-w-[680px] leading-[1.5]">
         Bandingkan pasar mana yang paling hemat dan periksa disparitas harga riil
         komoditas pilihanmu di {selectedRegion.name} sebelum berangkat berbelanja.
       </p>

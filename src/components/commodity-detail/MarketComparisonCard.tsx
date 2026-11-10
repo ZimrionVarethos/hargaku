@@ -21,12 +21,12 @@ export function MarketComparisonCard() {
   const maxPrice = calculateRegionalPrice(65000);
 
   return (
-    <div className="bg-white rounded-[18px] outline outline-1 outline-[#E5E3DE] p-5 sm:p-6 shadow-xs flex flex-col justify-between gap-5">
+    <div className="market-card p-5 sm:p-6 flex flex-col justify-between gap-5">
       <div className="flex flex-col gap-0.5">
-        <h3 className="text-[16px] font-bold text-[#1B1A18] tracking-tight">
+        <h3 className="text-[16px] font-bold text-[var(--text-primary)] tracking-tight">
           Perbandingan Pasar di {selectedRegion.name}
         </h3>
-        <p className="text-[12px] text-[#6E6D67]">
+        <p className="text-[12px] text-[var(--text-secondary)]">
           Harga rerata lapak hari ini (22 Okt 2026)
         </p>
       </div>
@@ -37,46 +37,46 @@ export function MarketComparisonCard() {
           const adjustedPrice = calculateRegionalPrice(m.price);
           const widthPercent = Math.round((adjustedPrice / maxPrice) * 100);
 
-          let badgeStyle = 'bg-[#F4F3F0] text-[#1B1A18] outline-[#E5E3DE]';
+          let badgeStyle = 'bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)]';
           if (m.badge === 'Paling Hemat') {
-            badgeStyle = 'bg-[#EEF773] text-[#1B1A18] outline-[#1B1A18]';
+            badgeStyle = 'bg-[#E2EFE6] text-[#245034] border border-[#245034]';
           } else if (m.badge === 'Agak Mahal') {
-            badgeStyle = 'bg-[#FEF3C7] text-[#92400E] outline-[#FDE68A]';
+            badgeStyle = 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]';
           } else if (m.badge === 'Tertinggi') {
-            badgeStyle = 'bg-[#FEE2E2] text-[#991B1B] outline-[#FECACA]';
+            badgeStyle = 'bg-[#FBE9E6] text-[var(--accent-chili)] border border-[var(--accent-chili)]';
           }
 
           return (
             <div key={m.name} className="flex flex-col gap-1">
               <div className="flex items-center justify-between text-[13px]">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-[#1B1A18]">{m.name}</span>
+                  <span className="font-bold text-[var(--text-primary)]">{m.name}</span>
                   <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-[4px] outline outline-1 ${badgeStyle}`}
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded ${badgeStyle}`}
                   >
                     {m.badge}
                   </span>
                 </div>
 
-                <span className="font-bold text-[#1B1A18] tabular-nums">
+                <span className="font-extrabold text-[var(--forest-ink)] tabular-nums font-mono-num">
                   Rp {adjustedPrice.toLocaleString('id-ID')}/kg
                 </span>
               </div>
 
               {/* Bar line */}
-              <div className="w-full h-2 rounded-full bg-[#FAF9F5] outline outline-1 outline-[#E5E3DE]/60 overflow-hidden flex">
+              <div className="w-full h-2 rounded-full bg-[var(--bg-muted)] border border-[var(--border-subtle)] overflow-hidden flex">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{
                     width: `${widthPercent}%`,
                     backgroundColor:
                       m.badge === 'Paling Hemat'
-                        ? '#EEF773'
+                        ? '#245034'
                         : m.badge === 'Tertinggi'
-                        ? '#EF4444'
+                        ? '#A92717'
                         : m.badge === 'Agak Mahal'
-                        ? '#F59E0B'
-                        : '#1B1A18',
+                        ? '#D97706'
+                        : '#132E20',
                   }}
                 />
               </div>
@@ -85,7 +85,7 @@ export function MarketComparisonCard() {
         })}
       </div>
 
-      <p className="text-[11px] text-[#78716C] leading-[16px] pt-2 border-t border-[#E5E3DE]">
+      <p className="text-[11px] text-[var(--text-muted)] leading-[16px] pt-2 border-t border-[var(--border-subtle)]">
         Berdasarkan 24 laporan terverifikasi + survei harian PIHPS.
       </p>
     </div>

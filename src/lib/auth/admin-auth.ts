@@ -23,12 +23,74 @@ export const DEMO_ADMIN_CREDENTIALS = {
 export async function loginAdmin(
   credentials: LoginCredentials
 ): Promise<{ success: boolean; error?: string; session?: AuthSession }> {
-  // Simulate network latency for authentic feel
-  await new Promise((resolve) => setTimeout(resolve, 150));
+  const durationMs = credentials.rememberMe
+    ? 7 * 24 * 60 * 60 * 1000
+    : 24 * 60 * 60 * 1000;
 
+  let signedToken = `tpid_jwt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  let userProfile = {
+    ...DEFAULT_ADMIN_USER,
+    lastLogin:
+      new Date().toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }) + ' WIB',
+  };
+
+  const canCallApi =
+    typeof window !== 'undefined' &&
+    typeof fetch === 'function' &&
+    window.location?.protocol?.startsWith('http');
+
+  if (canCallApi) {
+    try {
+      const res = await fetch('/api/v1/admin/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      });
+      const json = (await res.json()) as {
+        success?: boolean;
+        message?: string;
+        data?: { token?: string; user?: AdminUserProfile };
+      };
+      if (!res.ok || !json.success) {
+        return {
+          success: false,
+          error: json.message || 'Email atau kata sandi tidak valid.',
+        };
+      }
+      if (json.data?.token) signedToken = json.data.token;
+      if (json.data?.user) {
+        userProfile = { ...json.data.user, lastLogin: userProfile.lastLogin };
+      }
+    } catch {
+      return localFallbackLogin(credentials, signedToken, userProfile, durationMs);
+    }
+  } else {
+    return localFallbackLogin(credentials, signedToken, userProfile, durationMs);
+  }
+
+  const session: AuthSession = {
+    token: signedToken,
+    user: userProfile,
+    expiresAt: Date.now() + durationMs,
+  };
+  persistSession(session);
+  return { success: true, session };
+}
+
+function localFallbackLogin(
+  credentials: LoginCredentials,
+  token: string,
+  user: AdminUserProfile,
+  durationMs: number
+): { success: boolean; error?: string; session?: AuthSession } {
   const trimmedEmail = credentials.email.trim().toLowerCase();
   const trimmedPassword = credentials.password.trim();
-
   const isMatch =
     (trimmedEmail === 'admin@hargaku.id' ||
       trimmedEmail === 'admin' ||
@@ -38,32 +100,14 @@ export async function loginAdmin(
       trimmedPassword === 'admin2026!');
 
   if (!isMatch) {
-    return {
-      success: false,
-      error: 'Email atau kata sandi tidak valid.',
-    };
+    return { success: false, error: 'Email atau kata sandi tidak valid.' };
   }
+  const session: AuthSession = { token, user, expiresAt: Date.now() + durationMs };
+  persistSession(session);
+  return { success: true, session };
+}
 
-  // 24 hour expiry (or 7 days if remember me is active)
-  const durationMs = credentials.rememberMe
-    ? 7 * 24 * 60 * 60 * 1000
-    : 24 * 60 * 60 * 1000;
-
-  const session: AuthSession = {
-    token: `tpid_jwt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-    user: {
-      ...DEFAULT_ADMIN_USER,
-      lastLogin: new Date().toLocaleDateString('id-ID', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }) + ' WIB',
-    },
-    expiresAt: Date.now() + durationMs,
-  };
-
+function persistSession(session: AuthSession) {
   try {
     if (typeof window !== 'undefined' || typeof localStorage !== 'undefined') {
       localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
@@ -71,11 +115,6 @@ export async function loginAdmin(
   } catch {
     // Graceful fallback if localStorage is disabled
   }
-
-  return {
-    success: true,
-    session,
-  };
 }
 
 export function logoutAdmin(): void {
@@ -83,9 +122,22 @@ export function logoutAdmin(): void {
     if (typeof window !== 'undefined' || typeof localStorage !== 'undefined') {
       localStorage.removeItem(AUTH_SESSION_KEY);
     }
+    if (
+      typeof window !== 'undefined' &&
+      typeof fetch === 'function' &&
+      window.location?.protocol?.startsWith('http')
+    ) {
+      fetch('/api/v1/admin/auth/login', { method: 'DELETE' }).catch(() => {});
+    }
   } catch {
     // Ignore errors
   }
+}
+
+export function getAdminAuthHeaders(): Record<string, string> {
+  const session = getAdminSession();
+  if (!session?.token) return {};
+  return { Authorization: `Bearer ${session.token}` };
 }
 
 export function getAdminSession(): AuthSession | null {

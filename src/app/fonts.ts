@@ -1,14 +1,8 @@
-import localFont from 'next/font/local';
+import { Ubuntu } from 'next/font/google';
 
-export const roobert = localFont({
-  src: '../../fonts/clay.com/647b16174b38dc95.woff2',
-  variable: '--font-sans',
-  display: 'swap',
-  weight: '300 900',
-});
-
-export const clayDisplay = localFont({
-  src: '../../fonts/clay.com/5d97532b7d90f985.otf',
-  variable: '--font-display',
+export const ubuntu = Ubuntu({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '700'],
+  variable: '--font-ubuntu',
   display: 'swap',
 });

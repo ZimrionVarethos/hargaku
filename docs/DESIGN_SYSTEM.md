@@ -1,200 +1,84 @@
-# DESIGN_SYSTEM.md — Clay.com Foundations Design System
+# DESIGN_SYSTEM.md: PasarKu Kota Bogor Tactile Market Design System
 
-Dokumen ini adalah acuan resmi (**Design System & UI Guidelines**) untuk seluruh antarmuka proyek **HargaKu**, disinkronkan langsung dari kanvas desain Figma/Pencil resmi: **"Design System — Clay.com Foundations"** (Node `Q0Rb5J` di `HargaKu.pen`).
-
-> [!IMPORTANT]
-> **Aturan Wajib (Auto-Sync & No AI-Slop)**: Seluruh kode styling di antarmuka publik HargaKu wajib merujuk secara ketat pada token warna, tipografi Roobert, dan varian komponen di dokumen ini. Dilarang menggunakan styling Tailwind generik bawaan (seperti Slate/Zinc generik atau font sans fallback sistem) bila tidak ditentukan di sini.
+Dokumen ini adalah acuan resmi (**Design System & UI Guidelines**) untuk seluruh antarmuka proyek **PasarKu Kota Bogor**, disinkronkan secara ketat dengan `rule.md`, `design.md`, dan `palet.md` serta standar anti-slop publikasi resmi [Perumda Pasar Pakuan Jaya Kota Bogor](https://pasarpakuanjaya.co.id/komoditas/index/view-all).
 
 ---
 
-## 1. Brand Identity & Filosofi Visual
+## 1. Brand Identity & Karakter Visual
 
-* **Karakter Visual**: **Clean Minimalist Premium SaaS (Clay.com Signature Aesthetic)**.
-  * **Warm Stone Canvas**: Latar belakang tidak menggunakan putih silau (#FFFFFF) melainkan warm off-white `#FAF9F5` / `#F4F3F0`.
-  * **Iconic Clay Orange (`#FF7714`)**: Aksen brand utama yang vibrant, modern, dan memberikan energi pada titik aksi utama.
-  * **Electric Lime (`#EEF773`)**: Signature hero pill & badge accent yang dipadukan dengan teks hitam pekat `#1B1A18`.
-  * **Deep Charcoal Typography (`#1B1A18`)**: Kontras tinggi tanpa menjadi pitch black murni, dipadukan dengan warna secondary `#6E6D67` / `#78716C`.
-  * **Hairline Borders (`#E5E3DE`)**: Garis batas ultra-halus 1px yang memisahkan modul-modul kartu bento secara anggun.
-  * **Generous Curvature**: Radius terukur (`rounded-[8px]` untuk kontrol kecil, `rounded-[12px]` untuk tombol/input, `rounded-[20px]` untuk card panggung).
+* **Design Read**: `Platform Digital Eksplorasi & Pantauan Harga Komoditas Pasar Rakyat for Warga, Pedagang, dan Pemantau Pangan Kota Bogor, in a Warm Realistic Market Diorama & Tactile Broadsheet Card style, dial ENERGY 3 / RHYTHM 3 / MOTION 3.`
+* **Warm Paper Canvas (`#F9F3EE`)**: Latar belakang gading hangat yang menyatu alami dengan karya seni lorong pasar realistis Kota Bogor.
+* **Tinta Hutan Gelap (`#132E20`)**: Warna struktural tipografi utama, garis bingkai kartu tegas 2px, dan teks judul tebal.
+* **Aksen Merah Cabai PasarKu (`#A92717`)**: Aksen tunggal untuk tombol aksi utama (CTA `Mulai Sekarang`), lencana pantauan utama, jarum timbangan mekanis, dan fokus papan ketik.
+* **Gaya Kartu Tiket Taktil (`Tactile Market Ticket`)**: Bingkai padat 2px solid dengan bayangan tegas tanpa kabur (`3px 3px 0px #132E20` di mode siang, `3px 3px 0px #060B08` di mode subuh).
+* **Dua Tema Lengkap**: Mode Siang (`data-theme="light"`) dan Mode Subuh (`data-theme="dark"`).
 
 ---
 
-## 2. Color Palette & Token Swatches (Sesuai Node `FXBc0`)
+## 2. Token Warna Resmi (`palet.md`)
 
-### 2.1. Neutrals & Canvas
-| Token Name | Hex Code | CSS Variable | Penggunaan |
+| Token Variabel CSS | Mode Siang (`light`) | Mode Subuh (`dark`) | Penggunaan |
 | :--- | :--- | :--- | :--- |
-| **Clay Canvas** | `#FAF9F5` | `--color-clay-canvas` | Latar utama halaman web / body background |
-| **Clay Warm Stone** | `#F4F3F0` | `--color-clay-warm` | Top bar container, chip takaran inactive, bento box |
-| **Clay Surface** | `#FFFFFF` | `--color-clay-surface` | Kartu putih terangkat (elevated card), input, dropdown |
-| **Clay Border** | `#E5E3DE` | `--color-clay-border` | Garis batas 1px pada seluruh container, kartu, dan input |
-| **Clay Dark Card** | `#1B1A18` / `#242321` | `--color-clay-dark` | Kartu gelap panggung bento & footer background |
-| **Clay Text Dark** | `#1B1A18` | `--color-clay-text` | Warna teks judul, angka nominal tebal, ikon utama |
-| **Clay Text Muted** | `#6E6D67` / `#78716C`| `--color-clay-muted` | Paragraf penjelasan, label deskriptif, subtitle |
-
-### 2.2. Brand Accents
-| Token Name | Hex Code | CSS Variable | Penggunaan |
-| :--- | :--- | :--- | :--- |
-| **Clay Orange Primary** | `#FF7714` | `--color-clay-orange` | Tombol CTA utama (B1), dot aksen brand, focus state |
-| **Clay Orange Dark** | `#B53D0A` | `--color-clay-orange-dark` | Hover state tombol CTA, outline penegas |
-| **Clay Orange Light** | `#FFF3ED` | `--color-clay-orange-light`| Chip takaran aktif (selected), highlight badge wajar |
-| **Clay Electric Lime** | `#EEF773` | `--color-clay-lime` | Badge icon "H" navbar, tombol signature hero (B2) |
-| **Clay Forest Deep** | `#14532D` | `--color-clay-forest` | Teks status harga wajar |
-
-### 2.3. Semantic Status Kewajaran Harga (Node `M0TDz` & Anti-AI-Slop Refinement)
-Formula deviasi harga resmi Bapanas/PIHPS menentukan 4 pill status tanpa warna hijau slop generik:
-| Status | Rentang Deviasi | Background | Teks | Border / Outline |
-| :--- | :--- | :--- | :--- | :--- |
-| **Harga Wajar** | -10% s.d. +10% | `#F4F3F0` (Warm Stone) | `#1B1A18` | `#E5E3DE` |
-| **Agak Mahal** | +10% s.d. +25% | `#FEF3C7` (Soft Amber) | `#92400E` | `#FDE68A` |
-| **Terlalu Mahal** | > +25% | `#FEE2E2` (Soft Rose) | `#991B1B` | `#FECACA` |
-| **Murah / Termurah** | < -10% Rerata | `#EEF773` (Clay Lime) | `#1B1A18` | `#1B1A18` / `#DCE6AF` |
-
-### 2.4. Standar Warna Indikator Tren Harga (Ticker, Card, & Tabel)
-| Arah Tren | Label Badge Ticker | Text Color (Light View) | Badge (Dark Ticker) | Border |
-| :--- | :--- | :--- | :--- | :--- |
-| **Harga Turun (Hemat)** | `▼ -X.X% Turun` | `#15803D` (Forest Emerald) | `#EEF773` di `bg-[#EEF773]/15` | `border-[#EEF773]/30` |
-| **Harga Naik** | `▲ +X.X% Naik` | `#DC2626` (Clean Rose Red) | `#FCA5A5` di `bg-[#DC2626]/20` | `border-[#EF4444]/40` |
-| **Harga Stabil** | `— Stabil` | `#6E6D67` (Neutral Stone) | `#D1CFCA` di `bg-white/10` | `border-white/15` |
-
-> [!TIP]
-> **Anti-Eyebrow Clutter Rule**: Dilarang meletakkan raw uppercase orange text di atas judul utama halaman (`h1`). Judul halaman harus berdiri mandiri, percaya diri, dan bersih tanpa distraksi visual.
+| `--bg-paper` | `#F9F3EE` | `#0F1914` | Latar utama halaman & Hero Section |
+| `--bg-card` | `#FFFFFF` | `#16241D` | Kartu komoditas, tabel, & modal |
+| `--bg-muted` | `#EFE4D4` | `#1E3127` | Latar bagian sekunder & footer |
+| `--bg-stage` | `#132A1E` | `#0A120E` | Panggung meja timbangan mekanis |
+| `--text-primary` | `#132E20` | `#F9F3EE` | Judul `h1`-`h3`, nama komoditas |
+| `--text-secondary` | `#263E30` | `#D0DDD4` | Subjudul, alamat pasar, deskripsi |
+| `--text-muted` | `#566B5D` | `#9AB0A1` | Satuan `/kg`, nomor indeks `#16` |
+| `--forest-ink` | `#245034` | `#6EE7A0` | Angka nominal harga Rupiah |
+| `--forest-surface` | `#E2EFE6` | `#1E3829` | Latar kotak ikon SVG sayuran |
+| `--accent-chili` | `#A92717` | `#E54D37` | Tombol CTA, aksen Ku, jarum |
+| `--accent-chili-hover`| `#8C1E10` | `#FF6650` | Status hover tombol utama |
+| `--border-ink` | `#132E20` | `#4E6B59` | Garis tepi kartu (`2px solid`) |
+| `--border-subtle` | `#D8C8B0` | `#2A3F33` | Garis pemisah & titik buku besar |
+| `--wave-line-gold` | `#B39C7A` | `#9E8866` | Garis kontur gelombang lapis dalam |
+| `--wave-line-dark` | `#132E20` | `#6EE7A0` | Garis kontur gelombang lapis luar |
+| `--shadow-hard` | `3px 3px 0px #132E20` | `3px 3px 0px #060B08` | Bayangan tegas kartu taktil |
+| `--shadow-hard-sm` | `2px 2px 0px #132E20` | `2px 2px 0px #060B08` | Bayangan tegas tombol aksi |
 
 ---
 
-## 3. Typography Hierarchy (Roobert Only, Node `YxnO0`)
+## 3. Tipografi 100% Ubuntu (`rule.md`)
 
-Seluruh antarmuka **MANDATORI** menggunakan font **Roobert** (`Roobertvf` variable font) dari direktori `fonts/clay.com/`.
-
-```css
-@font-face {
-  font-family: 'Roobertvf';
-  src: url('/fonts/clay.com/647b16174b38dc95.woff2') format('woff2');
-  font-display: swap;
-  font-weight: 300 900;
-}
-```
-
-### Type Scale
-| Tingkat | Ukuran / Line-Height | Weight | Warna | Penggunaan di HargaKu |
-| :--- | :--- | :--- | :--- | :--- |
-| **Display Hero** | 50px–54px / 1.12 | Medium (500) | `#1B1A18` | Headline utama hero landing page (`tracking-tight`) |
-| **Heading 1** | 36px–38px / 1.2 | Medium (500) | `#1B1A18` | Judul panggung section utama |
-| **Heading 2** | 24px–26px / 1.25 | Medium (500) | `#1B1A18` | Sub-headline fitur & nama pasar modal |
-| **Heading 3** | 16px–18px / 1.3 | SemiBold (600) | `#1B1A18` | Judul kartu komoditas (Cabai Rawit Merah) |
-| **Body Large** | 15px–16px / 1.5 | Normal (400) | `#6E6D67` | Deskripsi sub-hero & narasi pengantar |
-| **Body Regular** | 13px–14px / 1.5 | Normal (400)/500 | `#1B1A18` / `#6E6D67` | Teks navigasi, label formulir, data tabel |
-| **Caption / Micro** | 11px–12px / 1.4 | SemiBold (600) | `#78716C` / `#1B1A18` | Timestamp pembaruan data, tag pasar, chip |
-| **Tabular Figures**| Class `.tabular-nums` | Inherit | — | **Wajib** pada seluruh nominal Rupiah |
-
-### 3.2. Standar Ikonografi (Phosphor Icons Only)
-* Seluruh ikon di antarmuka **MANDATORI** menggunakan keluarga ikon **Phosphor Icons** (`@phosphor-icons/react`).
-* **DILARANG KERAS** menggunakan emoji (seperti 🔍, 📍, 🛒) atau ikon generik tanpa standar di dalam elemen UI profesional.
-* Pilihan weight ikon standar: `regular` untuk navigasi/kontrol form, `bold` untuk indikator status/arah tren, dan `fill` untuk pin lokasi / badge aktif.
+Seluruh elemen teks antarmuka **MANDATORI** menggunakan keluarga huruf [Google Fonts Ubuntu](https://fonts.google.com/specimen/Ubuntu):
+* **Display / Hero (`<h1>`)**: `Ubuntu Bold (700)`, `30px` (ponsel) hingga `50px` (desktop), `line-height: 1.14`.
+* **Judul Bagian (`<h2>`)**: `Ubuntu Bold (700)`, `24px` hingga `30px`.
+* **Judul Kartu (`<h3>`)**: `Ubuntu Bold (700)`, `16px` (reguler) hingga `20px` (utama).
+* **Angka Harga (`.font-mono-num`)**: `Ubuntu Bold (700)` dengan `font-variant-numeric: tabular-nums` agar sejajar vertikal.
+* **Larangan Em-Dash (R-02)**: Dilarang keras menggunakan karakter em-dash (`—`). Gunakan tanda koma, titik dua, titik, atau kurung.
 
 ---
 
-## 4. Master Components & Button Variants (Node `vLjdy` & `QGRMx`)
+## 4. Geometri Komponen Kartu & Tombol (`design.md`)
 
-### 4.1. Buttons
-* **B1 Primary (Clay Orange)**: `bg-[#FF7714] text-white rounded-[12px] px-5 py-2.5 font-bold text-[13px] hover:bg-[#B53D0A] transition-colors shadow-sm`
-* **B2 Signature Hero (Clay Lime)**: `bg-[#EEF773] text-[#1B1A18] outline outline-1 outline-[#1B1A18] -outline-offset-1 rounded-[8px] px-[18px] py-[9px] font-semibold text-[13px] hover:bg-[#d8e25d] transition-colors`
-* **B3 Dark Charcoal**: `bg-[#1B1A18] text-white rounded-[12px] px-5 py-2.5 font-semibold text-[13px] hover:bg-black transition-colors`
-* **B4 Secondary Outline**: `bg-[#F4F3F0] border border-[#E5E3DE] text-[#1B1A18] rounded-[12px] px-5 py-2.5 font-medium text-[13px] hover:bg-[#eae8e3] transition-colors`
-
-### 4.2. Form Inputs & Takaran Chips (Node `G2DESt` & `M0TDz`)
-* **Search / Text Input**: Tinggi 44px–48px, `bg-white border border-[#E5E3DE] rounded-[8px] sm:rounded-[12px] px-4 text-[13px] text-[#1B1A18] placeholder-[#8C8B85] focus:outline-none focus:border-[#FF7714]`
-* **Takaran Chips (Kg, Ons, dsb.)**:
-  * Active: `bg-[#FFF3ED] text-[#FF7714] border border-[#FF7714] rounded-[8px] px-3 py-1.5 font-semibold text-[13px]`
-  * Inactive: `bg-[#F4F3F0] text-[#6E6D67] border border-[#E5E3DE] rounded-[8px] px-3 py-1.5 font-medium text-[13px] hover:bg-[#ebe9e4]`
-
-### 4.4. Hero Section 2-Column Split Architecture
-* **Layout Kiri (Narrative & Conversion)**:
-  * Eyebrow badge status live dengan pulsing dot.
-  * Headline display hero `font-medium` (500) `text-[42px] sm:text-[52px]` dengan `tracking-tight`.
-  * Sub-headline `text-[16px]` penjelasan nilai produk.
-  * Tombol CTA utama (Clay Lime B2 atau Clay Orange B1) + Tombol sekunder dengan ikon Phosphor.
-  * Strip metrik kepercayaan (*Proof points*: Pasar-pasar tradisional terdaftar, update harian 06:00 WIB, inisiatif data publik gratis).
-* **Layout Kanan (Live Interactive Instrument - Clay Foundations Aesthetic)**:
-  * Kartu elevated white konsisten: `bg-white rounded-[24px] outline outline-1 outline-[#E5E3DE] -outline-offset-1 shadow-[0_12px_40px_rgba(0,0,0,0.06)] overflow-hidden`.
-  * Header pemilih komoditas cepat: chip komoditas elegan dengan `outline outline-1 outline-[#E5E3DE]` dan state aktif `bg-[#1B1A18] text-white font-semibold shadow-xs`.
-  * Toggle tab instrumen (Kalkulator Takaran vs. Komparasi Antar Pasar): tab halus dengan pill aktif putih `bg-white text-[#1B1A18] font-semibold shadow-xs`.
-  * Komponen kalkulator takaran terkalibrasi otomatis per komoditas: input presisi dengan frame `bg-[#FAF9F5] outline outline-[1.5px] outline-[#1B1A18] rounded-[8px]` dan result box adaptif.
-  * Komponen komparasi pasar dibatasi Top 5 pasar terfilter per wilayah aktif (`selectedRegion`) untuk mencegah anomali kartu meregang ke bawah.
-
-
+1. **Kartu Standar (`.market-card`)**: `rounded-[14px]`, `border: 2px solid var(--border-ink)`, `box-shadow: var(--shadow-hard)`.
+2. **Kartu Interaktif (`.market-card-interactive`)**: Bergerak `translate(-2px, -2px)` dan bayangan naik menjadi `5px 5px 0px var(--border-ink)` saat kursor diarahkan.
+3. **Kartu Pantauan Utama (2 Kolom, R-14)**: Lebar 2 kolom (`sm:col-span-2`), lencana merah `KOMODITAS PANTAUAN UTAMA`, ilustrasi SVG `64x64px`, harga `24px`, bilah perbandingan rata-rata kategori.
+4. **Kartu Komoditas Reguler (1 Kolom)**: Lebar 1 kolom, ilustrasi SVG `48x48px`, nomor indeks (`INDEKS #XX`), subkategori, harga `20px`.
+5. **Tombol CTA Hero (`.pasarku-cta-btn`)**: `rounded-[16px]`, latar merah bata `#A92717`, teks putih tebal, ikon panah masuk lorong, bayangan lembut `0 10px 24px -4px rgba(169, 39, 23, 0.42)`.
+6. **Tombol Aksi Kartu (`.market-btn-primary` & `.market-btn-secondary`)**: `rounded-[10px]`, `border: 2px solid var(--border-ink)`, `box-shadow: 2px 2px 0px var(--border-ink)`.
+7. **Pola Titik Buku Besar (`.ledger-leader`)**: Garis bertitik `1.5px dotted var(--border-subtle)` yang menghubungkan nama komoditas dan nominal harga pada papan cepat.
 
 ---
 
-## 5. Master Navbar & Footer Spec (Node `D0aYEW` & `gHczi`)
+## 5. Tata Letak Panggung Halaman Utama PasarKu
 
-* **Master Navbar**:
-  * Background: `#FAF9F5` dengan border-bottom 1px `#E5E3DE`.
-  * Brand Identity: Kotak 28x28px Lime `#EEF773` dengan border hitam 1.5px & huruf "H" bold, diikuti teks `HargaKu` (`#1B1A18`) + `.` (`#FF7714`).
-  * Links: "Harga", "Cek Harga", "Peta", "Lapor Harga", "Keranjang", "Tentang".
-  * Action: Tombol B2 Signature Hero "Cek Harga".
-* **Master Footer**:
-  * Background: `#FAF9F5` dengan border-top 1px `#E5E3DE`.
-  * Grid: Kolom Brand Info (Logo, deskripsi nasional, copyright 2026), Menu Utama, dan Sumber Data Resmi.
-  * Footnote: Bersih dan berwibawa: *"Inisiatif transparansi pangan publik — Tanpa bias komersial."* (Link internal/admin telah ditiadakan dari footer publik).
+* **Hero Section Diorama Pasar (`#heroSection`)**: Sayap pasar kiri (`#leftMarketWing`) dan sayap pasar kanan (`#rightMarketWing`) proporsional tanpa distorsi, dilengkapi pendar lampu kios (`animate-lamp-glow`), pin harga interaktif (`.market-hotspot-pin`), kurva gelombang SVG dinamis (`animatePasarKuHeroWaves`), dan kanvas partikel pagi.
+* **Panggung Timbangan & Pembanding Sumber (`#etagStageSection`)**: Pembagian asimetris 5:7 antara panel kontrol kecepatan/mode dan meja timbangan mekanis yang kini berfungsi membandingkan selisih antar sumber harga (`PIHPS BI`, `Bapanas`, `Perumda PPJ`, `Laporan Warga`) sekaligus mengarahkan pengguna ke Rekomendasi AI Multi-Sumber.
+* **Papan Pokok & Sorotan Pangan (`#sorotanSection`)**: Pembagian asimetris 5:7 antara metrik pangan utama dan papan harga cepat 10 komoditas harian dengan aksi langsung `Tanya AI`.
+* **Grafik Kategori (`#analitikSection`)**: Pembagian asimetris 4:8 antara 3 metrik kelompok dan grafik batang SVG taktil dengan garis batas rerata kategori.
+* **Direktori 13 Unit Pasar (`#unitPasarSection`)**: Grid 3 kolom memuat 13 unit pasar rakyat dengan penyaring kecamatan.
+* **Panel Rekomendasi & Tanya AI Multi-Sumber (`AssistantDrawer` & `/rekomendasi-ai`)**: Menggantikan keranjang belanja; panel geser kanan & halaman khusus untuk menanyakan kewajaran harga, perbandingan lintas sumber resmi, serta saran beli dari AI Gemini berbasis data Supabase.
 
 ---
 
-## 6. Admin Portal Component Specs & Integrity Rules
+## 6. Lorong Pasar 3D Interaktif (WebGL Three.js Architecture)
 
-### 6.1. Filter Koridor Wilayah (Island Corridor Tabs)
-* **Kategori Tab**: `Semua Wilayah`, `Jawa`, `Sumatera`, `Kalimantan`, `Sulawesi`, `Bali-Nusra`, `Maluku-Papua`.
-* **Layout**: `flex flex-wrap items-center gap-1.5`. Dilarang menggunakan overflow slider sempit yang memotong stroke teks atau memicu gesture swipe yang menelan aksi klik pengguna.
-* **Token Tab**:
-  * Aktif: `bg-[#1B1A18] text-white border-[#1B1A18] shadow-xs`.
-  * Inaktif: `bg-white text-[#706E6A] border-[#E5E3DE] hover:bg-[#FAF9F5] hover:text-[#1B1A18]`.
-
-### 6.2. Pagination Kontrol Data Tabel & Interactive Ellipsis
-* **Limit Standar**: 10 item per halaman (`ITEMS_PER_PAGE = 10`) untuk mencegah tabel data panjang tak terbatas.
-* **Komponen**: `AdminPagination.tsx`.
-* **State Reset**: Mengubah pencarian teks atau filter wilayah pulau wajib mengembalikan halaman ke `page 1`.
-* **Tombol Nomor Halaman**: `w-8 h-8 rounded-xl font-semibold border text-xs`.
-* **Interactive Ellipsis Popover (`...`)**: Jika jumlah halaman melampaui batas (misal: `1 2 3 ... 7`), tombol `...` dapat diklik untuk memunculkan bubble popover interaktif (`PILIH HALAMAN`) yang berisi tombol nomor halaman tersembunyi (`4, 5, 6`), sehingga pengguna dapat langsung melompat ke halaman manapun tanpa harus menekan tombol satu per satu. Popup dilengkapi backdrop click-outside untuk menutup secara otomatis.
-
-### 6.3. Stroke & Border Integrity (Anti-Clipping Rule)
-* **Larangan Penggunaan `outline outline-1`**: `outline` pada elemen bersudut lengkung (`rounded-[16px]`, `rounded-[24px]`) menyebabkan artefak visual terpotong di tepi container scroll (`overflow-y-auto` / `overflow-x-auto`).
-* **Standar Wajib**: Selalu gunakan `border border-[#E5E3DE]` atau `border border-[#1B1A18]` dengan padding kontainer minimal `p-1` agar garis batas 100% utuh dan tidak terpotong subpixel.
-
-### 6.4. Tabel Data Admin & Alokasi Kolom Bebas Sesak (Anti-Crowding & Anti-Clipping Aksi)
-* **Penyederhanaan Kolom Pasar Tradisional**: Menghapus kolom "Sentra Spesialisasi" dari tabel utama untuk mencegah kepadatan visual (*visual crowding*). Detail spesialisasi tetap dapat dikelola via modal form edit.
-* **Alokasi Lebar Kolom Tabel Pasar (`table-fixed`)**:
-  * `Pasar & Wilayah`: `w-[36%] min-w-[220px]`
-  * `Titik GPS`: `w-[24%] min-w-[170px]`
-  * `Jam Operasional`: `w-[20%] min-w-[140px]`
-  * `Status Peta`: `w-[10%] min-w-[90px]`
-  * `Aksi`: `w-[10%] min-w-[100px] text-right pr-6`
-* **Jarak Aman Kolom Aksi (`pr-6`)**: Seluruh cell dan header kolom "Aksi" wajib memiliki padding kanan minimal `pr-6` (24px) agar tombol `[Edit]` dan `[Hapus]` memiliki ruang bernapas yang cukup dan garis tepi (*border stroke*) tidak pernah terpotong oleh batas kontainer kartu ber-`overflow-hidden`.
-
-### 6.5. Entri Cepat Harga Resmi Harian & Sinkronisasi Multi-Wilayah
-* **Filter Koridor Pulau (`ISLAND_TABS`)**: Memungkinkan pemilihan koridor wilayah nusantara (`Semua`, `Jawa`, `Sumatera`, `Kalimantan`, `Sulawesi`, `Bali-Nusra`, `Maluku-Papua`) yang menyaring daftar pasar secara reaktif.
-* **Search Bar & Autocomplete Pasar**: Menggantikan native dropdown `<select>` dengan input pencarian responsif lengkap dengan tag pulau dan kota (contoh: `[KALIMANTAN] Pasar Segiri · Kota Samarinda`).
-* **Akses Cepat Geser Horisontal (Scrollable / Swipeable Track)**:
-  * Menggunakan `flex items-center gap-2 overflow-x-auto scrollbar-none` (tanpa tombol panah `< >` dan tanpa pembungkusan baris/wrap).
-  * Menampilkan pasar-pasar aktif secara dinamis sesuai koridor pulau yang sedang dipilih.
-* **Kartu Konteks Dampak Publik**: Menampilkan identitas pasar, nama provinsi publik, indeks biaya logistik kargo laut (disparitas HAP), dan keterangan keterhubungan live dengan website publik.
-* **Modal Pasar Multi-Wilayah (`MarketFormModal.tsx`)**: Wajib menyertakan pemilih `Provinsi / Wilayah Pangan` (`MOCK_REGIONS`) agar setiap pasar baru otomatis terpetakan ke `regionId` yang valid.
-
----
-
-## 7. Peta Spasial & Keranjang Belanja Spec
-
-### 7.1. Peta Pasar & Tabel Komparasi Harga
-* **Spasial Interaktif**: Menggunakan Leaflet.js dengan marker terpusat otomatis (*auto-center & zoom*) pada koordinat provinsi aktif.
-* **Tabel Peringkat Pasar Transparan**:
-  * Kolom: `Peringkat & Pasar`, `Harga Lapak / kg`, `Rerata Wilayah`, `Selisih (%)`, `Laporan Warga`, `Aksi`.
-  * Menghapus indikator stok gudang/toko untuk menghindari misinformasi publik. Fokus 100% pada perbandingan harga lapak vs harga rata-rata acuan wilayah.
-* **Mode Ringan (Tabel Langsung)**: Toggle cepat untuk pengguna dengan koneksi internet terbatas tanpa memuat peta Leaflet.
-
-### 7.2. Keranjang Belanja & Fitur Berbagi Catatan
-* **Store Keranjang Terpusat**: Menggunakan `CartProvider` yang tersinkronisasi otomatis dengan `localStorage` (`hargaku_user_cart_items`).
-* **Integrasi Cek Harga Wajar $\rightarrow$ Keranjang**: Hasil evaluasi kewajaran belanja di lapak menyediakan tombol satu-klik `[+ Masukkan ke Keranjang Belanja]` dengan status konfirmasi instan.
-* **Komparasi Dinamis Multi-Wilayah**: Otomatis membandingkan total belanja paket komoditas di seluruh pasar tradisional pada wilayah/provinsi yang sedang aktif dipilih di navbar.
-* **Ekspor Catatan Belanja WhatsApp**: Tombol satu-klik `bg-[#25D366]` untuk menyalin rincian belanja, pasar paling hemat, dan estimasi total biaya ke clipboard serta membuka WhatsApp Web/App secara otomatis.
-
-
-
+* **Struktur Lapak Bertingkat, Gema Tekstur UV Organik, & Wadah Otentik**: Lapak kayu 3 undakan (Depan 0.58m, Tengah 0.82m, Belakang 1.06m) menggunakan alas gundukan padat (`mound`) dan tekstur UV prosedural otentik: ikan kembung pipih bersirip ekor V-fork di atas es serut bak biru, cabai melengkung bertangkai hijau menggunung penuh, daging sapi marmer, minyak goreng botol keemasan, bak beras terbuka, serta krat/keranjang/baskom pasar tradisional.
+* **Sinkronisasi Satu Sumber Kebenaran (`BOGOR_COMMODITIES`)**: Seluruh 18 lapak 3D mengambil ID, nama resmi, satuan (`/kg`, `/ikat`, `/liter`), kategori, dan harga resmi langsung dari `BOGOR_COMMODITIES`, memastikan konsistensi mutlak antara spanduk, objek 3D, hitbox raycast, dan popup rincian.
+* **Poster Dinding & Spanduk Gantung Lapak**: Setiap sekat komoditas dilengkapi poster dinding di sisi kiri/kanan dan spanduk gantung yang hanya menampilkan ilustrasi gambar komoditas, nomor lapak, kategori, dan nama barang (bebas angka harga statis karena harga dikelola dinamis dari fetch API & Konsol Admin). Harga dinamis tetap tampil pada papan harga meja, tooltip sorotan, dan modal detail.
+* **Optimasi Kinerja Ekstrem (Anti-Lag)**:
+  * **Batching `THREE.InstancedMesh`**: Seluruh ribuan butir komoditas organik digambar dalam belasan draw call terpadu, menghemat draw call WebGL lebih dari 95%.
+  * **Pencahayaan Terkumpul (Pooled Dynamic Lights)**: Menggunakan 2 `PointLight` dinamis yang mengikuti posisi kamera pengguna serta eliminasi render pass transmissive ganda.
+  * **Render On-Demand & Pembersihan GPU**: Loop render berinterpolasi halus hanya berjalan aktif saat kamera bergerak/di-scroll, disertai pembersihan total geometri, material, dan tekstur saat unmount.

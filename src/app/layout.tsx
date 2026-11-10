@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { roobert, clayDisplay } from '@/app/fonts';
+import { ubuntu } from '@/app/fonts';
 import { PublicLayoutWrapper } from '@/components/layout/PublicLayoutWrapper';
 
 export const metadata: Metadata = {
-  title: 'HargaKu — Tahu Harga Wajar Pasar Sebelum Melangkah Belanja',
+  title: 'PasarKu Bogor: Harga Pasar, Lebih Dekat',
   description:
-    'Platform transparansi komoditas pangan dengan standarisasi acuan nasional Bapanas terkalibrasi daerah. Cek tren harga riil dari rumah sebelum melangkah belanja dan bandingkan penawaran pedagang dengan harga wajar pasar.',
+    'Platform digital untuk menjelajahi, membandingkan, dan memantau harga komoditas pasar secara real-time berdasarkan publikasi resmi Perumda Pasar Pakuan Jaya Kota Bogor.',
 };
 
 export default function RootLayout({
@@ -15,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${roobert.variable} ${clayDisplay.variable}`}>
-      <body className="min-h-screen flex flex-col font-sans bg-[#FAF9F5] text-[#1B1A18] antialiased selection:bg-[#EEF773] selection:text-[#1B1A18]">
+    <html lang="id" data-theme="light" className={`${ubuntu.variable} scroll-smooth`}>
+      <body className="min-h-screen flex flex-col font-sans bg-[var(--bg-paper)] text-[var(--text-primary)] antialiased transition-colors duration-200">
         <PublicLayoutWrapper>{children}</PublicLayoutWrapper>
       </body>
     </html>

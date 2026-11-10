@@ -5,13 +5,54 @@
 ---
 
 ## 📌 Status Terkini (Current State)
-* **Tanggal Terakhir Diperbarui**: 2026-10-23
-* **Fase Saat Ini**: **Fase A — First Draft (19 Okt – 1 Nov 2026)** — Arsitektur Standarisasi Nasional HAP Bapanas + Penyesuaian Daerah Dinamis & Deteksi Mark-up Belanja Pangan Aktif.
-* **Fokus Pengerjaan**: Perluasan cakupan platform dari pilot tunggal Kota Bogor menjadi platform nasional dengan kemampuan penyesuaian daerah (multi-wilayah), melayani dua momen kunci belanja warga (Momen 1: Cek tren pra-belanja dari rumah; Momen 2: Cek kewajaran & deteksi mark-up pedagang saat di depan lapak pasar).
+* **Tanggal Terakhir Diperbarui**: 2026-11-10
+* **Fase Saat Ini**: **Fase C: Integrasi Database Supabase, AI Rekomendasi Harga Multi-Sumber (Gemini), & Dinamisasi PasarKu 3D**
+* **Fokus Pengerjaan**: Menghapus harga statis dari poster/banner 3D, menghubungkan katalog/harga harian/laporan/pengaturan ke Supabase PostgreSQL, menambahkan konfigurasi API Key dinamis di Admin Console (`/admin` -> `Integrasi AI & API`), serta menggantikan seluruh fitur keranjang belanja menjadi **Rekomendasi Harga AI Multi-Sumber & Tanya Jawab** (`/rekomendasi-ai` & `AssistantDrawer`).
+* **Fitur Utama Terkini**:
+  - **Integrasi Database Supabase PostgreSQL (`supabase/schema.sql`, `src/lib/server/admin-db.ts`, `src/lib/store/admin-store.tsx`)**:
+    - Tabel `commodities`, `markets`, `daily_prices`, `citizen_reports`, dan `system_settings` (dilindungi RLS) berjalan di Supabase PostgreSQL 17.11 via Session Pooler `pg` + `@supabase/supabase-js`.
+    - Endpoint `/api/v1/admin/bootstrap`, `/api/v1/admin/sync`, `/api/v1/admin/settings`, `/api/v1/reports`, dan `/api/v1/assistant/chat` tersinkron dua arah antara Konsol Admin, halaman publik `/`, `/cek-harga`, `/lapor`, dan `/rekomendasi-ai`.
+  - **Konfigurasi Gemini API Key Dinamis di DB (`AdminSettingsView.tsx`, `src/lib/server/settings-db.ts`)**:
+    - API key, model aktif (`gemini-3.8-flash`), instruksi sistem, dan sumber pembanding harga disimpan dinamis di tabel `system_settings` Supabase dan dapat diuji serta diganti langsung di dashboard admin (`/admin` -> `Integrasi AI & API`) tanpa hardcode.
+  - **Penggantian Total Keranjang -> Rekomendasi Harga AI Multi-Sumber (`AiRecommendationView.tsx`, `AssistantDrawer.tsx`, `src/lib/server/gemini-service.ts`)**:
+    - Menghapus fitur keranjang belanja dan membandingkan harga dari `Panel Harga Bapanas`, `Survei PIHPS BI`, `Perumda PPJ / Pasar Rakyat`, dan `Laporan Warga Terverifikasi`, lengkap dengan tanya jawab Gemini AI di drawer navbar, modal komoditas, timbangan stage, sorotan, hasil cek harga, serta halaman khusus `/rekomendasi-ai`.
+  - **Banner 3D Bebas Harga Statis & Sinkronisasi Harga Live (`three-banners.ts`, `three-stalls.ts`, `three-scene-manager.ts`, `LorongThreeMarketAlley.tsx`)**:
+    - Poster dinding dan spanduk gantung 3D kini hanya menampilkan ilustrasi gambar komoditas, nomor lapak, kategori, dan nama barang. Harga dinamis dari Admin/Supabase diperbarui secara efisien ke papan harga meja, hover tooltip, dan popup modal tanpa rebuild WebGL context.
 
 ---
 
 ## ✅ Fitur & Tahapan yang Sudah Selesai (Completed)
+- [x] **Penerapan Penuh Desain PasarKu Kota Bogor ke Skrip Utama Next.js & Ekosistem Halaman**:
+  - [x] **Pengalaman Interaktif Scroll Masuk ke Lorong Pasar Nyata Sesuai Foto Referensi Asli ([`PasarKuLorongHero.tsx`](src/components/landing/pasarku/PasarKuLorongHero.tsx), [`LorongPasarRealAlley.tsx`](src/components/landing/pasarku/LorongPasarRealAlley.tsx), [`LorongHotspotPin.tsx`](src/components/landing/pasarku/LorongHotspotPin.tsx))**:
+    - **Transisi Zoom & Buka Gerbang**: Saat pengguna melakukan scroll dari Hero, sayap pasar kiri dan kanan membesar (`scale: 1 -> 3.5`) dan membuka ke samping luar layar, menara teks memudar ke atas, dan kamera seolah melangkah masuk menembus celah gerbang langsung ke dalam lorong pasar tradisional.
+    - **Visual Realistis 100% Mengikuti Foto Pasar Asli**:
+      - Mengeliminasi total kartu kotak yang menutupi layar dan menerapkan foto lorong nyata pasar tradisional Kota Bogor (`public/images/pasarku/market-alley-real.jpg`).
+      - Menampilkan atap seng gelombang, rumbai umbai-umbai merah-putih, pendar lampu gantung filamen kuningan (`.animate-lamp-glow`), meja kayu lapak sayur berjejer di kiri (wortel, tomat, bawang merah, bawang putih, kentang, cabai, kacang panjang) serta meja sayuran daun dan pedagang di kanan.
+      - **Pin Harga Interaktif Taktil ([`LorongHotspotPin.tsx`](src/components/landing/pasarku/LorongHotspotPin.tsx))**: Menyematkan pin harga langsung pada komoditas di atas meja lapak pasar (Wortel, Bawang Merah, Bawang Putih, Cabai Keriting, Cabai Rawit, Kangkung, Bayam, Beras, Daging, Ikan). Mengklik pin membuka pop-up rincian resmi.
+    - **Sensasi Berjalan Masuk ke Dalam saat Scroll ([`useMarketWalk.ts`](src/components/landing/pasarku/useMarketWalk.ts))**:
+      - Saat di-scroll, kamera meluncur maju ke dalam lorong (`scale: 1.0 -> 1.95`, `translateY`) berpusat di titik lenyap lorong (`48% 52%`) dengan ayunan langkah kaki manusia berirama (`stepBobY`).
+    - **Bilah Kendali Bawah & Laci 53 Komoditas ([`LorongBottomBar.tsx`](src/components/landing/pasarku/LorongBottomBar.tsx), [`LorongCommodityDrawer.tsx`](src/components/landing/pasarku/LorongCommodityDrawer.tsx))**:
+      - Toolbar mengambang minimalis di dasar layar: odometer langkah meteran (`👣 X m / 100 m`), pil lompat kategori cepat, tombol langkah mundur/maju, serta tombol laci geser untuk membuka daftar lengkap 53 komoditas tanpa mengganggu pemandangan lorong pasar.
+  - [x] **Ekstraksi Aset WebP PasarKu ([`public/images/pasarku/`](public/images/pasarku/))**: Mengekstrak logo navbar (`logo-nav.webp`), sayap lorong pasar kiri (`market-wing-left.webp`), sayap lorong sembako kanan (`market-wing-right.webp`), dan logo hero (`logo-hero.webp`) dari base64 data URI HTML ke file mandiri yang teroptimasi.
+  - [x] **Tipografi 100% Google Fonts Ubuntu ([`src/app/fonts.ts`](src/app/fonts.ts), [`src/app/layout.tsx`](src/app/layout.tsx))**: Mengonfigurasi keluarga huruf Ubuntu (weights 300, 400, 500, 700) sebagai font tunggal wajib seluruh elemen teks dan digit tabular angka Rupiah.
+  - [x] **Sistem Palet Warna & Token Taktil ([`src/app/globals.css`](src/app/globals.css), [`palet.md`](palet.md))**:
+    - Menyematkan token warna resmi: `--bg-paper (#F9F3EE / #0F1914)`, `--text-primary (#132E20 / #F9F3EE)`, `--accent-chili (#A92717 / #E54D37)`, `--forest-ink (#245034 / #6EE7A0)`, `--border-ink (#132E20 / #4E6B59)`, dan bayangan tegas `--shadow-hard (3px 3px 0px #132E20)`.
+    - Menyediakan dukungan pergantian tema instan: Mode Siang (`data-theme="light"`) dan Mode Subuh (`data-theme="dark"`).
+    - Memetakan token warna Tailwind `@theme` agar seluruh halaman sekunder (`/cek-harga`, `/peta`, `/lapor`, `/keranjang`, `/dashboard`, `/admin`) otomatis beradaptasi dengan palet PasarKu.
+    - Menghapus pita ticker marquee atas di atas navbar sesuai aturan `rule.md`.
+  - [x] **Struktur Modular Landing Page Utama ([`src/app/page.tsx`](src/app/page.tsx), [`src/components/landing/pasarku/`](src/components/landing/pasarku/))**:
+    - [`PasarKuHeroSection.tsx`](src/components/landing/pasarku/PasarKuHeroSection.tsx): Diorama lorong pasar kiri/kanan responsif, pendar lampu gantung berdenyut (`animate-lamp-glow`), pin harga interaktif (`.market-hotspot-pin`), kurva pita gelombang kontur dinamis (`useHeroAnimation.ts`), dan kanvas partikel pagi.
+    - [`PasarKuStageSection.tsx`](src/components/landing/pasarku/PasarKuStageSection.tsx): Meja timbangan mekanis interaktif dengan jarum dial yang bergerak mengikuti beban item keranjang, kartu spesimen mengambang, serta kendali mode dan kecepatan animasi.
+    - [`PasarKuSorotanSection.tsx`](src/components/landing/pasarku/PasarKuSorotanSection.tsx): Sorotan pangan utama dan papan harga cepat 10 komoditas terhubung garis titik-titik buku besar (`.ledger-leader`).
+    - [`PasarKuKatalogSection.tsx`](src/components/landing/pasarku/PasarKuKatalogSection.tsx): Direktori lengkap 53 komoditas resmi Perumda Pasar Pakuan Jaya, filter kategori tab, pencarian cepat, pengurutan, penguji 4 status UI (**R-27**: Normal, Loading, Kosong, Gangguan), dan tombol beralih tampilan Kartu/Tabel.
+    - [`CommodityCard.tsx`](src/components/landing/pasarku/CommodityCard.tsx) & [`CommodityTable.tsx`](src/components/landing/pasarku/CommodityTable.tsx): Kartu taktil tiket pasar (komoditas utama membentang 2 kolom dengan bilah perbandingan rata-rata kategori).
+    - [`PasarKuAnalitikSection.tsx`](src/components/landing/pasarku/PasarKuAnalitikSection.tsx): Metrik harga tertinggi/terendah/rerata dan grafik batang komparasi kategori SVG taktil responsif dengan garis batas rerata.
+    - [`PasarKuUnitPasarSection.tsx`](src/components/landing/pasarku/PasarKuUnitPasarSection.tsx): Direktori 13 unit pasar rakyat Kota Bogor dengan dropdown penyaring kecamatan.
+    - [`PasarKuCartDrawer.tsx`](src/components/landing/pasarku/PasarKuCartDrawer.tsx): Laci belanja simulasi geser kanan dengan bilah kuota anggaran, manipulasi kuantitas, dan penyalinan catatan nota ke clipboard.
+    - [`PasarKuCommodityModal.tsx`](src/components/landing/pasarku/PasarKuCommodityModal.tsx): Dialog modal inspeksi detail komoditas dan perbandingan harga terhadap rata-rata kategori.
+  - [x] **Pembersihan Mutlak Karakter Em-Dash (Rule R-02)**: Mengeliminasi 100% karakter em-dash (`—`) di seluruh file kode sumber `src/` (terverifikasi 0 kemunculan via `scripts/find-em-dash.mjs`).
+  - [x] **Kepatuhan Batas Keras 300 Baris Kode per File (Rule 1)**: Memverifikasi 100% file kode sumber di `src/` berada di bawah 300 baris kode (terverifikasi 151/151 file PASS via `scripts/check-loc.mjs`).
+  - [x] **Sinkronisasi Living Docs**: Memutakhirkan [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) untuk mendokumentasikan sistem desain PasarKu Kota Bogor Tactile Market.
 - [x] **Sinkronisasi Total Living Documentation (`docs/*.md`, `README.md`, `AGENTS.md`)**:
   - [x] [`docs/PRD.md`](docs/PRD.md): Memutakhirkan persona Bu Retno, modul Cek Harga Wajar (sambungan tombol keranjang belanja), sanitasi istilah disparitas harga, modul Peta (tabel peringkat harga lapak vs rerata wilayah tanpa data stok fiktif), modul Keranjang Belanja (komparasi pasar multi-wilayah nasional & ekspor catatan belanja ke WhatsApp), dan modul Admin netral.
   - [x] [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md): Menambahkan Seksi 7 (*Peta Spasial & Keranjang Belanja Spec*), memperbarui spesifikasi Footnote bebas tautan internal di Seksi 5, dan mempertahankan token warna harmonis (Soft Rose Red, Clay Orange, Soft Amber, Forest Green).
@@ -361,17 +402,17 @@
   - 04 · Cek Harga Wajar (`/cek-harga`)
   - 05 · Peta Interaktif Spasial Pasar Nusantara (`/peta`)
   - 06 · Lapor Harga Warga (`/lapor`)
-  - 07 · Keranjang Belanja (`/keranjang`)
+  - 07 · Rekomendasi Harga AI Multi-Sumber & Tanya Jawab (`/rekomendasi-ai`, dengan redirect `/keranjang` -> `/rekomendasi-ai`)
   - 08 · Tentang & Sumber Data (`/tentang`)
-  - 09 · Portal Moderasi TPID (`/admin`)
+  - 09 · Admin Console Terintegrasi Supabase & Pengaturan Gemini AI (`/admin`)
 
 ---
 
 ## 🛑 Kendala & Blocker Aktif (Active Blockers / Issues)
-* *Tidak ada blocker aktif.* Seluruh styling kanvas `HargaKu.pen` (Clay.com Foundations) telah terpasang rapi, fungsional, dan teruji di Next.js 16.
+* *Tidak ada blocker aktif.* Seluruh integrasi Supabase PostgreSQL, konfigurasi Gemini API Key dinamis via Admin Dashboard, AI Rekomendasi Multi-Sumber, serta PasarKu 3D bebas harga statis telah lulus verifikasi build dan runtime smoke test.
 
 ---
 
 ## ⏭️ Langkah Selanjutnya (Next Immediate Actions)
-1. Setup Prisma PostgreSQL dan migrasi database schema sesuai [`docs/SCHEMA.md`](docs/SCHEMA.md).
-2. Hubungkan adapter live backend API saat database terpasang.
+1. Masuk ke `/admin` -> menu **Integrasi AI & API** untuk menyetel dan menguji koneksi **Gemini API Key** langsung ke tabel `system_settings` Supabase.
+2. Sinkronisasi variabel lingkungan produksi (`.env`) di Vercel apabila melakukan deployment ke cloud.
