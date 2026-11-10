@@ -94,11 +94,11 @@ export function AdminPagination({
   const pageItems = getPageItems(currentPage, effectiveTotalPages);
 
   return (
-    <div className="bg-white border border-[#E5E3DE] rounded-[20px] p-4 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div className="text-xs text-[#706E6A]">
-        Menampilkan <span className="font-semibold text-[#1B1A18]">{startIndex}</span> –{' '}
-        <span className="font-semibold text-[#1B1A18]">{endIndex}</span> dari{' '}
-        <span className="font-semibold text-[#1B1A18]">{totalItems}</span> {itemLabel}
+    <div className="market-card p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="text-xs text-[var(--text-secondary)]">
+        Menampilkan <span className="font-mono-num font-bold text-[var(--text-primary)]">{startIndex}</span> s.d.{' '}
+        <span className="font-mono-num font-bold text-[var(--text-primary)]">{endIndex}</span> dari{' '}
+        <span className="font-mono-num font-bold text-[var(--text-primary)]">{totalItems}</span> {itemLabel}
       </div>
 
       <div className="flex items-center gap-1.5">
@@ -109,7 +109,7 @@ export function AdminPagination({
             setActiveEllipsisKey(null);
             onPageChange(Math.max(1, currentPage - 1));
           }}
-          className="p-2 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] text-xs font-semibold text-[#1B1A18] hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          className="market-btn-secondary w-8 h-8 p-0 inline-flex items-center justify-center text-xs disabled:opacity-40"
           title="Halaman Sebelumnya"
         >
           <CaretLeft size={14} weight="bold" />
@@ -126,10 +126,10 @@ export function AdminPagination({
                   setActiveEllipsisKey(null);
                   onPageChange(item.page);
                 }}
-                className={`w-8 h-8 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+                className={`w-8 h-8 p-0 inline-flex items-center justify-center font-mono-num text-xs transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-[#1B1A18] text-white border-[#1B1A18] shadow-xs'
-                    : 'bg-white text-[#706E6A] border-[#E5E3DE] hover:bg-[#FAF9F5] hover:text-[#1B1A18]'
+                    ? 'market-btn-primary'
+                    : 'market-btn-secondary font-bold'
                 }`}
               >
                 {item.page}
@@ -137,7 +137,6 @@ export function AdminPagination({
             );
           }
 
-          // Interactive Ellipsis Popover
           const isOpen = activeEllipsisKey === item.key;
 
           return (
@@ -147,10 +146,8 @@ export function AdminPagination({
                 onClick={() =>
                   setActiveEllipsisKey((prev) => (prev === item.key ? null : item.key))
                 }
-                className={`w-8 h-8 rounded-xl text-xs font-bold border transition-all flex items-center justify-center cursor-pointer ${
-                  isOpen
-                    ? 'bg-[#1B1A18] text-white border-[#1B1A18] shadow-xs'
-                    : 'bg-[#FAF9F5] text-[#706E6A] border-[#E5E3DE] hover:bg-white hover:text-[#1B1A18]'
+                className={`w-8 h-8 p-0 inline-flex items-center justify-center text-xs font-bold transition-all cursor-pointer ${
+                  isOpen ? 'market-btn-primary' : 'market-btn-secondary'
                 }`}
                 title="Klik untuk memilih halaman lain"
               >
@@ -163,8 +160,8 @@ export function AdminPagination({
                     className="fixed inset-0 z-30"
                     onClick={() => setActiveEllipsisKey(null)}
                   />
-                  <div className="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 z-40 bg-white border border-[#1B1A18] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.12)] p-2.5 flex flex-col gap-1.5 min-w-[140px] animate-in fade-in zoom-in-95">
-                    <div className="text-[10px] font-bold text-[#A8A29E] uppercase tracking-wider px-1 text-center">
+                  <div className="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 z-40 market-card p-2.5 flex flex-col gap-1.5 min-w-[148px]">
+                    <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider px-1 text-center">
                       Pilih Halaman
                     </div>
                     <div className="flex items-center justify-center gap-1.5 flex-wrap">
@@ -176,7 +173,7 @@ export function AdminPagination({
                             onPageChange(hp);
                             setActiveEllipsisKey(null);
                           }}
-                          className="w-8 h-8 rounded-xl text-xs font-bold border border-[#E5E3DE] bg-[#FAF9F5] text-[#1B1A18] hover:bg-[#EEF773] hover:border-[#1B1A18] transition-all flex items-center justify-center cursor-pointer shadow-2xs"
+                          className="w-8 h-8 rounded-[10px] font-mono-num text-xs font-bold border border-[var(--border-ink)] bg-[var(--bg-paper)] text-[var(--text-primary)] hover:bg-[var(--accent-chili)] hover:text-white transition-all flex items-center justify-center cursor-pointer"
                         >
                           {hp}
                         </button>
@@ -196,7 +193,7 @@ export function AdminPagination({
             setActiveEllipsisKey(null);
             onPageChange(Math.min(effectiveTotalPages, currentPage + 1));
           }}
-          className="p-2 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] text-xs font-semibold text-[#1B1A18] hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          className="market-btn-secondary w-8 h-8 p-0 inline-flex items-center justify-center text-xs disabled:opacity-40"
           title="Halaman Berikutnya"
         >
           <CaretRight size={14} weight="bold" />

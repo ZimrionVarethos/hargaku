@@ -85,12 +85,11 @@ export function AdminProfileModal({ isOpen, onClose }: AdminProfileModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={onClose} />
-      <div className="relative w-full max-w-lg bg-white border border-[#E5E3DE] rounded-[24px] shadow-2xl p-6 z-10 space-y-5">
-        {/* Modal Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#E5E3DE]">
+      <div className="fixed inset-0 bg-[#0A120E]/65 transition-opacity" onClick={onClose} />
+      <div className="relative w-full max-w-lg market-card p-6 z-10 space-y-5">
+        <div className="flex items-center justify-between pb-3 border-b-2 border-[var(--border-ink)]">
           <div className="flex items-center gap-3">
-            <div className="relative w-10 h-10 rounded-full overflow-hidden border border-[#E5E3DE] bg-[#FAF9F5] shrink-0">
+            <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-[var(--border-ink)] bg-[var(--forest-surface)] shrink-0">
               {user.avatarUrl ? (
                 <img
                   src={user.avatarUrl}
@@ -98,16 +97,16 @@ export function AdminProfileModal({ isOpen, onClose }: AdminProfileModalProps) {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-[#EEF773] text-[#1B1A18] font-bold text-xs">
+                <div className="w-full h-full flex items-center justify-center bg-[var(--forest-surface)] text-[var(--forest-ink)] font-bold text-xs">
                   AD
                 </div>
               )}
             </div>
             <div>
-              <h2 className="text-base font-semibold text-[#1B1A18]">
+              <h2 className="text-base font-bold text-[var(--text-primary)]">
                 Pengaturan Akun Admin
               </h2>
-              <span className="text-xs text-[#706E6A]">
+              <span className="text-xs text-[var(--text-secondary)]">
                 {user.email || 'admin@hargaku.id'}
               </span>
             </div>
@@ -115,21 +114,21 @@ export function AdminProfileModal({ isOpen, onClose }: AdminProfileModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 text-[#706E6A] hover:text-[#1B1A18] rounded-xl border border-[#E5E3DE]"
+            aria-label="Tutup pengaturan akun"
+            className="market-btn-secondary w-9 h-9 p-0 inline-flex items-center justify-center"
           >
-            <X size={18} weight="bold" />
+            <X size={16} weight="bold" />
           </button>
         </div>
 
-        {/* Tab switcher */}
-        <div className="flex items-center gap-1.5 border-b border-[#E5E3DE] pb-2">
+        <div className="flex items-center gap-1.5 border-b border-[var(--border-subtle)] pb-2.5">
           <button
             type="button"
             onClick={() => setActiveTab('PROFILE')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+            className={`px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
               activeTab === 'PROFILE'
-                ? 'bg-[#1B1A18] text-white'
-                : 'text-[#706E6A] hover:bg-[#FAF9F5]'
+                ? 'market-btn-primary'
+                : 'rounded-[10px] text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]'
             }`}
           >
             <User size={14} weight="bold" />
@@ -139,10 +138,10 @@ export function AdminProfileModal({ isOpen, onClose }: AdminProfileModalProps) {
           <button
             type="button"
             onClick={() => setActiveTab('SECURITY')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+            className={`px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
               activeTab === 'SECURITY'
-                ? 'bg-[#1B1A18] text-white'
-                : 'text-[#706E6A] hover:bg-[#FAF9F5]'
+                ? 'market-btn-primary'
+                : 'rounded-[10px] text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]'
             }`}
           >
             <LockKey size={14} weight="bold" />
@@ -152,10 +151,10 @@ export function AdminProfileModal({ isOpen, onClose }: AdminProfileModalProps) {
           <button
             type="button"
             onClick={() => setActiveTab('AUDIT')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+            className={`px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
               activeTab === 'AUDIT'
-                ? 'bg-[#1B1A18] text-white'
-                : 'text-[#706E6A] hover:bg-[#FAF9F5]'
+                ? 'market-btn-primary'
+                : 'rounded-[10px] text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]'
             }`}
           >
             <ClockCounterClockwise size={14} weight="bold" />
@@ -163,57 +162,55 @@ export function AdminProfileModal({ isOpen, onClose }: AdminProfileModalProps) {
           </button>
         </div>
 
-        {/* Notifications */}
         {successMessage && (
-          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-medium text-emerald-700 flex items-center gap-2">
+          <div className="p-3 rounded-[10px] bg-[var(--forest-surface)] border-2 border-[var(--forest-ink)] text-xs font-bold text-[var(--forest-ink)] flex items-center gap-2">
             <CheckCircle size={16} weight="fill" />
             <span>{successMessage}</span>
           </div>
         )}
         {passwordError && (
-          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-600">
+          <div className="p-3 rounded-[10px] bg-[var(--accent-chili-soft)] border-2 border-[var(--accent-chili)] text-xs font-bold text-[var(--accent-chili)]">
             {passwordError}
           </div>
         )}
 
-        {/* Tab Content: Profile */}
         {activeTab === 'PROFILE' && (
           <form onSubmit={handleSaveProfile} className="space-y-4">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[#1B1A18]">Nama Tampilan</label>
+              <label className="text-xs font-bold text-[var(--text-primary)]">Nama Tampilan</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] text-sm text-[#1B1A18] focus:bg-white focus:outline-[#1B1A18]"
+                className="w-full px-3 py-2 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)]"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[#1B1A18]">Email Administrator</label>
+              <label className="text-xs font-bold text-[var(--text-primary)]">Email Administrator</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] text-sm text-[#1B1A18] focus:bg-white focus:outline-[#1B1A18]"
+                className="w-full px-3 py-2 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)]"
               />
             </div>
 
-            <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E5E3DE] text-xs text-[#706E6A] space-y-1">
+            <div className="p-3 rounded-[10px] bg-[var(--bg-paper)] border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] space-y-1">
               <div className="flex justify-between">
                 <span>Peran:</span>
-                <span className="font-semibold text-[#1B1A18]">Administrator Penuh</span>
+                <span className="font-bold text-[var(--text-primary)]">Administrator Penuh</span>
               </div>
               <div className="flex justify-between">
                 <span>Hak Akses:</span>
-                <span className="font-semibold text-[#15803D]">CRUD Komoditas, Pasar, Harga &amp; Moderasi</span>
+                <span className="font-bold text-[var(--forest-ink)]">CRUD Komoditas, Pasar, Harga &amp; Moderasi</span>
               </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl bg-[#EEF773] text-[#1B1A18] border border-[#1B1A18] text-xs font-bold shadow-[2px_2px_0px_#1B1A18] hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
+                className="market-btn-primary px-4 py-2 text-xs cursor-pointer"
               >
                 Simpan Perubahan
               </button>
@@ -221,40 +218,39 @@ export function AdminProfileModal({ isOpen, onClose }: AdminProfileModalProps) {
           </form>
         )}
 
-        {/* Tab Content: Security */}
         {activeTab === 'SECURITY' && (
           <form onSubmit={handleSavePassword} className="space-y-3.5">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[#1B1A18]">Kata Sandi Saat Ini</label>
+              <label className="text-xs font-bold text-[var(--text-primary)]">Kata Sandi Saat Ini</label>
               <input
                 type="password"
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-3 py-2 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] text-sm text-[#1B1A18] focus:bg-white focus:outline-[#1B1A18]"
+                className="w-full px-3 py-2 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)]"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#1B1A18]">Kata Sandi Baru</label>
+                <label className="text-xs font-bold text-[var(--text-primary)]">Kata Sandi Baru</label>
                 <input
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Min. 6 karakter"
-                  className="w-full px-3 py-2 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] text-sm text-[#1B1A18] focus:bg-white focus:outline-[#1B1A18]"
+                  className="w-full px-3 py-2 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#1B1A18]">Ulangi Kata Sandi Baru</label>
+                <label className="text-xs font-bold text-[var(--text-primary)]">Ulangi Kata Sandi Baru</label>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Ulangi sandi baru"
-                  className="w-full px-3 py-2 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] text-sm text-[#1B1A18] focus:bg-white focus:outline-[#1B1A18]"
+                  className="w-full px-3 py-2 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)]"
                 />
               </div>
             </div>
@@ -262,7 +258,7 @@ export function AdminProfileModal({ isOpen, onClose }: AdminProfileModalProps) {
             <div className="flex justify-end gap-2 pt-2">
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl bg-[#EEF773] text-[#1B1A18] border border-[#1B1A18] text-xs font-bold shadow-[2px_2px_0px_#1B1A18] hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
+                className="market-btn-primary px-4 py-2 text-xs cursor-pointer"
               >
                 Perbarui Kata Sandi
               </button>
@@ -270,20 +266,19 @@ export function AdminProfileModal({ isOpen, onClose }: AdminProfileModalProps) {
           </form>
         )}
 
-        {/* Tab Content: Audit */}
         {activeTab === 'AUDIT' && (
           <div className="space-y-3 text-xs">
-            <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E5E3DE] space-y-2">
+            <div className="p-3.5 rounded-[12px] bg-[var(--bg-paper)] border border-[var(--border-subtle)] space-y-2">
               <div className="flex items-center justify-between font-medium">
-                <span className="text-[#706E6A]">Status Sesi:</span>
-                <span className="text-[#15803D] font-bold flex items-center gap-1">
+                <span className="text-[var(--text-secondary)]">Status Sesi:</span>
+                <span className="text-[var(--forest-ink)] font-bold flex items-center gap-1">
                   <ShieldCheck size={14} weight="fill" />
                   Aktif &amp; Terverifikasi
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[#706E6A]">Token Autentikasi:</span>
-                <span className="font-mono text-[#1B1A18]">JWT-SHA256 (Exp: 24 Jam)</span>
+                <span className="text-[var(--text-secondary)]">Token Autentikasi:</span>
+                <span className="font-mono-num font-bold text-[var(--text-primary)]">JWT-SHA256 (Exp: 24 Jam)</span>
               </div>
             </div>
           </div>

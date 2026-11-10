@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   loginAdmin,
   isAuthenticatedAdmin,
 } from '@/lib/auth/admin-auth';
+import { useTheme } from '@/lib/store/theme-store';
 import {
   LockKey,
   EnvelopeSimple,
@@ -16,10 +18,13 @@ import {
   ArrowLeft,
   WarningCircle,
   CheckCircle,
+  Moon,
+  Sun,
 } from '@phosphor-icons/react';
 
 export function AdminLoginForm() {
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,75 +64,95 @@ export function AdminLoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md bg-white border border-[#E5E3DE] rounded-[28px] shadow-[0_12px_40px_rgba(0,0,0,0.06)] p-6 sm:p-8 space-y-6">
-      {/* Header */}
-      <div className="space-y-3 text-center sm:text-left">
-        <div className="flex items-center justify-center sm:justify-start gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-[#EEF773] border-1.5 border-[#1B1A18] flex items-center justify-center font-bold text-base text-[#1B1A18] shadow-[1px_1px_0px_#1B1A18]">
-            H.
+    <div className="w-full max-w-md market-card p-6 sm:p-8 space-y-6">
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5">
+            <span className="pasarku-logo-plaque">
+              <Image
+                src="/images/pasarku/logo-nav.webp"
+                alt="Logo PasarKu"
+                width={400}
+                height={173}
+                unoptimized
+                className="h-7 w-auto object-contain"
+              />
+            </span>
+            <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-ink)]">
+              ADMIN CONSOLE
+            </span>
           </div>
-          <span className="text-[11px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[#FAF9F5] text-[#1B1A18] border border-[#E5E3DE]">
-            ADMIN CONSOLE
-          </span>
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Beralih ke Mode Siang' : 'Beralih ke Mode Subuh'}
+            title={theme === 'dark' ? 'Beralih ke Mode Siang' : 'Beralih ke Mode Subuh'}
+            className="market-btn-secondary w-9 h-9 p-0 inline-flex items-center justify-center shrink-0"
+          >
+            {theme === 'dark' ? (
+              <Sun size={17} weight="bold" className="text-[#EEF773]" aria-hidden="true" />
+            ) : (
+              <Moon size={17} weight="bold" className="text-[var(--text-primary)]" aria-hidden="true" />
+            )}
+          </button>
         </div>
 
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#1B1A18]">
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
             Masuk ke Dashboard Admin
           </h1>
-          <p className="text-xs text-[#706E6A] mt-1">
-            Gunakan akun administrator untuk mengakses panel kontrol HargaKu.
+          <p className="text-xs text-[var(--text-secondary)] mt-1">
+            Gunakan akun administrator untuk mengakses panel kontrol PasarKu.
           </p>
         </div>
       </div>
 
-      {/* Notifications */}
       {errorMessage && (
-        <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs font-medium text-red-600 flex items-center gap-2">
+        <div className="p-3.5 rounded-[10px] bg-[var(--accent-chili-soft)] border-2 border-[var(--accent-chili)] text-xs font-bold text-[var(--accent-chili)] flex items-center gap-2">
           <WarningCircle size={16} weight="fill" className="shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
       {isSuccess && (
-        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-medium text-emerald-700 flex items-center gap-2">
+        <div className="p-3.5 rounded-[10px] bg-[var(--forest-surface)] border-2 border-[var(--forest-ink)] text-xs font-bold text-[var(--forest-ink)] flex items-center gap-2">
           <CheckCircle size={16} weight="fill" className="shrink-0" />
           <span>Autentikasi berhasil! Mengalihkan...</span>
         </div>
       )}
 
-      {/* Login Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-[#1B1A18]">Email Administrator</label>
+          <label className="text-xs font-bold text-[var(--text-primary)]">Email Administrator</label>
           <div className="relative">
-            <EnvelopeSimple size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8A29E]" />
+            <EnvelopeSimple size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@hargaku.id"
-              className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] focus:bg-white text-sm text-[#1B1A18] focus:outline-[#1B1A18]"
+              className="w-full pl-10 pr-3.5 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]"
             />
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-[#1B1A18]">Kata Sandi</label>
+          <label className="text-xs font-bold text-[var(--text-primary)]">Kata Sandi</label>
           <div className="relative">
-            <LockKey size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8A29E]" />
+            <LockKey size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] focus:bg-white text-sm text-[#1B1A18] focus:outline-[#1B1A18]"
+              className="w-full pl-10 pr-10 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]"
             />
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
               aria-label={showPassword ? 'Sembunyikan sandi' : 'Tampilkan sandi'}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#A8A29E] hover:text-[#1B1A18]"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
             >
               {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
             </button>
@@ -135,12 +160,12 @@ export function AdminLoginForm() {
         </div>
 
         <div className="flex items-center justify-between pt-0.5">
-          <label className="flex items-center gap-2 cursor-pointer text-xs text-[#706E6A]">
+          <label className="flex items-center gap-2 cursor-pointer text-xs text-[var(--text-secondary)] font-medium">
             <input
               type="checkbox"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="w-4 h-4 rounded border-[#E5E3DE] text-[#1B1A18] focus:ring-0"
+              className="w-4 h-4 rounded border-[var(--border-ink)] accent-[var(--accent-chili)]"
             />
             <span>Ingat sesi saya</span>
           </label>
@@ -149,18 +174,17 @@ export function AdminLoginForm() {
         <button
           type="submit"
           disabled={isLoading || isSuccess}
-          className="w-full py-3 rounded-xl bg-[#EEF773] text-[#1B1A18] border border-[#1B1A18] text-xs font-bold shadow-[2px_2px_0px_#1B1A18] hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
+          className="market-btn-primary w-full py-3 text-xs flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
         >
           <span>{isLoading ? 'Memverifikasi...' : 'Masuk ke Dashboard'}</span>
           <ArrowRight size={16} weight="bold" />
         </button>
       </form>
 
-      {/* Back to public link */}
-      <div className="text-center pt-2 border-t border-[#E5E3DE]">
+      <div className="text-center pt-3 border-t border-[var(--border-subtle)]">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[#706E6A] hover:text-[#1B1A18] transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--accent-chili)] transition-colors no-underline"
         >
           <ArrowLeft size={14} weight="bold" />
           <span>Kembali ke Website Publik</span>

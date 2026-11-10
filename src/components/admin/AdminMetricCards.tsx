@@ -22,54 +22,50 @@ export function AdminMetricCards({
 }: Props) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {/* 1. Menunggu */}
-      <div className="p-4 sm:p-5 rounded-[18px] bg-white border border-[#E5E3DE] shadow-xs flex flex-col justify-between gap-3">
+      <div className="market-card p-4 sm:p-5 flex flex-col justify-between gap-3">
         <div className="flex items-center justify-between">
-          <span className="text-[12px] font-semibold text-[#8E8D86]">
+          <span className="text-[12px] font-bold text-[var(--text-muted)]">
             Menunggu Review
           </span>
-          <Hourglass size={18} weight="bold" className="text-[#8E8D86]" />
+          <Hourglass size={18} weight="bold" className="text-[var(--text-muted)]" />
         </div>
-        <span className="text-[26px] sm:text-[30px] font-bold text-[#1B1A18] tabular-nums tracking-tight">
+        <span className="font-mono-num text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tabular-nums tracking-tight">
           {pendingCount}
         </span>
       </div>
 
-      {/* 2. Anomali */}
-      <div className="p-4 sm:p-5 rounded-[18px] bg-[#FFF3ED] border border-[#FFD9C7] shadow-xs flex flex-col justify-between gap-3">
+      <div className="market-card bg-[var(--ochre-surface)] p-4 sm:p-5 flex flex-col justify-between gap-3">
         <div className="flex items-center justify-between">
-          <span className="text-[12px] font-bold text-[#FF7714]">
+          <span className="text-[12px] font-bold text-[var(--warning-ink)]">
             Peringatan Anomali
           </span>
-          <WarningCircle size={18} weight="bold" className="text-[#FF7714]" />
+          <WarningCircle size={18} weight="bold" className="text-[var(--warning-ink)]" />
         </div>
-        <span className="text-[26px] sm:text-[30px] font-bold text-[#FF7714] tabular-nums tracking-tight">
+        <span className="font-mono-num text-[26px] sm:text-[30px] font-bold text-[var(--warning-ink)] tabular-nums tracking-tight">
           {anomalyCount}
         </span>
       </div>
 
-      {/* 3. Disetujui */}
-      <div className="p-4 sm:p-5 rounded-[18px] bg-white border border-[#E5E3DE] shadow-xs flex flex-col justify-between gap-3">
+      <div className="market-card p-4 sm:p-5 flex flex-col justify-between gap-3">
         <div className="flex items-center justify-between">
-          <span className="text-[12px] font-semibold text-[#8E8D86]">
+          <span className="text-[12px] font-bold text-[var(--text-muted)]">
             Disetujui Hari Ini
           </span>
-          <CheckCircle size={18} weight="bold" className="text-[#15803D]" />
+          <CheckCircle size={18} weight="bold" className="text-[var(--forest-ink)]" />
         </div>
-        <span className="text-[26px] sm:text-[30px] font-bold text-[#1B1A18] tabular-nums tracking-tight">
+        <span className="font-mono-num text-[26px] sm:text-[30px] font-bold text-[var(--forest-ink)] tabular-nums tracking-tight">
           {approvedCount}
         </span>
       </div>
 
-      {/* 4. Dieliminasi */}
-      <div className="p-4 sm:p-5 rounded-[18px] bg-white border border-[#E5E3DE] shadow-xs flex flex-col justify-between gap-3">
+      <div className="market-card p-4 sm:p-5 flex flex-col justify-between gap-3">
         <div className="flex items-center justify-between">
-          <span className="text-[12px] font-semibold text-[#8E8D86]">
+          <span className="text-[12px] font-bold text-[var(--text-muted)]">
             Dieliminasi / Spam
           </span>
-          <Prohibit size={18} weight="bold" className="text-[#991B1B]" />
+          <Prohibit size={18} weight="bold" className="text-[var(--accent-chili)]" />
         </div>
-        <span className="text-[26px] sm:text-[30px] font-bold text-[#991B1B] tabular-nums tracking-tight">
+        <span className="font-mono-num text-[26px] sm:text-[30px] font-bold text-[var(--accent-chili)] tabular-nums tracking-tight">
           {rejectedCount}
         </span>
       </div>

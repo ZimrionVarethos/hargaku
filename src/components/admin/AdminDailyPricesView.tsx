@@ -118,17 +118,16 @@ export function AdminDailyPricesView() {
         regionMap={regionMap}
       />
 
-      {/* Quick market scrollable track */}
-      <div className="bg-white border border-[#E5E3DE] rounded-[20px] p-4 flex flex-col gap-2 shadow-2xs">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-semibold text-[#1B1A18]">
-            Akses Cepat Pasar {selectedIsland !== 'ALL' ? `(Koridor ${selectedIsland})` : '(Semua Wilayah)'}:
+      <div className="market-card p-4 sm:p-5 flex flex-col gap-2.5">
+        <div className="flex items-center justify-between text-xs pb-2 border-b border-[var(--border-subtle)]">
+          <span className="font-bold text-[var(--text-primary)]">
+            Akses Cepat Pasar {selectedIsland !== 'ALL' ? `(Koridor ${selectedIsland})` : '(Semua Wilayah)'}
           </span>
-          <span className="text-[11px] text-[#A8A29E]">
-            {islandFilteredMarkets.length} pasar · Geser ke samping untuk memilih pasar lain
+          <span className="text-[11px] font-bold text-[var(--text-muted)]">
+            {islandFilteredMarkets.length} pasar &middot; Geser ke samping
           </span>
         </div>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1.5 pt-0.5 -mx-1 px-1 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-0.5 -mx-1 px-1 scrollbar-none">
           {islandFilteredMarkets.map((m) => {
             const isSelected = m.id === selectedMarketId;
             return (
@@ -136,10 +135,10 @@ export function AdminDailyPricesView() {
                 key={m.id}
                 type="button"
                 onClick={() => handleSelectMarket(m.id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border shrink-0 transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border shrink-0 transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-[#1B1A18] text-white border-[#1B1A18] shadow-xs'
-                    : 'bg-[#FAF9F5] text-[#706E6A] border-[#E5E3DE] hover:bg-white hover:text-[#1B1A18]'
+                    ? 'market-btn-primary'
+                    : 'bg-[var(--bg-paper)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:border-[var(--border-ink)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {m.name}
@@ -149,41 +148,40 @@ export function AdminDailyPricesView() {
         </div>
       </div>
 
-      {/* Public Context Banner */}
-      <div className="bg-white border border-[#E5E3DE] rounded-[20px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+      <div className="market-card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-start sm:items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#FAF9F5] border border-[#E5E3DE] flex items-center justify-center text-[#FF7714] shrink-0">
+          <div className="w-10 h-10 rounded-[10px] bg-[var(--accent-chili-soft)] border border-[var(--border-ink)] flex items-center justify-center text-[var(--accent-chili)] shrink-0">
             <Storefront size={20} weight="bold" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-sm font-bold text-[#1B1A18]">{currentMarket?.name}</h3>
-              <span className="px-2 py-0.5 rounded-md bg-[#FAF9F5] text-[#706E6A] border border-[#E5E3DE] text-[11px] font-medium flex items-center gap-1">
-                <MapPin size={12} weight="bold" />
+              <h3 className="text-sm font-bold text-[var(--text-primary)]">{currentMarket?.name}</h3>
+              <span className="px-2.5 py-0.5 rounded-full bg-[var(--bg-muted)] text-[var(--text-secondary)] border border-[var(--border-subtle)] text-[11px] font-bold inline-flex items-center gap-1">
+                <MapPin size={12} weight="bold" className="text-[var(--accent-chili)]" />
                 {currentRegion ? `${currentRegion.name} (${currentRegion.islandName})` : currentMarket?.city || 'Nasional'}
               </span>
             </div>
-            <p className="text-xs text-[#706E6A] mt-0.5">
-              {currentMarket?.address || 'Alamat pasar terdaftar di konsol admin'} · {currentMarket?.district}
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+              {currentMarket?.address || 'Alamat pasar terdaftar di konsol admin'} &middot; {currentMarket?.district}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF9F5] border border-[#E5E3DE] text-xs font-medium text-[#1B1A18]">
-            <Clock size={14} className="text-[#706E6A]" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-[var(--bg-paper)] border-2 border-[var(--border-ink)] text-xs font-bold text-[var(--text-primary)]">
+            <Clock size={14} className="text-[var(--text-muted)]" />
             <input
               type="date"
               value={recordedDate}
               onChange={(e) => setRecordedDate(e.target.value)}
-              className="bg-transparent border-none text-xs font-semibold text-[#1B1A18] focus:outline-none cursor-pointer"
+              className="bg-transparent border-none text-xs font-mono-num font-bold text-[var(--text-primary)] focus:outline-none cursor-pointer"
             />
           </div>
         </div>
       </div>
 
       {successMessage && (
-        <div className="p-3.5 rounded-2xl bg-[#DCFCE7] border border-[#86EFAC] text-[#166534] text-xs font-semibold flex items-center gap-2">
+        <div className="p-3.5 rounded-[12px] bg-[var(--forest-surface)] border-2 border-[var(--forest-ink)] text-[var(--forest-ink)] text-xs font-bold flex items-center gap-2">
           <CheckCircle size={16} weight="bold" />
           <span>{successMessage}</span>
         </div>

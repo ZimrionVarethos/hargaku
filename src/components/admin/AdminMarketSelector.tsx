@@ -45,10 +45,9 @@ export function AdminMarketSelector({
 
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-      {/* Search Autocomplete */}
       <div ref={searchBoxRef} className="relative flex-1 max-w-md">
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#706E6A]">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--text-muted)]">
             <MagnifyingGlass size={16} />
           </div>
           <input
@@ -60,13 +59,14 @@ export function AdminMarketSelector({
             }}
             onFocus={() => setIsSearchOpen(true)}
             placeholder="Cari pasar, kota, atau kecamatan..."
-            className="w-full pl-9 pr-9 py-2 rounded-xl bg-white border border-[#E5E3DE] text-xs font-medium text-[#1B1A18] placeholder-[#A8A29E] focus:outline-none focus:border-[#1B1A18] shadow-2xs transition-colors"
+            className="w-full pl-9 pr-9 py-2.5 rounded-[10px] bg-[var(--bg-card)] border-2 border-[var(--border-ink)] text-xs font-bold text-[var(--text-primary)] placeholder-[var(--text-muted)] shadow-[var(--shadow-hard-sm)]"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#706E6A] hover:text-[#1B1A18]"
+              aria-label="Hapus pencarian pasar"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-[var(--text-muted)] hover:text-[var(--text-primary)]"
             >
               <X size={14} />
             </button>
@@ -74,7 +74,7 @@ export function AdminMarketSelector({
         </div>
 
         {isSearchOpen && (
-          <div className="absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-[#E5E3DE] rounded-2xl shadow-lg p-2 z-30 space-y-1">
+          <div className="absolute top-full left-0 right-0 mt-1.5 max-h-60 overflow-y-auto market-card p-2 z-30 space-y-1">
             {filteredMarkets.length > 0 ? (
               filteredMarkets.map((m) => {
                 const isSelected = m.id === selectedMarketId;
@@ -84,23 +84,23 @@ export function AdminMarketSelector({
                     key={m.id}
                     type="button"
                     onClick={() => handleSelectMarket(m.id)}
-                    className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                    className={`w-full text-left px-3 py-2 rounded-[10px] text-xs flex items-center justify-between transition-colors cursor-pointer ${
                       isSelected
-                        ? 'bg-[#1B1A18] text-white'
-                        : 'hover:bg-[#FAF9F5] text-[#1B1A18]'
+                        ? 'bg-[var(--accent-chili)] text-white'
+                        : 'hover:bg-[var(--bg-muted)] text-[var(--text-primary)]'
                     }`}
                   >
                     <div className="flex flex-col">
-                      <span className="font-semibold">{m.name}</span>
-                      <span className={isSelected ? 'text-white/80' : 'text-[#706E6A]'}>
-                        {m.city || 'Nasional'} · {m.district}
+                      <span className="font-bold">{m.name}</span>
+                      <span className={isSelected ? 'text-white/85' : 'text-[var(--text-secondary)]'}>
+                        {m.city || 'Nasional'} &middot; {m.district}
                       </span>
                     </div>
                     <span
-                      className={`px-2 py-0.5 rounded-md text-[10px] font-medium ${
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                         isSelected
-                          ? 'bg-white/20 text-white'
-                          : 'bg-[#FAF9F5] text-[#6E6D67] border border-[#E5E3DE]'
+                          ? 'bg-white/20 text-white border-white/30'
+                          : 'bg-[var(--bg-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)]'
                       }`}
                     >
                       {reg?.islandName || 'Nasional'}
@@ -109,7 +109,7 @@ export function AdminMarketSelector({
                 );
               })
             ) : (
-              <div className="p-4 text-center text-xs text-[#706E6A]">
+              <div className="p-4 text-center text-xs text-[var(--text-muted)]">
                 Tidak ada pasar yang cocok dengan pencarian &quot;{searchQuery}&quot;
               </div>
             )}
@@ -117,7 +117,6 @@ export function AdminMarketSelector({
         )}
       </div>
 
-      {/* Island tabs */}
       <div className="flex flex-wrap items-center gap-1.5 shrink-0">
         {ISLAND_TABS.map((tab) => {
           const isSelected = selectedIsland === tab.id;
@@ -129,10 +128,10 @@ export function AdminMarketSelector({
                 setSelectedIsland(tab.id);
                 setSearchQuery('');
               }}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-[#1B1A18] text-white border-[#1B1A18] shadow-xs'
-                  : 'bg-white text-[#706E6A] border-[#E5E3DE] hover:bg-[#FAF9F5] hover:text-[#1B1A18]'
+                  ? 'market-btn-primary'
+                  : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:border-[var(--border-ink)] hover:text-[var(--text-primary)]'
               }`}
             >
               {tab.label}

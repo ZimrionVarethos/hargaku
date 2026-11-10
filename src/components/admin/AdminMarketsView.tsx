@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import type { AdminMarket } from '@/lib/types/admin';
 import { useAdminStore } from '@/lib/store/admin-store';
+import { MARKET_ISLAND_FILTERS, REGION_ISLAND_MAP } from './admin-data';
 import { MarketFormModal } from './MarketFormModal';
 import { AdminConfirmModal } from './AdminConfirmModal';
 import { AdminPagination } from './AdminPagination';
@@ -16,40 +17,6 @@ import {
   MapPin,
   Clock,
 } from '@phosphor-icons/react';
-
-const REGION_TO_ISLAND: Record<string, string> = {
-  reg_jabar: 'JAWA',
-  reg_jakarta: 'JAWA',
-  reg_jateng: 'JAWA',
-  reg_jatim: 'JAWA',
-  reg_banten: 'JAWA',
-  reg_diy: 'JAWA',
-  reg_sumut: 'SUMATERA',
-  reg_sumsel: 'SUMATERA',
-  reg_sumbar: 'SUMATERA',
-  reg_riau: 'SUMATERA',
-  reg_lampung: 'SUMATERA',
-  reg_kaltim: 'KALIMANTAN',
-  reg_kalbar: 'KALIMANTAN',
-  reg_kalsel: 'KALIMANTAN',
-  reg_sulsel: 'SULAWESI',
-  reg_sulut: 'SULAWESI',
-  reg_bali: 'BALI_NUSRA',
-  reg_ntb: 'BALI_NUSRA',
-  reg_ntt: 'BALI_NUSRA',
-  reg_maluku: 'MALUKU_PAPUA',
-  reg_papua: 'MALUKU_PAPUA',
-};
-
-const ISLAND_TABS = [
-  { id: 'ALL', label: 'Semua Wilayah' },
-  { id: 'JAWA', label: 'Jawa' },
-  { id: 'SUMATERA', label: 'Sumatera' },
-  { id: 'KALIMANTAN', label: 'Kalimantan' },
-  { id: 'SULAWESI', label: 'Sulawesi' },
-  { id: 'BALI_NUSRA', label: 'Bali-Nusra' },
-  { id: 'MALUKU_PAPUA', label: 'Maluku-Papua' },
-];
 
 const ITEMS_PER_PAGE = 10;
 
@@ -71,7 +38,7 @@ export function AdminMarketsView() {
       (item.district && item.district.toLowerCase().includes(q)) ||
       (item.address && item.address.toLowerCase().includes(q));
 
-    const itemIsland = (item.regionId && REGION_TO_ISLAND[item.regionId]) || 'JAWA';
+    const itemIsland = (item.regionId && REGION_ISLAND_MAP[item.regionId]) || 'JAWA';
     const matchesIsland = selectedIsland === 'ALL' || itemIsland === selectedIsland;
 
     return matchesSearch && matchesIsland;
@@ -101,17 +68,13 @@ export function AdminMarketsView() {
 
   return (
     <div className="space-y-6">
-      {/* Header bar */}
-      <div className="bg-white border border-[#E5E3DE] rounded-[24px] p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="market-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-[#FF7714]">
-            Titik Pantau Spasial
-          </span>
-          <h1 className="text-2xl font-medium tracking-tight text-[#1B1A18] mt-0.5">
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
             Kelola Pasar Tradisional
           </h1>
-          <p className="text-sm text-[#706E6A]">
-            Atur data pasar tradisional per koridor wilayah nusantara untuk titik peta spasial dan komparasi harga.
+          <p className="text-sm text-[var(--text-secondary)] mt-0.5">
+            Atur data sentra pasar per koridor wilayah untuk titik peta spasial 3D dan komparasi harga.
           </p>
         </div>
 
@@ -121,42 +84,40 @@ export function AdminMarketsView() {
             setEditingItem(null);
             setIsModalOpen(true);
           }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#EEF773] text-[#1B1A18] border border-[#1B1A18] text-xs font-bold shadow-[2px_2px_0px_#1B1A18] hover:translate-x-0.5 hover:translate-y-0.5 transition-all self-start sm:self-auto shrink-0 cursor-pointer"
+          className="market-btn-primary inline-flex items-center gap-2 px-4 py-2.5 text-xs self-start sm:self-auto shrink-0 cursor-pointer"
         >
           <Plus size={16} weight="bold" />
           <span>Tambah Pasar</span>
         </button>
       </div>
 
-      {/* Filter and Search Bar: Full-width wrap (No Slider) */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-3">
         <div className="relative flex-1">
           <MagnifyingGlass
             size={18}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8A29E]"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
           />
           <input
             type="text"
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Cari pasar, kota, atau kecamatan..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E5E3DE] bg-white text-sm text-[#1B1A18] focus:border-[#1B1A18] focus:outline-none"
+            className="w-full pl-10 pr-4 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-card)] text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] shadow-[var(--shadow-hard-sm)]"
           />
         </div>
 
-        {/* Koridor Wilayah Pulau Tabs: Wrap naturally with zero gesture conflicts */}
         <div className="flex flex-wrap items-center gap-1.5 shrink-0">
-          {ISLAND_TABS.map((tab) => {
+          {MARKET_ISLAND_FILTERS.map((tab) => {
             const isSelected = selectedIsland === tab.id;
             return (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => handleIslandChange(tab.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-[#1B1A18] text-white border-[#1B1A18] shadow-xs'
-                    : 'bg-white text-[#706E6A] border-[#E5E3DE] hover:bg-[#FAF9F5] hover:text-[#1B1A18]'
+                    ? 'market-btn-primary'
+                    : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:border-[var(--border-ink)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {tab.label}
@@ -166,84 +127,101 @@ export function AdminMarketsView() {
         </div>
       </div>
 
-      {/* Data Table */}
-      <div className="bg-white border border-[#E5E3DE] rounded-[24px] shadow-sm overflow-hidden min-h-[520px] flex flex-col justify-between">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm table-fixed">
-            <thead className="bg-[#FAF9F5] border-b border-[#E5E3DE] text-xs font-semibold text-[#706E6A] uppercase tracking-wider">
-              <tr>
-                <th className="px-5 py-3.5 w-[36%] min-w-[220px]">Pasar & Wilayah</th>
-                <th className="px-5 py-3.5 w-[24%] min-w-[170px]">Titik GPS (Lat, Lng)</th>
-                <th className="px-5 py-3.5 w-[20%] min-w-[140px]">Jam Operasional</th>
-                <th className="px-5 py-3.5 w-[10%] min-w-[90px]">Status Peta</th>
-                <th className="px-5 py-3.5 w-[10%] min-w-[100px] text-right pr-6">Aksi</th>
+      <div className="market-card p-5 sm:p-6 flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b-2 border-[var(--border-ink)]">
+          <div>
+            <h2 className="text-[17px] font-bold text-[var(--text-primary)] tracking-tight">
+              Daftar Sentra Pasar Tradisional
+            </h2>
+            <p className="text-[12px] text-[var(--text-secondary)]">
+              Koordinat GPS, jam operasional bongkar muat, dan status pemantauan peta publik.
+            </p>
+          </div>
+          <span className="text-[11px] font-bold text-[var(--text-muted)] bg-[var(--bg-muted)] px-2.5 py-1 rounded-full border border-[var(--border-subtle)] w-fit">
+            {filtered.length} Pasar Pantauan
+          </span>
+        </div>
+
+        <div className="overflow-x-auto -mx-5 sm:mx-0 px-5 sm:px-0">
+          <table className="w-full text-left border-collapse min-w-[700px]">
+            <thead>
+              <tr className="border-b border-[var(--border-subtle)] text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                <th className="py-2.5 pl-3.5 sm:pl-4 pr-4 min-w-[220px]">No. &amp; Pasar</th>
+                <th className="py-2.5 px-4 whitespace-nowrap">Titik GPS</th>
+                <th className="py-2.5 px-4 whitespace-nowrap">Jam Operasional</th>
+                <th className="py-2.5 px-4 text-center whitespace-nowrap">Status Peta</th>
+                <th className="py-2.5 pr-3.5 sm:pr-4 pl-4 text-right whitespace-nowrap">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E5E3DE]">
+            <tbody className="divide-y divide-[var(--border-subtle)] text-[13px]">
               {paginatedMarkets.length > 0 ? (
-                paginatedMarkets.map((item) => (
-                  <tr key={item.id} className="hover:bg-[#FAF9F5]/70 transition-colors">
-                    <td className="px-5 py-4">
-                      <div className="font-medium text-[#1B1A18]">{item.name}</div>
-                      <div className="text-xs text-[#706E6A]">
-                        <span className="font-semibold text-[#1B1A18]">{item.city || 'Nasional'}</span> · {item.district}
+                paginatedMarkets.map((item, idx) => (
+                  <tr key={item.id} className="hover:bg-[var(--bg-muted)]/35 transition-colors">
+                    <td className="py-3.5 pl-3.5 sm:pl-4 pr-4">
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                            item.isActive
+                              ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border border-[var(--forest-ink)]/45'
+                              : 'bg-[var(--bg-muted)] text-[var(--text-muted)] border border-[var(--border-subtle)]'
+                          }`}
+                        >
+                          {startIndex + idx + 1}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="font-bold text-[var(--text-primary)]">{item.name}</div>
+                          <span className="text-[11px] text-[var(--text-muted)]">
+                            {item.city || 'Nasional'}, {item.district}
+                          </span>
+                        </div>
                       </div>
                     </td>
-                    <td className="px-5 py-4">
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FAF9F5] border border-[#E5E3DE] text-xs font-mono text-[#44403C]">
-                        <MapPin size={13} weight="fill" className="text-[#FF7714]" />
+                    <td className="py-3.5 px-4">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--bg-muted)] border border-[var(--border-subtle)] text-[11px] font-mono-num font-bold text-[var(--text-secondary)]">
+                        <MapPin size={12} weight="fill" className="text-[var(--accent-chili)] shrink-0" />
                         <span>{item.latitude.toFixed(4)}, {item.longitude.toFixed(4)}</span>
-                      </div>
+                      </span>
                     </td>
-                    <td className="px-5 py-4 text-xs text-[#706E6A]">
+                    <td className="py-3.5 px-4 text-xs font-medium text-[var(--text-secondary)]">
                       <div className="flex items-center gap-1.5">
-                        <Clock size={14} className="text-[#A8A29E]" />
+                        <Clock size={14} className="text-[var(--text-muted)] shrink-0" />
                         <span>{item.operatingHours}</span>
                       </div>
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="py-3.5 px-4 text-center">
                       <button
                         type="button"
                         onClick={() => updateMarket(item.id, { isActive: !item.isActive })}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border transition-colors cursor-pointer ${
                           item.isActive
-                            ? 'bg-[#DCFCE7] text-[#15803D] border-[#BBF7D0]'
-                            : 'bg-[#F4F3F0] text-[#706E6A] border-[#E5E3DE]'
+                            ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border-[var(--forest-ink)]/40'
+                            : 'bg-[var(--bg-muted)] text-[var(--text-muted)] border-[var(--border-subtle)]'
                         }`}
                       >
-                        {item.isActive ? (
-                          <>
-                            <CheckCircle size={14} weight="fill" />
-                            <span>Aktif</span>
-                          </>
-                        ) : (
-                          <>
-                            <XCircle size={14} weight="fill" />
-                            <span>Nonaktif</span>
-                          </>
-                        )}
+                        {item.isActive ? <CheckCircle size={13} weight="fill" /> : <XCircle size={13} weight="fill" />}
+                        <span>{item.isActive ? 'Aktif' : 'Nonaktif'}</span>
                       </button>
                     </td>
-                    <td className="px-5 py-4 text-right pr-6">
-                      <div className="inline-flex items-center gap-2">
+                    <td className="py-3.5 pr-3.5 sm:pr-4 pl-4 text-right">
+                      <div className="inline-flex items-center justify-end gap-2">
                         <button
                           type="button"
                           onClick={() => {
                             setEditingItem(item);
                             setIsModalOpen(true);
                           }}
-                          aria-label={`Edit ${item.name}`}
-                          className="p-1.5 rounded-lg border border-[#E5E3DE] text-[#706E6A] hover:text-[#1B1A18] hover:bg-white cursor-pointer"
+                          className="market-btn-secondary px-3 py-1.5 text-[11px] font-bold inline-flex items-center gap-1"
                         >
-                          <PencilSimple size={16} weight="bold" />
+                          <PencilSimple size={13} weight="bold" />
+                          <span>Edit</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => setDeletingMarket({ id: item.id, name: item.name })}
                           aria-label={`Hapus ${item.name}`}
-                          className="p-1.5 rounded-lg border border-[#E5E3DE] text-[#706E6A] hover:text-red-600 hover:border-red-200 hover:bg-red-50 cursor-pointer"
+                          className="p-1.5 rounded-lg border border-[var(--border-ink)] text-[var(--text-secondary)] hover:text-[var(--accent-chili)] hover:bg-[var(--accent-chili-soft)] transition-colors cursor-pointer"
                         >
-                          <Trash size={16} weight="bold" />
+                          <Trash size={14} weight="bold" />
                         </button>
                       </div>
                     </td>
@@ -251,7 +229,7 @@ export function AdminMarketsView() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-xs text-[#706E6A]">
+                  <td colSpan={5} className="px-4 py-8 text-center text-xs text-[var(--text-muted)]">
                     Tidak ada pasar tradisional yang sesuai dengan kata kunci pencarian atau wilayah ini.
                   </td>
                 </tr>

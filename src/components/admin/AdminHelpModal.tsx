@@ -38,19 +38,19 @@ export function AdminHelpModal({ isOpen, onClose }: AdminHelpModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={onClose} />
-      <div className="relative w-full max-w-lg bg-white border border-[#E5E3DE] rounded-[24px] shadow-2xl p-6 z-10 space-y-5">
-        <div className="flex items-center justify-between pb-3 border-b border-[#E5E3DE]">
+      <div className="fixed inset-0 bg-[#0A120E]/65 transition-opacity" onClick={onClose} />
+      <div className="relative w-full max-w-lg market-card p-6 z-10 space-y-5">
+        <div className="flex items-center justify-between pb-3 border-b-2 border-[var(--border-ink)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#EEF773] border border-[#1B1A18] flex items-center justify-center text-[#1B1A18] shadow-[1px_1px_0px_#1B1A18]">
+            <div className="w-10 h-10 rounded-[10px] bg-[var(--forest-surface)] border-2 border-[var(--border-ink)] flex items-center justify-center text-[var(--forest-ink)]">
               <Question size={20} weight="bold" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-[#1B1A18]">
+              <h2 className="text-base font-bold text-[var(--text-primary)]">
                 Bantuan &amp; Panduan Admin
               </h2>
-              <span className="text-xs text-[#706E6A]">
-                SOP Pengelolaan Data HargaKu
+              <span className="text-xs text-[var(--text-secondary)]">
+                SOP Pengelolaan Data PasarKu
               </span>
             </div>
           </div>
@@ -58,9 +58,9 @@ export function AdminHelpModal({ isOpen, onClose }: AdminHelpModalProps) {
             type="button"
             onClick={onClose}
             aria-label="Tutup modal"
-            className="p-1.5 text-[#706E6A] hover:text-[#1B1A18] rounded-xl border border-[#E5E3DE] transition-colors"
+            className="market-btn-secondary w-9 h-9 p-0 inline-flex items-center justify-center"
           >
-            <X size={18} weight="bold" />
+            <X size={16} weight="bold" />
           </button>
         </div>
 
@@ -70,13 +70,13 @@ export function AdminHelpModal({ isOpen, onClose }: AdminHelpModalProps) {
             return (
               <div
                 key={faq.title}
-                className="p-3.5 rounded-2xl bg-[#FAF9F5] border border-[#E5E3DE] space-y-1.5"
+                className="p-3.5 rounded-[12px] bg-[var(--bg-paper)] border border-[var(--border-subtle)] space-y-1.5"
               >
-                <div className="flex items-center gap-2 font-semibold text-xs text-[#1B1A18]">
-                  <Icon size={16} weight="bold" className="text-[#FF7714]" />
+                <div className="flex items-center gap-2 font-bold text-xs text-[var(--text-primary)]">
+                  <Icon size={16} weight="bold" className="text-[var(--accent-chili)]" />
                   <span>{faq.title}</span>
                 </div>
-                <p className="text-xs text-[#706E6A] leading-relaxed">
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                   {faq.desc}
                 </p>
               </div>
@@ -84,7 +84,7 @@ export function AdminHelpModal({ isOpen, onClose }: AdminHelpModalProps) {
           })}
         </div>
 
-        <div className="pt-2 border-t border-[#E5E3DE] flex items-center justify-between text-xs text-[#706E6A]">
+        <div className="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs text-[var(--text-muted)]">
           <div className="flex items-center gap-1.5">
             <EnvelopeSimple size={15} />
             <span>Kontak: support@hargaku.id</span>
@@ -92,7 +92,7 @@ export function AdminHelpModal({ isOpen, onClose }: AdminHelpModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="px-3.5 py-1.5 rounded-xl bg-[#1B1A18] text-white text-xs font-semibold hover:bg-black transition-colors"
+            className="market-btn-primary px-4 py-1.5 text-xs"
           >
             Tutup
           </button>

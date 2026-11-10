@@ -148,7 +148,7 @@ export function AdminSettingsView() {
 
   if (loading) {
     return (
-      <div className="bg-white border border-[#E5E3DE] rounded-3xl p-8 text-xs text-[#706E6A]">
+      <div className="market-card p-8 text-xs font-medium text-[var(--text-muted)]">
         Memuat konfigurasi integrasi Supabase, Gemini AI &amp; Mapbox...
       </div>
     );
@@ -156,12 +156,12 @@ export function AdminSettingsView() {
 
   if (needsRelogin) {
     return (
-      <div className="bg-white border border-[#E5E3DE] rounded-3xl p-6 sm:p-8 space-y-4">
-        <div className="flex items-center gap-2.5 text-amber-700 font-bold text-sm">
+      <div className="market-card p-6 sm:p-8 space-y-4">
+        <div className="flex items-center gap-2.5 text-[var(--warning-ink)] font-bold text-sm">
           <WarningCircle size={20} weight="fill" />
           <span>Sesi Server Admin Perlu Diperbarui</span>
         </div>
-        <p className="text-xs text-[#706E6A] leading-relaxed">
+        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
           Untuk mengelola kredensial API &amp; token Mapbox di database Supabase, silakan masuk ulang agar cookie sesi terverifikasi oleh server.
         </p>
         <button
@@ -170,7 +170,7 @@ export function AdminSettingsView() {
             logoutAdmin();
             router.push('/admin/login');
           }}
-          className="px-4 py-2.5 rounded-xl bg-[#EEF773] text-[#1B1A18] border border-[#1B1A18] text-xs font-bold cursor-pointer"
+          className="market-btn-primary px-4 py-2.5 text-xs cursor-pointer"
         >
           Keluar &amp; Login Ulang Sekarang
         </button>

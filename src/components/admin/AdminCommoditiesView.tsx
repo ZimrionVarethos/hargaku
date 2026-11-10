@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import type { AdminCommodity, CommodityCategory } from '@/lib/types/admin';
+import type { AdminCommodity } from '@/lib/types/admin';
 import { useAdminStore } from '@/lib/store/admin-store';
+import { COMMODITY_CATEGORY_FILTERS } from './admin-data';
 import { CommodityFormModal } from './CommodityFormModal';
 import { AdminConfirmModal } from './AdminConfirmModal';
 import { AdminPagination } from './AdminPagination';
@@ -14,6 +15,10 @@ import {
   CheckCircle,
   XCircle,
 } from '@phosphor-icons/react';
+
+const CATEGORY_LABEL_MAP: Record<string, string> = Object.fromEntries(
+  COMMODITY_CATEGORY_FILTERS.filter((c) => c.id !== 'ALL').map((c) => [c.id, c.label])
+);
 
 export function AdminCommoditiesView() {
   const { commodities, addCommodity, updateCommodity, deleteCommodity } =
@@ -79,16 +84,12 @@ export function AdminCommoditiesView() {
 
   return (
     <div className="space-y-6">
-      {/* Header bar */}
-      <div className="bg-white border border-[#E5E3DE] rounded-[24px] p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="market-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-[#FF7714]">
-            Katalog Pangan Publik
-          </span>
-          <h1 className="text-2xl font-medium tracking-tight text-[#1B1A18] mt-0.5">
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
             Kelola Komoditas Pangan
           </h1>
-          <p className="text-sm text-[#706E6A]">
+          <p className="text-sm text-[var(--text-secondary)] mt-0.5">
             Atur nama, kategori, harga acuan HAP/HET Bapanas, dan status tayang di publik.
           </p>
         </div>
@@ -96,140 +97,154 @@ export function AdminCommoditiesView() {
         <button
           type="button"
           onClick={handleOpenAdd}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#EEF773] text-[#1B1A18] border border-[#1B1A18] text-xs font-bold shadow-[2px_2px_0px_#1B1A18] hover:translate-x-0.5 hover:translate-y-0.5 transition-all self-start sm:self-auto shrink-0"
+          className="market-btn-primary inline-flex items-center gap-2 px-4 py-2.5 text-xs self-start sm:self-auto shrink-0 cursor-pointer"
         >
           <Plus size={16} weight="bold" />
           <span>Tambah Komoditas</span>
         </button>
       </div>
 
-      {/* Filter and Search Bar */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-3">
         <div className="relative flex-1">
           <MagnifyingGlass
             size={18}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8A29E]"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
           />
           <input
             type="text"
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder="Cari komoditas..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E5E3DE] bg-white text-sm text-[#1B1A18] focus:border-[#1B1A18] focus:outline-none"
+            placeholder="Cari komoditas atau slug..."
+            className="w-full pl-10 pr-4 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-card)] text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] shadow-[var(--shadow-hard-sm)]"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5 shrink-0">
-          {['ALL', 'CABAI_BAWANG', 'BERAS', 'DAGING', 'MINYAK', 'SAYUR'].map(
-            (cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => handleCategoryChange(cat)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
-                  selectedCategory === cat
-                    ? 'bg-[#1B1A18] text-white border-[#1B1A18] shadow-xs'
-                    : 'bg-white text-[#706E6A] border-[#E5E3DE] hover:bg-[#FAF9F5] hover:text-[#1B1A18]'
-                }`}
-              >
-                {cat === 'ALL'
-                  ? 'Semua'
-                  : cat === 'CABAI_BAWANG'
-                  ? 'Cabai/Bawang'
-                  : cat === 'BERAS'
-                  ? 'Beras'
-                  : cat === 'DAGING'
-                  ? 'Daging/Telur'
-                  : cat === 'MINYAK'
-                  ? 'Minyak/Gula'
-                  : 'Sayur'}
-              </button>
-            )
-          )}
+          {COMMODITY_CATEGORY_FILTERS.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => handleCategoryChange(cat.id)}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
+                selectedCategory === cat.id
+                  ? 'market-btn-primary'
+                  : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:border-[var(--border-ink)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Data Table */}
-      <div className="bg-white border border-[#E5E3DE] rounded-[24px] shadow-sm overflow-hidden min-h-[520px] flex flex-col justify-between">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm table-fixed">
-            <thead className="bg-[#FAF9F5] border-b border-[#E5E3DE] text-xs font-semibold text-[#706E6A] uppercase tracking-wider">
-              <tr>
-                <th className="px-5 py-3.5 w-[24%] min-w-[160px]">Komoditas</th>
-                <th className="px-5 py-3.5 w-[16%] min-w-[120px]">Kategori</th>
-                <th className="px-5 py-3.5 w-[10%] min-w-[80px]">Satuan</th>
-                <th className="px-5 py-3.5 w-[18%] min-w-[130px]">HAP Acuan Resmi</th>
-                <th className="px-5 py-3.5 w-[12%] min-w-[90px]">Toleransi</th>
-                <th className="px-5 py-3.5 w-[12%] min-w-[90px]">Status Publik</th>
-                <th className="px-5 py-3.5 w-[8%] min-w-[80px] text-right pr-6">Aksi</th>
+      <div className="market-card p-5 sm:p-6 flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b-2 border-[var(--border-ink)]">
+          <div>
+            <h2 className="text-[17px] font-bold text-[var(--text-primary)] tracking-tight">
+              Katalog Komoditas &amp; Acuan HAP
+            </h2>
+            <p className="text-[12px] text-[var(--text-secondary)]">
+              Klik status publik untuk mengaktifkan atau menonaktifkan komoditas di katalog warga.
+            </p>
+          </div>
+          <span className="text-[11px] font-bold text-[var(--text-muted)] bg-[var(--bg-muted)] px-2.5 py-1 rounded-full border border-[var(--border-subtle)] w-fit">
+            {filtered.length} Komoditas Terdata
+          </span>
+        </div>
+
+        <div className="overflow-x-auto -mx-5 sm:mx-0 px-5 sm:px-0">
+          <table className="w-full text-left border-collapse min-w-[700px]">
+            <thead>
+              <tr className="border-b border-[var(--border-subtle)] text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                <th className="py-2.5 pl-3.5 sm:pl-4 pr-4 min-w-[210px]">No. &amp; Komoditas</th>
+                <th className="py-2.5 px-4 whitespace-nowrap">Kategori</th>
+                <th className="py-2.5 px-4 whitespace-nowrap">Satuan</th>
+                <th className="py-2.5 px-4 text-right whitespace-nowrap">HAP Resmi</th>
+                <th className="py-2.5 px-4 text-center whitespace-nowrap">Toleransi</th>
+                <th className="py-2.5 px-4 text-center whitespace-nowrap">Status</th>
+                <th className="py-2.5 pr-3.5 sm:pr-4 pl-4 text-right whitespace-nowrap">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E5E3DE]">
-              {paginatedCommodities.map((item) => (
-                <tr key={item.id} className="hover:bg-[#FAF9F5]/70 transition-colors">
-                  <td className="px-5 py-4">
-                    <div className="font-medium text-[#1B1A18]">{item.name}</div>
-                    <div className="text-xs text-[#A8A29E]">{item.slug}</div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#FAF9F5] border border-[#E5E3DE] text-[#44403C]">
-                      {item.category}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-[#706E6A] font-mono text-xs">
-                    {item.unit}
-                  </td>
-                  <td className="px-5 py-4 font-semibold text-[#1B1A18]">
-                    Rp {item.hapHetPrice.toLocaleString('id-ID')}
-                  </td>
-                  <td className="px-5 py-4 text-xs text-[#706E6A]">
-                    ±{item.tolerancePercentage}%
-                  </td>
-                  <td className="px-5 py-4">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleActive(item)}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
-                        item.isActive
-                          ? 'bg-[#DCFCE7] text-[#15803D] border-[#BBF7D0]'
-                          : 'bg-[#F4F3F0] text-[#706E6A] border-[#E5E3DE]'
-                      }`}
-                    >
-                      {item.isActive ? (
-                        <>
-                          <CheckCircle size={14} weight="fill" />
-                          <span>Aktif</span>
-                        </>
-                      ) : (
-                        <>
-                          <XCircle size={14} weight="fill" />
-                          <span>Nonaktif</span>
-                        </>
-                      )}
-                    </button>
-                  </td>
-                  <td className="px-5 py-4 text-right pr-6">
-                    <div className="inline-flex items-center gap-2">
+            <tbody className="divide-y divide-[var(--border-subtle)] text-[13px]">
+              {paginatedCommodities.length > 0 ? (
+                paginatedCommodities.map((item, idx) => (
+                  <tr key={item.id} className="hover:bg-[var(--bg-muted)]/35 transition-colors">
+                    <td className="py-3.5 pl-3.5 sm:pl-4 pr-4">
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                            item.isActive
+                              ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border border-[var(--forest-ink)]/45'
+                              : 'bg-[var(--bg-muted)] text-[var(--text-muted)] border border-[var(--border-subtle)]'
+                          }`}
+                        >
+                          {startIndex + idx + 1}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="font-bold text-[var(--text-primary)]">{item.name}</div>
+                          <span className="text-[11px] text-[var(--text-muted)]">{item.slug}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[var(--bg-muted)] border border-[var(--border-subtle)] text-[var(--text-secondary)]">
+                        {CATEGORY_LABEL_MAP[item.category] || item.category}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 text-xs font-semibold text-[var(--text-secondary)] whitespace-nowrap">
+                      / {item.unit}
+                    </td>
+                    <td className="py-3.5 px-4 text-right font-mono-num font-extrabold text-[var(--forest-ink)] tabular-nums text-[14px] whitespace-nowrap">
+                      Rp {item.hapHetPrice.toLocaleString('id-ID')}
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--ochre-surface)] text-[var(--warning-ink)] border border-[var(--earth-ochre)]/45 font-mono-num tabular-nums">
+                        &plusmn;{item.tolerancePercentage}%
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
                       <button
                         type="button"
-                        onClick={() => handleOpenEdit(item)}
-                        aria-label={`Edit ${item.name}`}
-                        className="p-1.5 rounded-lg border border-[#E5E3DE] text-[#706E6A] hover:text-[#1B1A18] hover:bg-white"
+                        onClick={() => handleToggleActive(item)}
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border transition-colors cursor-pointer ${
+                          item.isActive
+                            ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border-[var(--forest-ink)]/40'
+                            : 'bg-[var(--bg-muted)] text-[var(--text-muted)] border-[var(--border-subtle)]'
+                        }`}
                       >
-                        <PencilSimple size={16} weight="bold" />
+                        {item.isActive ? <CheckCircle size={13} weight="fill" /> : <XCircle size={13} weight="fill" />}
+                        <span>{item.isActive ? 'Aktif' : 'Nonaktif'}</span>
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(item.id, item.name)}
-                        aria-label={`Hapus ${item.name}`}
-                        className="p-1.5 rounded-lg border border-[#E5E3DE] text-[#706E6A] hover:text-red-600 hover:border-red-200 hover:bg-red-50"
-                      >
-                        <Trash size={16} weight="bold" />
-                      </button>
-                    </div>
+                    </td>
+                    <td className="py-3.5 pr-3.5 sm:pr-4 pl-4 text-right">
+                      <div className="inline-flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEdit(item)}
+                          className="market-btn-secondary px-3 py-1.5 text-[11px] font-bold inline-flex items-center gap-1"
+                        >
+                          <PencilSimple size={13} weight="bold" />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(item.id, item.name)}
+                          aria-label={`Hapus ${item.name}`}
+                          className="p-1.5 rounded-lg border border-[var(--border-ink)] text-[var(--text-secondary)] hover:text-[var(--accent-chili)] hover:bg-[var(--accent-chili-soft)] transition-colors cursor-pointer"
+                        >
+                          <Trash size={14} weight="bold" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-xs text-[var(--text-muted)]">
+                    Tidak ada komoditas yang cocok dengan filter pencarian ini.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

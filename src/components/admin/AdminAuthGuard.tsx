@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { isAuthenticatedAdmin } from '@/lib/auth/admin-auth';
 
@@ -24,13 +25,20 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
   if (!isAuthorized) {
     return (
       <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#EEF773] border-1.5 border-[#1B1A18] flex items-center justify-center font-bold text-base text-[#1B1A18] shadow-[2px_2px_0px_#1B1A18] animate-bounce">
-          H.
-        </div>
-        <div className="text-xs font-semibold text-[#1B1A18]">
+        <span className="pasarku-logo-plaque px-3 py-1.5 bg-[var(--bg-card)] border-2 border-[var(--border-ink)] shadow-[var(--shadow-hard-sm)] animate-pulse">
+          <Image
+            src="/images/pasarku/logo-nav.webp"
+            alt="Logo PasarKu"
+            width={400}
+            height={173}
+            unoptimized
+            className="h-8 w-auto object-contain"
+          />
+        </span>
+        <div className="text-xs font-bold text-[var(--text-primary)]">
           Memverifikasi Otorisasi Administrator...
         </div>
-        <span className="text-[11px] text-[#706E6A]">
+        <span className="text-[11px] text-[var(--text-muted)]">
           Mengalihkan ke portal masuk jika sesi tidak valid.
         </span>
       </div>

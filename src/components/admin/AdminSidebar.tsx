@@ -67,50 +67,56 @@ export function AdminSidebar({
 
   const navContent = (
     <div className="flex flex-col justify-between h-full space-y-4">
-      <div className="space-y-1">
-        <div className="px-3 pb-2 text-[11px] font-bold tracking-wider text-[#A8A29E] uppercase">
+      <div className="space-y-1.5">
+        <div className="px-3 pb-2 text-[11px] font-bold tracking-wider text-[var(--text-muted)] uppercase border-b-2 border-[var(--border-ink)]">
           Menu Operasional
         </div>
-        {menuItems.map((item) => {
-          const isActive = activeModule === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => {
-                onSelectModule(item.id);
-                onCloseMobile();
-              }}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
-                isActive
-                  ? 'bg-[#1B1A18] text-white shadow-xs'
-                  : 'text-[#706E6A] hover:bg-white hover:text-[#1B1A18]'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <span className={isActive ? 'text-[#FF7714]' : 'text-[#706E6A]'}>{item.icon}</span>
-                <span>{item.label}</span>
-              </div>
-              {item.badge !== undefined && (
-                <span
-                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-[#FAF9F5] text-[#706E6A] border border-[#E5E3DE]'
-                  }`}
-                >
-                  {item.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
+        <div className="pt-1 space-y-1.5">
+          {menuItems.map((item) => {
+            const isActive = activeModule === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => {
+                  onSelectModule(item.id);
+                  onCloseMobile();
+                }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition-all cursor-pointer ${
+                  isActive
+                    ? 'market-btn-primary'
+                    : 'rounded-[10px] border-2 border-transparent font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-subtle)]'
+                }`}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className={isActive ? 'text-white shrink-0' : 'text-[var(--text-muted)] shrink-0'}>
+                    {item.icon}
+                  </span>
+                  <span className="truncate">{item.label}</span>
+                </div>
+                {item.badge !== undefined && (
+                  <span
+                    className={`font-mono-num text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                      isActive
+                        ? 'bg-white/20 text-white border border-white/30'
+                        : 'bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)]'
+                    }`}
+                  >
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="space-y-2 pt-3 border-t border-[#E5E3DE]">
+      <div className="space-y-2.5 pt-3 border-t-2 border-[var(--border-subtle)]">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setIsHelpOpen(true)}
-            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#706E6A] bg-white border border-[#E5E3DE] hover:text-[#1B1A18] hover:border-[#1B1A18] transition-colors cursor-pointer"
+            className="market-btn-secondary flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold"
           >
             <Question size={14} weight="bold" />
             <span>Bantuan</span>
@@ -119,31 +125,33 @@ export function AdminSidebar({
             type="button"
             onClick={() => setIsResetConfirmOpen(true)}
             title="Reset Data Simulasi"
-            className="p-2 rounded-xl text-[#706E6A] bg-white border border-[#E5E3DE] hover:text-[#DC2626] hover:border-[#DC2626] transition-colors cursor-pointer"
+            aria-label="Reset Data Simulasi"
+            className="market-btn-secondary p-2 hover:text-[var(--accent-chili)]"
           >
             <ArrowsCounterClockwise size={14} weight="bold" />
           </button>
         </div>
 
-        <div className="p-3 rounded-2xl bg-white border border-[#E5E3DE] shadow-2xs flex items-center justify-between gap-2">
+        <div className="p-3 rounded-[12px] bg-[var(--bg-paper)] border-2 border-[var(--border-ink)] flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={() => setIsProfileOpen(true)}
             className="flex items-center gap-2.5 min-w-0 text-left hover:opacity-80 transition-opacity cursor-pointer"
           >
-            <div className="w-8 h-8 rounded-full bg-[#1B1A18] text-white font-bold text-xs flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[var(--forest-surface)] border border-[var(--border-ink)] text-[var(--forest-ink)] font-bold text-xs flex items-center justify-center shrink-0">
               {user.name.charAt(0)}
             </div>
             <div className="min-w-0">
-              <div className="text-xs font-bold text-[#1B1A18] truncate">{user.name}</div>
-              <div className="text-[10px] text-[#A8A29E] truncate">{user.email}</div>
+              <div className="text-xs font-bold text-[var(--text-primary)] truncate">{user.name}</div>
+              <div className="text-[10px] text-[var(--text-muted)] truncate">{user.email}</div>
             </div>
           </button>
           <button
             type="button"
             onClick={() => setIsLogoutModalOpen(true)}
             title="Keluar Akun"
-            className="p-1.5 text-[#706E6A] hover:text-[#DC2626] rounded-lg transition-colors cursor-pointer"
+            aria-label="Keluar Akun"
+            className="p-1.5 text-[var(--text-muted)] hover:text-[var(--accent-chili)] rounded-lg transition-colors cursor-pointer"
           >
             <SignOut size={16} weight="bold" />
           </button>
@@ -154,20 +162,21 @@ export function AdminSidebar({
 
   return (
     <>
-      <aside className="hidden lg:block w-[240px] shrink-0 sticky top-24 self-start bg-[#FAF9F5] rounded-3xl p-4 border border-[#E5E3DE] shadow-xs">
+      <aside className="hidden lg:block w-[248px] shrink-0 sticky top-6 self-start market-card p-4">
         {navContent}
       </aside>
 
       {isOpenMobile && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity" onClick={onCloseMobile} />
-          <div className="relative w-[280px] max-w-[85vw] bg-[#FAF9F5] h-full p-5 shadow-2xl flex flex-col justify-between border-r border-[#E5E3DE] z-10">
-            <div className="flex items-center justify-between pb-4 border-b border-[#E5E3DE]">
-              <span className="font-semibold text-sm text-[#1B1A18]">Navigasi Admin</span>
+          <div className="fixed inset-0 bg-[#0A120E]/65 transition-opacity" onClick={onCloseMobile} />
+          <div className="relative w-[280px] max-w-[85vw] bg-[var(--bg-card)] h-full p-5 flex flex-col justify-between border-r-2 border-[var(--border-ink)] z-10">
+            <div className="flex items-center justify-between pb-3.5 border-b-2 border-[var(--border-ink)]">
+              <span className="font-bold text-sm text-[var(--text-primary)]">Navigasi Admin</span>
               <button
                 type="button"
                 onClick={onCloseMobile}
-                className="p-1.5 text-[#706E6A] hover:text-[#1B1A18] rounded-lg border border-[#E5E3DE]"
+                aria-label="Tutup menu admin"
+                className="market-btn-secondary w-9 h-9 p-0 inline-flex items-center justify-center"
               >
                 <X size={16} weight="bold" />
               </button>

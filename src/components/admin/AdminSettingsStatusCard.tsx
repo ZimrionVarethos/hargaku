@@ -23,34 +23,36 @@ interface Props {
 export function AdminSettingsStatusCard({ settings, feedback }: Props) {
   return (
     <>
-      <div className="bg-white border border-[#E5E3DE] rounded-3xl p-6 space-y-2">
-        <h1 className="text-xl font-bold text-[#1B1A18]">
-          Integrasi Database Supabase, Gemini AI &amp; Mapbox 3D
-        </h1>
-        <p className="text-xs text-[#706E6A] leading-relaxed">
-          Kelola API Key Google Gemini (PUNTEN) dan token publik Mapbox GL JS secara dinamis dari tabel{' '}
-          <code className="px-1.5 py-0.5 rounded bg-[#FAF9F5] border border-[#E5E3DE]">
-            system_settings
-          </code>{' '}
-          Supabase tanpa hardcode di kode sumber.
-        </p>
+      <div className="market-card p-5 sm:p-6 space-y-3">
+        <div className="pb-3 border-b-2 border-[var(--border-ink)]">
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
+            Integrasi Database Supabase, Gemini AI &amp; Mapbox 3D
+          </h1>
+          <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-1">
+            Kelola API Key Google Gemini (PUNTEN) dan token publik Mapbox GL JS secara dinamis dari tabel{' '}
+            <code className="px-1.5 py-0.5 rounded bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)] font-mono-num">
+              system_settings
+            </code>{' '}
+            Supabase tanpa hardcode di kode sumber.
+          </p>
+        </div>
 
-        <div className="pt-2 flex flex-wrap gap-2.5">
+        <div className="pt-1 flex flex-wrap gap-2.5">
           <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${
               settings?.dbConnected
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                : 'bg-red-50 text-red-700 border-red-200'
+                ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border-[var(--forest-ink)]/40'
+                : 'bg-[var(--accent-chili-soft)] text-[var(--accent-chili)] border-[var(--accent-chili)]/40'
             }`}
           >
             <Database size={15} weight="bold" />
             <span>Supabase PostgreSQL: {settings?.dbConnected ? 'Terhubung' : 'Offline'}</span>
           </span>
           <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${
               settings?.hasApiKey
-                ? 'bg-[#F0FDF4] text-[#15803D] border-[#BBF7D0]'
-                : 'bg-amber-50 text-amber-800 border-amber-200'
+                ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border-[var(--forest-ink)]/40'
+                : 'bg-[var(--ochre-surface)] text-[var(--warning-ink)] border-[var(--earth-ochre)]/45'
             }`}
           >
             <Key size={15} weight="bold" />
@@ -60,10 +62,10 @@ export function AdminSettingsStatusCard({ settings, feedback }: Props) {
             </span>
           </span>
           <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${
               settings?.hasMapboxToken
-                ? 'bg-[#F0FDF4] text-[#15803D] border-[#BBF7D0]'
-                : 'bg-amber-50 text-amber-800 border-amber-200'
+                ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border-[var(--forest-ink)]/40'
+                : 'bg-[var(--ochre-surface)] text-[var(--warning-ink)] border-[var(--earth-ochre)]/45'
             }`}
           >
             <MapPin size={15} weight="bold" />
@@ -79,10 +81,10 @@ export function AdminSettingsStatusCard({ settings, feedback }: Props) {
 
       {feedback && (
         <div
-          className={`p-4 rounded-2xl border text-xs font-semibold flex items-center gap-2.5 ${
+          className={`p-4 rounded-[12px] border-2 text-xs font-bold flex items-center gap-2.5 ${
             feedback.type === 'ok'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              : 'bg-red-50 border-red-200 text-red-700'
+              ? 'bg-[var(--forest-surface)] border-[var(--forest-ink)] text-[var(--forest-ink)]'
+              : 'bg-[var(--accent-chili-soft)] border-[var(--accent-chili)] text-[var(--accent-chili)]'
           }`}
         >
           {feedback.type === 'ok' ? (

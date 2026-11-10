@@ -31,15 +31,15 @@ export function AdminConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-[#0A120E]/65 transition-opacity"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-sm bg-white border border-[#E5E3DE] rounded-[24px] shadow-2xl p-6 z-10 text-center space-y-4">
+      <div className="relative w-full max-w-sm market-card p-6 z-10 text-center space-y-4">
         <div
-          className={`w-12 h-12 rounded-2xl border flex items-center justify-center mx-auto ${
+          className={`w-12 h-12 rounded-[12px] border-2 border-[var(--border-ink)] flex items-center justify-center mx-auto ${
             isDanger
-              ? 'bg-red-50 border-red-200 text-red-600'
-              : 'bg-[#FFF3ED] border-[#FFD8C2] text-[#FF7714]'
+              ? 'bg-[var(--accent-chili-soft)] text-[var(--accent-chili)]'
+              : 'bg-[var(--ochre-surface)] text-[var(--warning-ink)]'
           }`}
         >
           {isDanger ? (
@@ -50,15 +50,15 @@ export function AdminConfirmModal({
         </div>
 
         <div className="space-y-1.5">
-          <h3 className="text-base font-semibold text-[#1B1A18]">{title}</h3>
-          <p className="text-xs text-[#706E6A] leading-relaxed">{description}</p>
+          <h3 className="text-base font-bold text-[var(--text-primary)]">{title}</h3>
+          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{description}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-2.5 pt-2">
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-2.5 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] hover:bg-white text-xs font-semibold text-[#1B1A18] transition-colors cursor-pointer"
+            className="market-btn-secondary w-full py-2.5 text-xs font-bold cursor-pointer"
           >
             {cancelLabel}
           </button>
@@ -68,11 +68,7 @@ export function AdminConfirmModal({
               onConfirm();
               onClose();
             }}
-            className={`w-full py-2.5 rounded-xl text-xs font-semibold shadow-sm transition-colors cursor-pointer ${
-              isDanger
-                ? 'bg-red-600 hover:bg-red-700 text-white'
-                : 'bg-[#1B1A18] hover:bg-black text-white'
-            }`}
+            className="market-btn-primary w-full py-2.5 text-xs cursor-pointer"
           >
             {confirmLabel}
           </button>

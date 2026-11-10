@@ -27,12 +27,11 @@ export function AdminReportsView() {
 
   return (
     <div className="space-y-6">
-      {/* Header bar */}
-      <div className="bg-white border border-[#E5E3DE] rounded-[24px] p-6 shadow-sm">
-        <h1 className="text-2xl font-medium tracking-tight text-[#1B1A18]">
+      <div className="market-card p-5 sm:p-6">
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
           Portal Moderasi Laporan Warga
         </h1>
-        <p className="text-sm text-[#706E6A]">
+        <p className="text-sm text-[var(--text-secondary)] mt-0.5">
           Tinjau nota transaksi belanja warga, saring anomali statistik MAD, dan berikan persetujuan untuk acuan Lapis 3.
         </p>
       </div>
@@ -45,7 +44,6 @@ export function AdminReportsView() {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Report Queue List */}
         <div className="lg:col-span-5 xl:col-span-5">
           <AdminReportQueue
             reports={reports}
@@ -56,7 +54,6 @@ export function AdminReportsView() {
           />
         </div>
 
-        {/* Right Column: Selected Report Detail Inspector */}
         <div className="lg:col-span-7 xl:col-span-7">
           {selectedReport ? (
             <AdminReportInspector
@@ -68,7 +65,7 @@ export function AdminReportsView() {
               }
             />
           ) : (
-            <div className="bg-white rounded-[24px] border border-[#E5E3DE] p-8 text-center text-sm text-[#706E6A]">
+            <div className="market-card p-8 text-center text-sm text-[var(--text-muted)]">
               Tidak ada laporan warga yang dipilih.
             </div>
           )}

@@ -117,49 +117,50 @@ export function MarketFormModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={onClose} />
-      <div className="relative w-full max-w-lg bg-white border border-[#E5E3DE] rounded-[24px] shadow-2xl p-6 z-10 space-y-5">
-        <div className="flex items-center justify-between pb-3 border-b border-[#E5E3DE]">
-          <h2 className="text-lg font-semibold text-[#1B1A18]">
+      <div className="fixed inset-0 bg-[#0A120E]/65 transition-opacity" onClick={onClose} />
+      <div className="relative w-full max-w-lg market-card p-6 z-10 max-h-[92vh] overflow-y-auto space-y-5">
+        <div className="flex items-center justify-between pb-3 border-b-2 border-[var(--border-ink)]">
+          <h2 className="text-lg font-bold text-[var(--text-primary)]">
             {initialData ? 'Edit Pasar Tradisional' : 'Tambah Pasar Tradisional Baru'}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 text-[#706E6A] hover:text-[#1B1A18] rounded-xl border border-[#E5E3DE]"
+            aria-label="Tutup modal pasar"
+            className="market-btn-secondary w-9 h-9 p-0 inline-flex items-center justify-center"
           >
-            <X size={18} weight="bold" />
+            <X size={16} weight="bold" />
           </button>
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-600">
+          <div className="p-3 rounded-[10px] bg-[var(--accent-chili-soft)] border-2 border-[var(--accent-chili)] text-xs font-bold text-[var(--accent-chili)]">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-[#1B1A18]">Nama Pasar Tradisional</label>
+            <label className="text-xs font-bold text-[var(--text-primary)]">Nama Pasar Tradisional</label>
             <input
               type="text"
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
               placeholder="Contoh: Pasar Induk Kramat Jati"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] focus:bg-white text-sm text-[#1B1A18] focus:outline-[#1B1A18]"
+              className="w-full px-3.5 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)]"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-[#1B1A18]">Provinsi / Koridor Wilayah Acuan</label>
+            <label className="text-xs font-bold text-[var(--text-primary)]">Provinsi / Koridor Wilayah Acuan</label>
             <select
               value={regionId}
               onChange={(e) => setRegionId(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] focus:bg-white text-sm text-[#1B1A18] focus:outline-[#1B1A18] cursor-pointer"
+              className="w-full px-3.5 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)] cursor-pointer"
             >
               {MOCK_REGIONS.map((r) => (
                 <option key={r.id} value={r.id}>
-                  {r.name} ({r.islandName}) · {r.logisticsCostPct > 0 ? `+${r.logisticsCostPct}% Ongkir Kapal` : 'Sentra Produksi (Acuan Nasional)'}
+                  {r.name} ({r.islandName}) &middot; {r.logisticsCostPct > 0 ? `+${r.logisticsCostPct}% Ongkir Kapal` : 'Sentra Produksi (Acuan Nasional)'}
                 </option>
               ))}
             </select>
@@ -167,83 +168,83 @@ export function MarketFormModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-[#1B1A18]">Kota / Kabupaten</label>
+              <label className="text-xs font-bold text-[var(--text-primary)]">Kota / Kabupaten</label>
               <input
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="Contoh: DKI Jakarta"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] focus:bg-white text-sm text-[#1B1A18] focus:outline-[#1B1A18]"
+                className="w-full px-3.5 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-[#1B1A18]">Kecamatan / Distrik</label>
+              <label className="text-xs font-bold text-[var(--text-primary)]">Kecamatan / Distrik</label>
               <input
                 type="text"
                 value={district}
                 onChange={(e) => setDistrict(e.target.value)}
                 placeholder="Contoh: Kramat Jati"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] focus:bg-white text-sm text-[#1B1A18] focus:outline-[#1B1A18]"
+                className="w-full px-3.5 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)]"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-[#1B1A18]">Alamat Lengkap</label>
+            <label className="text-xs font-bold text-[var(--text-primary)]">Alamat Lengkap</label>
             <input
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="Contoh: Jl. Merdeka No. 12"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] focus:bg-white text-sm text-[#1B1A18] focus:outline-[#1B1A18]"
+              className="w-full px-3.5 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-[#1B1A18]">Latitude GPS</label>
+              <label className="text-xs font-bold text-[var(--text-primary)]">Latitude GPS</label>
               <input
                 type="text"
                 value={latitude}
                 onChange={(e) => setLatitude(e.target.value)}
                 placeholder="-6.5925"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] focus:bg-white text-sm text-[#1B1A18] focus:outline-[#1B1A18]"
+                className="w-full px-3.5 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] font-mono-num text-sm text-[var(--text-primary)]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-[#1B1A18]">Longitude GPS</label>
+              <label className="text-xs font-bold text-[var(--text-primary)]">Longitude GPS</label>
               <input
                 type="text"
                 value={longitude}
                 onChange={(e) => setLongitude(e.target.value)}
                 placeholder="106.7905"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] focus:bg-white text-sm text-[#1B1A18] focus:outline-[#1B1A18]"
+                className="w-full px-3.5 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] font-mono-num text-sm text-[var(--text-primary)]"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-[#1B1A18]">Jam Bongkar Muat</label>
+              <label className="text-xs font-bold text-[var(--text-primary)]">Jam Bongkar Muat</label>
               <input
                 type="text"
                 value={operatingHours}
                 onChange={(e) => setOperatingHours(e.target.value)}
                 placeholder="04:00 – 14:00 WIB"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] focus:bg-white text-sm text-[#1B1A18] focus:outline-[#1B1A18]"
+                className="w-full px-3.5 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-[#1B1A18]">Spesialisasi Lapak</label>
+              <label className="text-xs font-bold text-[var(--text-primary)]">Spesialisasi Lapak</label>
               <input
                 type="text"
                 value={specialty}
                 onChange={(e) => setSpecialty(e.target.value)}
                 placeholder="Sentra Cabai & Rempah"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E3DE] bg-[#FAF9F5] focus:bg-white text-sm text-[#1B1A18] focus:outline-[#1B1A18]"
+                className="w-full px-3.5 py-2.5 rounded-[10px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] focus:bg-[var(--bg-card)] text-sm text-[var(--text-primary)]"
               />
             </div>
           </div>
@@ -254,24 +255,24 @@ export function MarketFormModal({
               id="isMarketActive"
               checked={isActive}
               onChange={(e) => setIsActive(e.target.checked)}
-              className="w-4 h-4 rounded text-[#1B1A18] border-[#E5E3DE] focus:ring-0"
+              className="w-4 h-4 rounded border-[var(--border-ink)] accent-[var(--accent-chili)]"
             />
-            <label htmlFor="isMarketActive" className="text-xs font-medium text-[#1B1A18] cursor-pointer">
+            <label htmlFor="isMarketActive" className="text-xs font-bold text-[var(--text-primary)] cursor-pointer">
               Pantau Pasar di Peta Publik (Status Aktif)
             </label>
           </div>
 
-          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#E5E3DE]">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t-2 border-[var(--border-subtle)]">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl border border-[#E5E3DE] bg-white text-xs font-semibold text-[#706E6A] hover:bg-[#FAF9F5]"
+              className="market-btn-secondary px-4 py-2 text-xs font-bold"
             >
               Batal
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded-xl bg-[#EEF773] text-[#1B1A18] border border-[#1B1A18] text-xs font-bold shadow-[2px_2px_0px_#1B1A18] hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
+              className="market-btn-primary px-4 py-2 text-xs cursor-pointer"
             >
               Simpan Pasar
             </button>

@@ -46,13 +46,12 @@ function AdminWorkspace() {
         </div>
       </div>
 
-      {/* Admin Dedicated Footnote - Pinned to bottom cleanly */}
-      <footer className="mt-auto pt-6 pb-2 text-xs text-[#A8A29E] flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-[#E5E3DE]">
-        <span>
-          HargaKu Admin Console · Khusus Petugas Operasional &amp; Pengawas Pangan
+      <footer className="mt-auto pt-5 pb-2 text-xs text-[var(--text-muted)] flex flex-col sm:flex-row items-center justify-between gap-2 border-t-2 border-[var(--border-subtle)]">
+        <span className="font-semibold text-[var(--text-secondary)]">
+          PasarKu Admin Console &middot; Khusus Petugas Operasional &amp; Pengawas Pangan
         </span>
-        <span className="font-mono text-[11px]">
-          Fase Produksi Multi-Wilayah Nasional
+        <span className="font-mono-num text-[11px]">
+          Sistem Pantauan Harga Pasar Rakyat
         </span>
       </footer>
     </div>

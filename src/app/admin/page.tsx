@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function AdminPage() {
   return (
-    <div className="w-full min-h-screen bg-[#F4F3F0] p-3 sm:p-5 lg:p-6 flex flex-col">
+    <div className="w-full min-h-screen bg-[var(--bg-paper)] text-[var(--text-primary)] p-3 sm:p-5 lg:p-6 flex flex-col transition-colors">
       <div className="max-w-[1440px] w-full mx-auto flex-1 flex flex-col">
         <AdminAuthGuard>
           <AdminContainer />

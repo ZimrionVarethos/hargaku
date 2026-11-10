@@ -3,6 +3,7 @@
 
 :root,
 html[data-theme="light"] {
+  color-scheme: light;
   --bg-paper: #F9F3EE;
   --bg-card: #FFFFFF;
   --bg-muted: #EFE4D4;
@@ -15,6 +16,7 @@ html[data-theme="light"] {
   --forest-surface: #E2EFE6;
   --earth-ochre: #A68F6D;
   --ochre-surface: #F5E9D4;
+  --warning-ink: #8A5316;
   --accent-chili: #A92717;
   --accent-chili-hover: #8C1E10;
   --accent-chili-soft: #FBE9E6;
@@ -27,6 +29,7 @@ html[data-theme="light"] {
 }
 
 html[data-theme="dark"] {
+  color-scheme: dark;
   --bg-paper: #0F1914;
   --bg-card: #16241D;
   --bg-muted: #1E3127;
@@ -39,6 +42,7 @@ html[data-theme="dark"] {
   --forest-surface: #1E3829;
   --earth-ochre: #D8C098;
   --ochre-surface: #2C2418;
+  --warning-ink: #F3D08A;
   --accent-chili: #E54D37;
   --accent-chili-hover: #FF6650;
   --accent-chili-soft: #3B1A15;
@@ -223,22 +227,10 @@ html[data-theme="dark"] .pasarku-logo-plaque {
 
 /* Authentic Market Alley (Lorong Pasar) Styles */
 .market-awning-stripes {
-  background: repeating-linear-gradient(
-    90deg,
-    #A92717 0px,
-    #A92717 24px,
-    #FFFFFF 24px,
-    #FFFFFF 48px
-  );
+  background: repeating-linear-gradient(90deg, #A92717 0px, #A92717 24px, #FFFFFF 24px, #FFFFFF 48px);
 }
 html[data-theme="dark"] .market-awning-stripes {
-  background: repeating-linear-gradient(
-    90deg,
-    #7F1D1D 0px,
-    #7F1D1D 24px,
-    #2A1D1B 24px,
-    #2A1D1B 48px
-  );
+  background: repeating-linear-gradient(90deg, #7F1D1D 0px, #7F1D1D 24px, #2A1D1B 24px, #2A1D1B 48px);
 }
 
 .market-tampah {

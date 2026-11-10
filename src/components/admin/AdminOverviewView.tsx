@@ -39,14 +39,13 @@ export function AdminOverviewView({ onNavigate }: AdminOverviewViewProps) {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner: Status Header */}
-      <div className="bg-white border border-[#E5E3DE] rounded-[24px] p-6 shadow-sm">
+      <div className="market-card p-5 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-medium tracking-tight text-[#1B1A18]">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
               Pusat Kendali Operasional
             </h1>
-            <p className="text-sm text-[#706E6A]">
+            <p className="text-sm text-[var(--text-secondary)]">
               Pantau kelengkapan harga resmi harian, katalog bahan pokok, dan validasi partisipasi warga.
             </p>
           </div>
@@ -55,7 +54,7 @@ export function AdminOverviewView({ onNavigate }: AdminOverviewViewProps) {
             <button
               type="button"
               onClick={() => onNavigate('daily-prices')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#EEF773] text-[#1B1A18] border border-[#1B1A18] text-xs font-bold shadow-[2px_2px_0px_#1B1A18] hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
+              className="market-btn-primary inline-flex items-center gap-2 px-4 py-2.5 text-xs cursor-pointer"
             >
               <Lightning size={16} weight="bold" />
               <span>Input Harga Hari Ini</span>
@@ -64,143 +63,142 @@ export function AdminOverviewView({ onNavigate }: AdminOverviewViewProps) {
         </div>
       </div>
 
-      {/* 4 Summary Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Komoditas */}
-        <div className="bg-white border border-[#E5E3DE] rounded-[20px] p-5 shadow-xs flex flex-col justify-between">
+        <div className="market-card p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#706E6A]">Komoditas Aktif</span>
-            <div className="w-8 h-8 rounded-lg bg-[#FAF9F5] border border-[#E5E3DE] flex items-center justify-center text-[#1B1A18]">
+            <span className="text-xs font-bold text-[var(--text-muted)]">Komoditas Aktif</span>
+            <div className="w-8 h-8 rounded-lg bg-[var(--forest-surface)] border border-[var(--border-ink)] flex items-center justify-center text-[var(--forest-ink)]">
               <Plant size={18} weight="bold" />
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-medium text-[#1B1A18]">{activeCommodities}</div>
-            <div className="text-xs text-[#706E6A] mt-1">
+            <div className="font-mono-num text-3xl font-bold text-[var(--text-primary)]">{activeCommodities}</div>
+            <div className="text-xs text-[var(--text-secondary)] mt-1">
               dari total {commodities.length} komoditas terdaftar
             </div>
           </div>
         </div>
 
-        {/* Card 2: Pasar */}
-        <div className="bg-white border border-[#E5E3DE] rounded-[20px] p-5 shadow-xs flex flex-col justify-between">
+        <div className="market-card p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#706E6A]">Pasar Tradisional</span>
-            <div className="w-8 h-8 rounded-lg bg-[#FAF9F5] border border-[#E5E3DE] flex items-center justify-center text-[#1B1A18]">
+            <span className="text-xs font-bold text-[var(--text-muted)]">Pasar Tradisional</span>
+            <div className="w-8 h-8 rounded-lg bg-[var(--forest-surface)] border border-[var(--border-ink)] flex items-center justify-center text-[var(--forest-ink)]">
               <Storefront size={18} weight="bold" />
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-medium text-[#1B1A18]">{activeMarkets}</div>
-            <div className="text-xs text-[#706E6A] mt-1">
-              titik pantau pasar nusantara
+            <div className="font-mono-num text-3xl font-bold text-[var(--text-primary)]">{activeMarkets}</div>
+            <div className="text-xs text-[var(--text-secondary)] mt-1">
+              titik pantau pasar terhubung
             </div>
           </div>
         </div>
 
-        {/* Card 3: Laporan Warga */}
-        <div className="bg-white border border-[#E5E3DE] rounded-[20px] p-5 shadow-xs flex flex-col justify-between">
+        <div className="market-card p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#706E6A]">Antrean Moderasi</span>
-            <div className="w-8 h-8 rounded-lg bg-[#FFF3ED] border border-[#FFD8C2] flex items-center justify-center text-[#FF7714]">
+            <span className="text-xs font-bold text-[var(--text-muted)]">Antrean Moderasi</span>
+            <div className="w-8 h-8 rounded-lg bg-[var(--ochre-surface)] border border-[var(--border-ink)] flex items-center justify-center text-[var(--warning-ink)]">
               <ShieldCheck size={18} weight="bold" />
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-medium text-[#1B1A18]">
+            <div className="font-mono-num text-3xl font-bold text-[var(--text-primary)]">
               {pendingReports + anomalyReports}
             </div>
-            <div className="text-xs text-[#FF7714] font-medium mt-1">
-              {anomalyReports > 0 ? `▲ ${anomalyReports} anomali statistik MAD` : 'Semua dalam toleransi'}
+            <div className="text-xs text-[var(--accent-chili)] font-bold mt-1">
+              {anomalyReports > 0 ? `Anomali MAD: ${anomalyReports} laporan` : 'Semua dalam toleransi'}
             </div>
           </div>
         </div>
 
-        {/* Card 4: Status Entri Hari Ini */}
-        <div className="bg-white border border-[#E5E3DE] rounded-[20px] p-5 shadow-xs flex flex-col justify-between">
+        <div className="market-card p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#706E6A]">Kelengkapan Survei</span>
-            <div className="w-8 h-8 rounded-lg bg-[#FAF9F5] border border-[#E5E3DE] flex items-center justify-center text-[#1B1A18]">
+            <span className="text-xs font-bold text-[var(--text-muted)]">Kelengkapan Survei</span>
+            <div className="w-8 h-8 rounded-lg bg-[var(--accent-chili-soft)] border border-[var(--border-ink)] flex items-center justify-center text-[var(--accent-chili)]">
               <Lightning size={18} weight="bold" />
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-medium text-[#1B1A18]">{completionPct}%</div>
-            <div className="text-xs text-[#706E6A] mt-1">
+            <div className="font-mono-num text-3xl font-bold text-[var(--forest-ink)]">{completionPct}%</div>
+            <div className="text-xs text-[var(--text-secondary)] mt-1">
               pembaruan survei 06:00 WIB
             </div>
           </div>
         </div>
       </div>
 
-      {/* Quick Action Shortcuts */}
-      <div className="bg-white border border-[#E5E3DE] rounded-[24px] p-6 shadow-sm space-y-4">
-        <h2 className="text-base font-semibold text-[#1B1A18]">
-          Aksi Cepat Manajemen Publik
-        </h2>
+      <div className="market-card p-5 sm:p-6 space-y-4">
+        <div className="flex items-center justify-between pb-2.5 border-b-2 border-[var(--border-ink)]">
+          <h2 className="text-[17px] font-bold text-[var(--text-primary)] tracking-tight">
+            Aksi Cepat Manajemen Publik
+          </h2>
+          <span className="text-[11px] font-bold text-[var(--text-muted)] bg-[var(--bg-muted)] px-2.5 py-1 rounded-full border border-[var(--border-subtle)]">
+            Pintasan Operasional
+          </span>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <button
             type="button"
             onClick={() => onNavigate('commodities')}
-            className="p-4 rounded-2xl border border-[#E5E3DE] bg-[#FAF9F5] hover:bg-white hover:border-[#1B1A18] text-left transition-all flex items-center justify-between group"
+            className="p-4 rounded-[12px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] hover:bg-[var(--bg-muted)] text-left transition-colors flex items-center justify-between group cursor-pointer shadow-[var(--shadow-hard-sm)]"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white border border-[#E5E3DE] flex items-center justify-center text-[#1B1A18]">
+              <div className="w-10 h-10 rounded-[10px] bg-[var(--bg-card)] border border-[var(--border-ink)] flex items-center justify-center text-[var(--forest-ink)]">
                 <Plus size={20} weight="bold" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-[#1B1A18]">
+                <div className="text-sm font-bold text-[var(--text-primary)]">
                   Kelola Komoditas
                 </div>
-                <div className="text-xs text-[#706E6A]">
+                <div className="text-xs text-[var(--text-secondary)]">
                   Tambah atau ubah HAP resmi
                 </div>
               </div>
             </div>
-            <ArrowRight size={16} weight="bold" className="text-[#A8A29E] group-hover:text-[#1B1A18] transition-colors" />
+            <ArrowRight size={16} weight="bold" className="text-[var(--text-muted)] group-hover:text-[var(--accent-chili)] transition-colors" />
           </button>
 
           <button
             type="button"
             onClick={() => onNavigate('markets')}
-            className="p-4 rounded-2xl border border-[#E5E3DE] bg-[#FAF9F5] hover:bg-white hover:border-[#1B1A18] text-left transition-all flex items-center justify-between group"
+            className="p-4 rounded-[12px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] hover:bg-[var(--bg-muted)] text-left transition-colors flex items-center justify-between group cursor-pointer shadow-[var(--shadow-hard-sm)]"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white border border-[#E5E3DE] flex items-center justify-center text-[#1B1A18]">
+              <div className="w-10 h-10 rounded-[10px] bg-[var(--bg-card)] border border-[var(--border-ink)] flex items-center justify-center text-[var(--accent-chili)]">
                 <Storefront size={20} weight="bold" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-[#1B1A18]">
+                <div className="text-sm font-bold text-[var(--text-primary)]">
                   Kelola Pasar
                 </div>
-                <div className="text-xs text-[#706E6A]">
-                  Titik peta & jam operasional
+                <div className="text-xs text-[var(--text-secondary)]">
+                  Titik peta &amp; jam operasional
                 </div>
               </div>
             </div>
-            <ArrowRight size={16} weight="bold" className="text-[#A8A29E] group-hover:text-[#1B1A18] transition-colors" />
+            <ArrowRight size={16} weight="bold" className="text-[var(--text-muted)] group-hover:text-[var(--accent-chili)] transition-colors" />
           </button>
 
           <button
             type="button"
             onClick={() => onNavigate('reports')}
-            className="p-4 rounded-2xl border border-[#E5E3DE] bg-[#FAF9F5] hover:bg-white hover:border-[#1B1A18] text-left transition-all flex items-center justify-between group"
+            className="p-4 rounded-[12px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] hover:bg-[var(--bg-muted)] text-left transition-colors flex items-center justify-between group cursor-pointer shadow-[var(--shadow-hard-sm)]"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white border border-[#E5E3DE] flex items-center justify-center text-[#1B1A18]">
+              <div className="w-10 h-10 rounded-[10px] bg-[var(--bg-card)] border border-[var(--border-ink)] flex items-center justify-center text-[var(--warning-ink)]">
                 <ShieldCheck size={20} weight="bold" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-[#1B1A18]">
+                <div className="text-sm font-bold text-[var(--text-primary)]">
                   Tinjau Laporan
                 </div>
-                <div className="text-xs text-[#706E6A]">
+                <div className="text-xs text-[var(--text-secondary)]">
                   Verifikasi bukti nota warga
                 </div>
               </div>
             </div>
-            <ArrowRight size={16} weight="bold" className="text-[#A8A29E] group-hover:text-[#1B1A18] transition-colors" />
+            <ArrowRight size={16} weight="bold" className="text-[var(--text-muted)] group-hover:text-[var(--accent-chili)] transition-colors" />
           </button>
         </div>
       </div>

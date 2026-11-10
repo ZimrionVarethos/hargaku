@@ -47,9 +47,22 @@ export function AdminReportQueue({
   });
 
   return (
-    <div className="bg-white rounded-[24px] border border-[#E5E3DE] p-5 shadow-xs flex flex-col gap-4">
-      {/* Tabs */}
-      <div className="grid grid-cols-5 gap-1.5 pb-2 border-b border-[#E5E3DE]">
+    <div className="market-card p-5 sm:p-6 flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-2 pb-3 border-b-2 border-[var(--border-ink)]">
+        <div>
+          <h2 className="text-[17px] font-bold text-[var(--text-primary)] tracking-tight">
+            Antrean Laporan Warga
+          </h2>
+          <p className="text-[11px] text-[var(--text-secondary)]">
+            Pilih baris untuk meninjau rincian dan bukti nota.
+          </p>
+        </div>
+        <span className="text-[11px] font-bold text-[var(--text-muted)] bg-[var(--bg-muted)] px-2.5 py-1 rounded-full border border-[var(--border-subtle)] shrink-0">
+          {filteredReports.length} Laporan
+        </span>
+      </div>
+
+      <div className="grid grid-cols-5 gap-1.5">
         {(
           [
             { id: 'ALL', label: 'Semua' },
@@ -66,10 +79,10 @@ export function AdminReportQueue({
               key={tab.id}
               type="button"
               onClick={() => onTabChange(tab.id)}
-              className={`py-2 px-1 rounded-xl text-[12px] font-semibold transition-all border text-center flex items-center justify-center cursor-pointer ${
+              className={`py-2 px-1 text-[11px] font-bold text-center flex items-center justify-center cursor-pointer transition-all ${
                 isActive
-                  ? 'bg-[#1B1A18] text-white border-[#1B1A18] shadow-xs'
-                  : 'bg-[#FAF9F5] text-[#6E6D67] border-[#E5E3DE] hover:bg-white hover:text-[#1B1A18]'
+                  ? 'market-btn-primary'
+                  : 'rounded-[10px] bg-[var(--bg-muted)] text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:border-[var(--border-ink)] hover:text-[var(--text-primary)]'
               }`}
             >
               <span className="truncate">{tab.label}</span>
@@ -78,86 +91,90 @@ export function AdminReportQueue({
         })}
       </div>
 
-      {/* Search Input */}
       <div className="relative">
         <MagnifyingGlass
           size={14}
           weight="bold"
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8C8B85]"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
         />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Cari ID laporan, komoditas, atau pasar..."
-          className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#FAF9F5] border border-[#E5E3DE] text-[12px] text-[#1B1A18] placeholder-[#8E8D86] shadow-xs focus:border-[#1B1A18] focus:outline-none"
+          className="w-full pl-9 pr-4 py-2 rounded-[10px] bg-[var(--bg-paper)] border-2 border-[var(--border-ink)] text-[12px] text-[var(--text-primary)] placeholder-[var(--text-muted)]"
         />
       </div>
 
-      {/* Report Queue List */}
-      <div className="flex flex-col gap-2.5 max-h-[580px] overflow-y-auto p-1 -m-1">
-        {filteredReports.map((r) => {
+      <div className="divide-y divide-[var(--border-subtle)] max-h-[540px] overflow-y-auto">
+        {filteredReports.map((r, idx) => {
           const isSelected = r.id === selectedReportId;
 
           return (
             <div
               key={r.id}
               onClick={() => onSelectReport(r.id)}
-              className={`p-3.5 rounded-[16px] border cursor-pointer transition-all ${
+              className={`py-3.5 px-2.5 cursor-pointer transition-colors flex flex-col gap-2 ${
                 isSelected
-                  ? 'bg-[#FAF9F5] border-[#1B1A18] shadow-xs'
-                  : 'bg-white border-[#E5E3DE] hover:bg-[#FAF9F5]/60'
+                  ? 'bg-[var(--bg-muted)]/70'
+                  : 'hover:bg-[var(--bg-muted)]/35'
               }`}
             >
-              <div className="flex items-center justify-between gap-2 mb-1.5">
-                <span className="text-[11px] font-mono font-bold text-[#8E8D86]">
-                  {r.id}
-                </span>
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start gap-2.5 min-w-0">
+                  <span
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 ${
+                      isSelected
+                        ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border border-[var(--forest-ink)]/50'
+                        : 'bg-[var(--bg-muted)] text-[var(--text-secondary)] border border-[var(--border-subtle)]'
+                    }`}
+                  >
+                    {idx + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <h4 className="text-[13px] font-bold text-[var(--text-primary)] leading-snug truncate">
+                      {r.commodityName}
+                    </h4>
+                    <span className="text-[11px] text-[var(--text-muted)] block truncate">
+                      {r.marketName} &middot; {r.id}
+                    </span>
+                  </div>
+                </div>
 
-                {/* Status Badges */}
                 {r.status === 'ANOMALY' && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FFF3ED] text-[#FF7714] border border-[#FFD9C7] flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--ochre-surface)] text-[var(--warning-ink)] border border-[var(--earth-ochre)]/45 flex items-center gap-1 shrink-0">
                     <WarningCircle size={11} weight="bold" />
-                    <span>OUTLIER ({r.diffPercent > 0 ? `+${r.diffPercent}%` : `${r.diffPercent}%`})</span>
+                    <span>{r.diffPercent > 0 ? `+${r.diffPercent}%` : `${r.diffPercent}%`}</span>
                   </span>
                 )}
                 {r.status === 'PENDING' && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FAF9F5] text-[#1B1A18] border border-[#E5E3DE] flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)] flex items-center gap-1 shrink-0">
                     <Hourglass size={11} weight="bold" />
                     <span>MENUNGGU</span>
                   </span>
                 )}
                 {r.status === 'APPROVED' && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#DCFCE7] text-[#15803D] border border-[#86EFAC] flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--forest-surface)] text-[var(--forest-ink)] border border-[var(--forest-ink)]/35 flex items-center gap-1 shrink-0">
                     <CheckCircle size={11} weight="bold" />
                     <span>DISETUJUI</span>
                   </span>
                 )}
                 {r.status === 'REJECTED' && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--accent-chili-soft)] text-[var(--accent-chili)] border border-[var(--accent-chili)]/35 flex items-center gap-1 shrink-0">
                     <Prohibit size={11} weight="bold" />
                     <span>DITOLAK</span>
                   </span>
                 )}
               </div>
 
-              <div className="flex flex-col gap-0.5">
-                <h4 className="text-[13px] font-bold text-[#1B1A18] leading-snug">
-                  {r.commodityName}
-                </h4>
-                <span className="text-[11px] text-[#6E6D67] truncate">
-                  {r.marketName}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-[#E5E3DE]/70 text-[11px]">
-                <span className="font-bold text-[#1B1A18] tabular-nums">
+              <div className="flex items-center justify-between gap-2 pl-8 text-[11px]">
+                <span className="font-mono-num font-extrabold text-[var(--forest-ink)] tabular-nums text-[12px]">
                   {formatRupiah(r.reportedPrice)} / {r.unit}
                 </span>
 
-                <div className="flex items-center gap-2 text-[#8E8D86]">
+                <div className="flex items-center gap-2 text-[var(--text-muted)]">
                   {r.hasPhoto && (
-                    <span className="flex items-center gap-0.5 text-[#15803D] font-semibold">
+                    <span className="flex items-center gap-0.5 text-[var(--forest-ink)] font-bold">
                       <Camera size={12} weight="bold" />
                       <span>Foto</span>
                     </span>

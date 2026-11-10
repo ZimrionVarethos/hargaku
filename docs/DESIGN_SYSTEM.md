@@ -28,6 +28,9 @@ Dokumen ini adalah acuan resmi (**Design System & UI Guidelines**) untuk seluruh
 | `--text-muted` | `#566B5D` | `#9AB0A1` | Satuan `/kg`, nomor indeks `#16` |
 | `--forest-ink` | `#245034` | `#6EE7A0` | Angka nominal harga Rupiah |
 | `--forest-surface` | `#E2EFE6` | `#1E3829` | Latar kotak ikon SVG sayuran |
+| `--earth-ochre` | `#A68F6D` | `#D8C098` | Kontur aksen rotan & bumi |
+| `--ochre-surface` | `#F5E9D4` | `#2C2418` | Latar lencana peringatan & anomali |
+| `--warning-ink` | `#8A5316` | `#F3D08A` | Teks & ikon lencana peringatan |
 | `--accent-chili` | `#A92717` | `#E54D37` | Tombol CTA, aksen Ku, jarum |
 | `--accent-chili-hover`| `#8C1E10` | `#FF6650` | Status hover tombol utama |
 | `--border-ink` | `#132E20` | `#4E6B59` | Garis tepi kartu (`2px solid`) |
@@ -82,3 +85,17 @@ Seluruh elemen teks antarmuka **MANDATORI** menggunakan keluarga huruf [Google F
   * **Batching `THREE.InstancedMesh`**: Seluruh ribuan butir komoditas organik digambar dalam belasan draw call terpadu, menghemat draw call WebGL lebih dari 95%.
   * **Pencahayaan Terkumpul (Pooled Dynamic Lights)**: Menggunakan 2 `PointLight` dinamis yang mengikuti posisi kamera pengguna serta eliminasi render pass transmissive ganda.
   * **Render On-Demand & Pembersihan GPU**: Loop render berinterpolasi halus hanya berjalan aktif saat kamera bergerak/di-scroll, disertai pembersihan total geometri, material, dan tekstur saat unmount.
+
+---
+
+## 7. Konsol Admin & Portal Masuk PasarKu (`/admin` & `/admin/login`)
+
+Seluruh halaman dan modal konsol pengawas (`/admin`, `/admin/login`) wajib mengikuti sistem desain taktil PasarKu secara penuh pada **Mode Siang (`data-theme="light"`)** maupun **Mode Subuh (`data-theme="dark"`)**:
+
+* **Identitas & Pengalih Tema**: `AdminTopbar` dan `AdminLoginForm` menyertakan logo `PasarKu` berplakat kertas hangat (`.pasarku-logo-plaque`) beserta tombol ikon tunggal pengalih tema (`Sun` / `Moon`) yang terhubung ke `useTheme()`.
+* **Permukaan & Aksi Konsisten**: Seluruh wadah memakai `.market-card`, navigasi aktif dan CTA primer memakai `.market-btn-primary` (`var(--accent-chili)`), kontrol sekunder memakai `.market-btn-secondary`, dan tombol persetujuan moderasi menggunakan warna hutan taktil (`var(--forest-ink)` / `#245034`).
+* **Paritas Tabel Data dengan `PetaMarketRankTable`**: Seluruh daftar/tabel data admin (`Katalog Komoditas`, `Sentra Pasar`, `Entri Harga Harian`, dan `Antrean Moderasi Laporan`) mengikuti anatomi tabel broadsheet `PetaMarketRankTable`:
+  1. Wadah luar `.market-card p-5 sm:p-6 flex flex-col gap-4`.
+  2. Kepala kartu berisi judul, subjudul keterangan, dan kapsul ringkasan jumlah data (`bg-[var(--bg-muted)] border border-[var(--border-subtle)]`) dengan garis pembatas bawah tegas **`border-b-2 border-[var(--border-ink)]`**.
+  3. Header kolom `<thead>` transparan bertepi bawah `border-b border-[var(--border-subtle)]` (`text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]`).
+  4. Baris `<tbody>` berpemisah `divide-y divide-[var(--border-subtle)]`, bulatan nomor indeks (`1, 2, 3...`), nominal harga `.font-mono-num` tebal berwarna `var(--forest-ink)`, lencana status kapsul semantik (`--forest-surface`, `--ochre-surface`/`--warning-ink`, `--accent-chili-soft`/`--accent-chili`), dan pasangan aksi `.market-btn-secondary` + tombol ikon `border border-[var(--border-ink)]`.
