@@ -3,13 +3,13 @@ import { FooterScenicBackdrop } from '@/components/layout/FooterScenicBackdrop';
 
 export function Footer() {
   return (
-    <footer className="bg-[var(--bg-muted)] border-t-2 border-[var(--border-ink)] mt-auto overflow-hidden">
+    <footer className="bg-[var(--bg-muted)] mt-auto overflow-hidden">
       <FooterMarketPanorama />
 
       <div className="relative w-full overflow-hidden bg-[var(--bg-muted)]">
         <FooterScenicBackdrop />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-8 md:px-12 lg:px-36 xl:px-24 pt-6 pb-28 sm:pt-7 sm:pb-32 md:pt-8 md:pb-36 lg:pt-9 lg:pb-24">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-8 md:px-12 lg:px-36 xl:px-24 pt-12 pb-28 sm:pt-14 sm:pb-32 md:pt-16 md:pb-36 lg:pt-16 lg:pb-24">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-7">
             <div className="md:col-span-5 space-y-2">
               <div className="font-bold text-2xl text-[var(--text-primary)]">
