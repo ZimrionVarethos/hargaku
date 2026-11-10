@@ -57,7 +57,7 @@ export function PasarKuStageSection() {
                 Meja Timbangan Indeks &amp; AI
               </h2>
               <p className="text-sm text-[var(--text-secondary)] mt-2 leading-relaxed">
-                Klik komoditas melayang untuk mengukur indeks harganya di timbangan pasar, lalu konsultasikan ke Gemini AI untuk perbandingan lintas sumber.
+                Klik komoditas melayang untuk mengukur indeks harganya di timbangan pasar, lalu konsultasikan ke Rin untuk perbandingan lintas sumber.
               </p>
             </div>
 
@@ -110,7 +110,7 @@ export function PasarKuStageSection() {
               onClick={handleOpenAi}
               className="market-btn-primary w-full py-3 text-sm flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>Tanya Rekomendasi AI ({activeSpec.name})</span>
+              <span>Tanya Rin</span>
             </button>
           </div>
 

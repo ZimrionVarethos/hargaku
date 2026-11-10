@@ -82,7 +82,7 @@ export function PasarKuSorotanSection() {
 
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs text-[var(--text-muted)] font-medium">Validasi AI Multi-Sumber</div>
+                  <div className="text-xs text-[var(--text-muted)] font-medium">Validasi Rin Multi-Sumber</div>
                   <div className="text-lg font-bold text-[#245034] font-mono-num">4 Sumber Resmi</div>
                   <div className="text-xs text-[var(--text-secondary)]">Bapanas, PIHPS, PPJ, &amp; Warga</div>
                 </div>
@@ -105,7 +105,7 @@ export function PasarKuSorotanSection() {
                   Papan Harga Cepat 10 Komoditas
                 </h3>
                 <span className="text-xs font-semibold text-[var(--text-muted)]">
-                  Klik Tanya AI untuk komparasi sumber
+                  Klik Tanya Rin untuk komparasi sumber
                 </span>
               </div>
 
@@ -134,9 +134,9 @@ export function PasarKuSorotanSection() {
                         type="button"
                         onClick={() => handleAskAi(item)}
                         className="market-btn-secondary px-2.5 py-1 text-xs font-bold hover:bg-[var(--accent-chili)] hover:text-white hover:border-[var(--border-ink)] transition-colors cursor-pointer"
-                        title={`Tanya rekomendasi AI untuk ${item.name}`}
+                        title={`Tanya Rin untuk ${item.name}`}
                       >
-                        Tanya AI
+                        Tanya Rin
                       </button>
                     </div>
                   </div>

@@ -65,11 +65,11 @@ Seluruh elemen teks antarmuka **MANDATORI** menggunakan keluarga huruf [Google F
 ## 5. Tata Letak Panggung Halaman Utama PasarKu
 
 * **Hero Section Diorama Pasar (`#heroSection`)**: Sayap pasar kiri (`#leftMarketWing`) dan sayap pasar kanan (`#rightMarketWing`) proporsional tanpa distorsi, dilengkapi pendar lampu kios (`animate-lamp-glow`), pin harga interaktif (`.market-hotspot-pin`), kurva gelombang SVG dinamis (`animatePasarKuHeroWaves`), dan kanvas partikel pagi.
-* **Panggung Timbangan & Pembanding Sumber (`#etagStageSection`)**: Pembagian asimetris 5:7 antara panel kontrol kecepatan/mode dan meja timbangan mekanis yang kini berfungsi membandingkan selisih antar sumber harga (`PIHPS BI`, `Bapanas`, `Perumda PPJ`, `Laporan Warga`) sekaligus mengarahkan pengguna ke Rekomendasi AI Multi-Sumber.
-* **Papan Pokok & Sorotan Pangan (`#sorotanSection`)**: Pembagian asimetris 5:7 antara metrik pangan utama dan papan harga cepat 10 komoditas harian dengan aksi langsung `Tanya AI`.
+* **Panggung Timbangan & Pembanding Sumber (`#etagStageSection`)**: Pembagian asimetris 5:7 antara panel kontrol kecepatan/mode dan meja timbangan mekanis yang membandingkan selisih antar sumber harga (`PIHPS BI`, `Bapanas`, `Perumda PPJ`, `Laporan Warga`) dengan tombol **`Tanya Rin`**.
+* **Papan Pokok & Sorotan Pangan (`#sorotanSection`)**: Pembagian asimetris 5:7 antara metrik pangan utama dan papan harga cepat 10 komoditas harian dengan aksi langsung **`Tanya Rin`**.
 * **Grafik Kategori (`#analitikSection`)**: Pembagian asimetris 4:8 antara 3 metrik kelompok dan grafik batang SVG taktil dengan garis batas rerata kategori.
 * **Direktori 13 Unit Pasar (`#unitPasarSection`)**: Grid 3 kolom memuat 13 unit pasar rakyat dengan penyaring kecamatan.
-* **Panel Rekomendasi & Tanya AI Multi-Sumber (`AssistantDrawer` & `/rekomendasi-ai`)**: Menggantikan keranjang belanja; panel geser kanan & halaman khusus untuk menanyakan kewajaran harga, perbandingan lintas sumber resmi, serta saran beli dari AI Gemini berbasis data Supabase.
+* **Panel Tanya Rin Multi-Sumber & Markdown (`AssistantDrawer`, `AiMessageBubble`, `MarkdownMessage`, `/rekomendasi-ai`)**: Menggantikan keranjang belanja; menghadirkan persona asisten **Rin** dengan avatar taktil, tombol konsisten **`Tanya Rin`**, serta parser **Markdown (`md`)** responsif untuk tabel perbandingan sumber, heading, kutipan, daftar poin, dan badge harga pada Mode Siang maupun Mode Subuh.
 
 ---
 

@@ -14,7 +14,10 @@
     - Endpoint `/api/v1/admin/bootstrap`, `/api/v1/admin/sync`, `/api/v1/admin/settings`, `/api/v1/reports`, dan `/api/v1/assistant/chat` tersinkron dua arah antara Konsol Admin, halaman publik `/`, `/cek-harga`, `/lapor`, dan `/rekomendasi-ai`.
   - **Konfigurasi Gemini API Key Dinamis di DB (`AdminSettingsView.tsx`, `src/lib/server/settings-db.ts`)**:
     - API key, model aktif (`gemini-3.8-flash`), instruksi sistem, dan sumber pembanding harga disimpan dinamis di tabel `system_settings` Supabase dan dapat diuji serta diganti langsung di dashboard admin (`/admin` -> `Integrasi AI & API`) tanpa hardcode.
-  - **Penggantian Total Keranjang -> Rekomendasi Harga AI Multi-Sumber (`AiRecommendationView.tsx`, `AssistantDrawer.tsx`, `src/lib/server/gemini-service.ts`)**:
+  - **Persona Asisten "Rin" & Markdown Renderer (`MarkdownMessage.tsx`, `AiMessageBubble.tsx`, `AssistantDrawer.tsx`, `AiRecommendationView.tsx`)**:
+    - Seluruh tombol pemicu konsultasi AI diseragamkan menjadi **`Tanya Rin`** (Navbar, Modal Komoditas, Meja Timbangan, Sorotan Pangan, Laci Komoditas 3D, Evaluasi Cek Harga, dan `/rekomendasi-ai`).
+    - Balon pesan **Rin** mendukung rendering **Markdown (`md`)** lengkap bebas dependensi eksternal (heading, tabel komparasi responsif, daftar berurut/poin, kutipan, inline code nominal Rupiah, dan tautan aman) di Mode Siang maupun Mode Subuh.
+  - **Penggantian Total Keranjang -> Tanya Rin & Komparasi Multi-Sumber (`AiRecommendationView.tsx`, `AssistantDrawer.tsx`, `src/lib/server/gemini-service.ts`)**:
     - Menghapus fitur keranjang belanja dan membandingkan harga dari `Panel Harga Bapanas`, `Survei PIHPS BI`, `Perumda PPJ / Pasar Rakyat`, dan `Laporan Warga Terverifikasi`, lengkap dengan tanya jawab Gemini AI di drawer navbar, modal komoditas, timbangan stage, sorotan, hasil cek harga, serta halaman khusus `/rekomendasi-ai`.
   - **Banner 3D Bebas Harga Statis & Sinkronisasi Harga Live (`three-banners.ts`, `three-stalls.ts`, `three-scene-manager.ts`, `LorongThreeMarketAlley.tsx`)**:
     - Poster dinding dan spanduk gantung 3D kini hanya menampilkan ilustrasi gambar komoditas, nomor lapak, kategori, dan nama barang. Harga dinamis dari Admin/Supabase diperbarui secara efisien ke papan harga meja, hover tooltip, dan popup modal tanpa rebuild WebGL context.

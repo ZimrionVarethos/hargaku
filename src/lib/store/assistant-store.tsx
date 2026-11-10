@@ -27,10 +27,10 @@ export function AssistantProvider({ children }: { children: React.ReactNode }) {
       id: 'welcome_1',
       role: 'assistant',
       timestamp: '06:00',
-      content: `Halo! Saya **Asisten Rekomendasi Harga HargaKu** (Gemini AI). Saya membandingkan data **Panel Harga Bapanas**, **PIHPS BI**, **Pasar Rakyat / Perumda PPJ**, dan **Laporan Warga Terverifikasi** untuk menilai kewajaran harga dan menjawab pertanyaanmu.`,
+      content: `### Halo, saya Rin!\n\nSaya asisten pemantau harga **HargaKu** yang siap membantu kamu membandingkan data dari:\n- **Panel Harga Bapanas** (acuan HAP & HET)\n- **Survei PIHPS BI** & **Pasar Rakyat**\n- **Laporan Warga Terverifikasi**\n\n> Tanyakan harga bahan pokok di lapak atau minta rincian pasar terhemat kapan saja.`,
       suggestedActions: [
         { label: 'Cek Harga Wajar', href: '/cek-harga' },
-        { label: 'Halaman AI Multi-Sumber', href: '/rekomendasi-ai' },
+        { label: 'Komparasi Multi-Sumber', href: '/rekomendasi-ai' },
       ],
     },
   ]);
@@ -107,7 +107,7 @@ export function AssistantProvider({ children }: { children: React.ReactNode }) {
         id: `welcome_${Date.now()}`,
         role: 'assistant',
         timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-        content: `Percakapan telah direset. Mau konsultasi harga atau resep belanja apa hari ini di **${selectedRegion.name}**?`,
+        content: `Obrolan dengan **Rin** sudah direset.\n\nMau bandingkan harga komoditas apa hari ini di **${selectedRegion.name}**?`,
       },
     ]);
   }, [selectedRegion]);

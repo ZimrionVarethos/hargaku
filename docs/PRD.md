@@ -123,10 +123,11 @@ HargaKu hadir sebagai **pendamping belanja pangan cerdas** yang memberikan acuan
 * Tabel peringkat pasar terurut dari paling hemat ke tertinggi dengan kolom berdampingan: `Harga Lapak`, `Rerata Wilayah`, dan `Selisih (%)`.
 * Mode Ringan (*Tabel Langsung*) untuk akses cepat dan rute navigasi langsung ke Google Maps.
 
-### Modul 7: Rekomendasi AI Multi-Sumber & Tanya Jawab Harga (Menggantikan Keranjang)
-* Karena HargaKu berfokus penuh pada transparansi & pengecekan harga (bukan e-commerce), fitur keranjang belanja dihapus dan digantikan oleh **Rekomendasi AI HargaKu** (`/rekomendasi-ai` & Drawer Tanya AI).
-* AI (didukung Google Gemini API dengan kunci dinamis dari Supabase `system_settings`) membandingkan harga dari **beberapa sumber resmi dan warga** (`PIHPS Bank Indonesia`, `Panel Harga Bapanas`, `Perumda Pasar Pakuan Jaya / Pasar Rakyat`, dan `Laporan Warga Terverifikasi`) sesuai wilayah aktif (`selectedRegion`).
-* Pengguna dapat langsung **bertanya secara bebas** (contoh: *"Lebih hemat beli Cabai Rawit berdasarkan acuan mana?"*, *"Ayam 45rb/kg di pasar wajar gak?"*, atau *"Bandingkan sumber harga beras & minyak minggu ini"*).
+### Modul 7: Rin, Asisten AI Multi-Sumber & Tanya Jawab Harga (Menggantikan Keranjang)
+* Karena HargaKu berfokus penuh pada transparansi & pengecekan harga (bukan e-commerce), fitur keranjang belanja dihapus dan digantikan oleh **Rin** (`/rekomendasi-ai` & Drawer **Tanya Rin**).
+* Seluruh tombol pemicu konsultasi AI di aplikasi memakai label seragam **`Tanya Rin`**.
+* **Rin** (didukung Google Gemini API dengan kunci dinamis dari Supabase `system_settings`) membandingkan harga dari **beberapa sumber resmi dan warga** (`PIHPS Bank Indonesia`, `Panel Harga Bapanas`, `Perumda Pasar Pakuan Jaya / Pasar Rakyat`, dan `Laporan Warga Terverifikasi`) sesuai wilayah aktif (`selectedRegion`), serta merender jawaban berformat **Markdown (`md`)** lengkap (tabel komparasi, heading, daftar poin, dan penekanan nominal).
+* Pengguna dapat langsung **bertanya secara bebas** kepada Rin (contoh: *"Lebih hemat beli Cabai Rawit berdasarkan acuan mana?"*, *"Ayam 45rb/kg di pasar wajar gak?"*, atau *"Bandingkan sumber harga beras & minyak minggu ini"*).
 
 ### Modul 8: Portal Admin Moderasi, Supabase CRUD, & Pengaturan AI Dinamis
 * **Integrasi Supabase PostgreSQL**: Seluruh CRUD komoditas, pasar tradisional, entri harga harian (`daily_prices`), moderasi laporan warga (`citizen_reports`), dan konfigurasi API tersimpan langsung di database Supabase.
@@ -136,9 +137,9 @@ HargaKu hadir sebagai **pendamping belanja pangan cerdas** yang memberikan acuan
 * **CRUD Master Komoditas & Pasar Tradisional**: Pengelolaan lengkap komoditas dan pasar di seluruh koridor wilayah.
 * **Fast-Entry Entri Harga Resmi Harian**: Matriks input cepat harga survei harian per pasar yang langsung memperbarui data publik dan harga lapak 3D.
 
-### Modul 9: Slide-Over Drawer Konsultasi Harga AI (`/api/v1/assistant/chat`)
-* Menggantikan tombol Keranjang di Top Navbar dengan tombol primer **`[ Rekomendasi AI ]`** yang membuka **Slide-over Drawer** interaktif maupun halaman penuh `/rekomendasi-ai`.
-* Grounded 100% pada data Supabase (`commodities`, `daily_prices`, `citizen_reports`) dan komparasi multi-sumber real-time.
+### Modul 9: Slide-Over Drawer Konsultasi Harga Rin (`/api/v1/assistant/chat`)
+* Menggantikan tombol Keranjang di Top Navbar dan CTA halaman dengan tombol seragam **`[ Tanya Rin ]`** yang membuka **Slide-over Drawer** interaktif maupun halaman penuh `/rekomendasi-ai`.
+* Mendukung penuh rendering **Markdown** untuk tabel pembanding sumber, ringkasan poin, dan sorotan angka Rupiah. Grounded 100% pada data Supabase (`commodities`, `daily_prices`, `citizen_reports`).
 
 ---
 

@@ -38,8 +38,8 @@ Mengevaluasi penawaran harga pedagang di lapak terhadap Lapis 1 (HAP/HET Bapanas
 ### 2.5. `POST /api/v1/reports`
 Menyimpan laporan harga warga baru ke tabel `citizen_reports` di Supabase lengkap dengan deteksi awal deviasi anomali.
 
-### 2.6. `POST /api/v1/assistant/chat` (AI Rekomendasi Harga Multi-Sumber & Tanya Jawab)
-Mengirimkan pertanyaan pengguna ke layanan **Google Gemini API** (kunci & model dibaca dinamis dari tabel `system_settings` Supabase) dengan konteks live multi-sumber (`PIHPS BI`, `Bapanas`, `Perumda PPJ`, `Laporan Warga`) dan daftar komoditas di wilayah aktif.
+### 2.6. `POST /api/v1/assistant/chat` (Rin: Asisten AI Harga Multi-Sumber)
+Mengirimkan pertanyaan pengguna ke persona asisten **Rin** berbasis **Google Gemini API** (kunci & model dibaca dinamis dari tabel `system_settings` Supabase) dengan respons berformat **Markdown**, konteks live multi-sumber (`PIHPS BI`, `Bapanas`, `Perumda PPJ`, `Laporan Warga`), dan daftar komoditas di wilayah aktif.
 * **Request Body**: `{ "message": string, "regionId": string, "commoditySlug"?: string, "conversationHistory"?: Array<{ role, content }> }`
 * **Response `data`**:
 ```json

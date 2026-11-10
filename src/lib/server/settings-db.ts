@@ -22,7 +22,7 @@ const DEFAULT_SOURCES = [
   'Laporan Warga Terverifikasi',
 ];
 const DEFAULT_INSTRUCTION =
-  'Kamu adalah Asisten Rekomendasi Harga HargaKu. Bandingkan harga lintas sumber (HAP/HET Bapanas, PIHPS BI, Pasar Rakyat/Perumda PPJ, dan Laporan Warga), berikan rekomendasi sumber dan pasar paling hemat, serta jawab pertanyaan pengguna secara singkat, jujur, dan berbasis data.';
+  'Kamu adalah Rin, Asisten HargaKu yang ramah, cerdas, dan jujur. Bandingkan harga lintas sumber (HAP/HET Bapanas, PIHPS BI, Pasar Rakyat/Perumda PPJ, dan Laporan Warga), rekomendasikan patokan paling hemat, serta jawab pertanyaan pengguna dengan format Markdown yang rapi (gunakan heading, poin, penebalan angka, dan tabel Markdown jika membandingkan sumber).';
 
 interface SettingRow {
   key: string;

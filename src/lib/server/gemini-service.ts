@@ -190,19 +190,22 @@ export async function generateMultiSourceAiReply(input: {
   const suggestedActions = [
     { label: 'Cek Harga Wajar Lapak', href: '/cek-harga' },
     { label: 'Peta Pasar Termurah', href: '/peta' },
-    { label: 'Halaman Rekomendasi AI', href: '/rekomendasi-ai' },
+    { label: 'Komparasi Multi-Sumber', href: '/rekomendasi-ai' },
   ];
 
   if (!cfg.apiKey) {
     const fallback = await processAssistantMessage(input.message, region);
     const bestLine = sourceComparisons[0]
-      ? `\n\nPerbandingan Lintas Sumber (${sourceComparisons[0].commodityName} di ${region.name}):\n` +
+      ? `\n\n#### Komparasi Sumber: ${sourceComparisons[0].commodityName} (${region.name})\n\n| Sumber Harga | Nominal | Keterangan |\n| :--- | ---: | :--- |\n` +
         sourceComparisons[0].sources
-          .map((s) => `- ${s.sourceName}: Rp ${s.price.toLocaleString('id-ID')}/${sourceComparisons[0].unit} (${s.note})`)
+          .map(
+            (s) =>
+              `| ${s.isLowest ? `**${s.sourceName}**` : s.sourceName} | \`Rp ${s.price.toLocaleString('id-ID')}/${sourceComparisons[0].unit}\` | ${s.note} |`
+          )
           .join('\n')
       : '';
     return {
-      reply: `${fallback.content}${bestLine}\n\nCatatan: Kunci Gemini API belum diisi di Admin Console (menu Integrasi AI & DB), jadi analisis saat ini memakai acuan lokal terverifikasi.`,
+      reply: `${fallback.content}${bestLine}\n\n> *Catatan: Kunci Gemini API belum diisi di Admin Console (menu Integrasi AI & API), jadi Rin saat ini memakai acuan lokal terverifikasi.*`,
       intent: 'PRICE_RECOMMENDATION',
       provider: 'grounded-fallback',
       model: cfg.geminiModel,
@@ -223,16 +226,17 @@ export async function generateMultiSourceAiReply(input: {
 
   const historyText = (input.conversationHistory || [])
     .slice(-6)
-    .map((m) => `${m.role === 'user' ? 'Pengguna' : 'Asisten'}: ${m.content}`)
+    .map((m) => `${m.role === 'user' ? 'Pengguna' : 'Rin'}: ${m.content}`)
     .join('\n');
 
   const prompt = [
+    `PERAN: Kamu adalah Rin, asisten harga pangan resmi di web HargaKu.`,
     `WILAYAH AKTIF: ${region.name} (${region.islandName}, ${region.zone}, toleransi logistik +${region.logisticsCostPct}%).`,
     `SUMBER PERBANDINGAN DATA HARGA NYATA DARI DATABASE:`,
     contextLines,
     historyText ? `\nRIWAYAT SINGKAT:\n${historyText}` : '',
     `\nPERTANYAAN PENGGUNA:\n${input.message}`,
-    `\nATURAN JAWABAN: Jawab dalam Bahasa Indonesia yang jelas, ramah, dan terstruktur. Sebutkan angka perbandingan antar sumber secara jujur, rekomendasikan sumber/pasar mana yang paling layak dijadikan patokan atau paling hemat, dan JANGAN menyarankan fitur keranjang belanja. Gunakan poin singkat tanpa karakter em-dash.`,
+    `\nATURAN JAWABAN RIN: Jawab dalam Bahasa Indonesia yang ramah menggunakan format Markdown rapi (gunakan ### heading singkat, tabel Markdown jika membandingkan antar sumber, bullet points, dan penebalan angka/backtick nominal Rupiah). Sebutkan angka antar sumber secara jujur, rekomendasikan sumber/pasar yang paling hemat, JANGAN menyarankan fitur keranjang belanja, dan JANGAN gunakan karakter em-dash.`,
   ]
     .filter(Boolean)
     .join('\n');

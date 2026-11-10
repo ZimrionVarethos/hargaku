@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Robot, PaperPlaneRight, Scales, ArrowsCounterClockwise, MapPin } from '@phosphor-icons/react';
+import { ChatCircleDots, PaperPlaneRight, ArrowsCounterClockwise, MapPin } from '@phosphor-icons/react';
 import { useAssistant } from '@/lib/store/assistant-store';
 import { useRegion } from '@/lib/store/region-store';
 import { useLiveCatalog } from '@/lib/store/use-live-catalog';
 import { DEFAULT_PROMPT_PRESETS } from '@/lib/assistant/assistant-presets';
+import { AiMessageBubble } from './AiMessageBubble';
 
 export function AiRecommendationView() {
   const { messages, isTyping, sendMessage, clearConversation } = useAssistant();
@@ -61,7 +62,7 @@ export function AiRecommendationView() {
   const handleAskSelected = () => {
     if (!activeCom) return;
     sendMessage(
-      `Bandingkan harga ${activeCom.name} lintas sumber di ${selectedRegion.name} (Bapanas, PIHPS BI, Pasar Rakyat, dan Laporan Warga), lalu rekomendasikan patokan terbaik dan tips menawarnya.`
+      `Bandingkan harga ${activeCom.name} lintas sumber di ${selectedRegion.name} (Bapanas, PIHPS BI, Pasar Rakyat, dan Laporan Warga) dalam tabel Markdown ringkas, lalu rekomendasikan patokan terbaik dan tips menawarnya.`
     );
   };
 
@@ -77,10 +78,10 @@ export function AiRecommendationView() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-[var(--border-ink)] pb-5">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
-            Rekomendasi Harga AI &amp; Komparasi Lintas Sumber
+            Tanya Rin &amp; Komparasi Harga Multi-Sumber
           </h1>
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
-            Bandingkan acuan Panel Bapanas, PIHPS Bank Indonesia, Pasar Rakyat, dan Laporan Warga secara real-time lalu tanyakan langsung ke Gemini AI.
+            Bandingkan acuan Panel Bapanas, PIHPS Bank Indonesia, Pasar Rakyat, dan Laporan Warga dari data harian lalu konsultasikan langsung dengan Rin.
           </p>
         </div>
 
@@ -156,67 +157,47 @@ export function AiRecommendationView() {
             type="button"
             onClick={handleAskSelected}
             disabled={isTyping}
-            className="market-btn-primary w-full py-3 text-xs font-bold inline-flex items-center justify-center gap-2 disabled:opacity-50"
+            className="market-btn-primary w-full py-3 text-xs font-bold inline-flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
-            <Scales size={16} weight="bold" />
-            <span>Analisis &amp; Tanya AI Untuk Komoditas Ini</span>
+            <ChatCircleDots size={16} weight="bold" />
+            <span>Tanya Rin</span>
           </button>
         </div>
 
-        {/* Right: Conversational Gemini Q&A Panel */}
-        <div className="lg:col-span-7 market-card bg-[var(--bg-card)] flex flex-col h-[560px] overflow-hidden">
+        {/* Right: Conversational Rin Q&A Panel with Markdown Support */}
+        <div className="lg:col-span-7 market-card bg-[var(--bg-card)] flex flex-col h-[560px] md:h-[620px] overflow-hidden">
           <div className="px-5 py-3.5 border-b-2 border-[var(--border-ink)] flex items-center justify-between bg-[var(--bg-muted)]">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#EEF773] border border-[#132E20] flex items-center justify-center text-[#132E20]">
-                <Robot size={18} weight="fill" />
+            <div className="flex items-center gap-3">
+              <div className="relative w-9 h-9 rounded-xl bg-[#EEF773] border-2 border-[#132E20] flex items-center justify-center text-[#132E20] font-bold text-sm">
+                R
+                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#15803D] border-2 border-[var(--bg-muted)]" />
               </div>
               <div>
-                <div className="text-xs font-bold text-[var(--text-primary)]">Asisten Tanya Jawab Gemini AI</div>
-                <div className="text-[11px] text-[var(--text-muted)]">Wilayah acuan: {selectedRegion.name}</div>
+                <div className="text-xs font-bold text-[var(--text-primary)]">
+                  Rin &middot; Asisten Harga Multi-Sumber
+                </div>
+                <div className="text-[11px] text-[var(--text-muted)]">
+                  Wilayah acuan: {selectedRegion.name} &bull; Format Markdown aktif
+                </div>
               </div>
             </div>
             <button
               type="button"
               onClick={clearConversation}
-              className="market-btn-secondary px-2.5 py-1 text-[11px] font-bold inline-flex items-center gap-1"
+              className="market-btn-secondary px-2.5 py-1 text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer"
             >
               <ArrowsCounterClockwise size={13} weight="bold" />
               <span>Reset</span>
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[var(--bg-paper)]">
-            {messages.map((msg) => {
-              const isUser = msg.role === 'user';
-              return (
-                <div key={msg.id} className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
-                  <div
-                    className={`max-w-[90%] rounded-2xl p-3.5 text-xs leading-relaxed border-2 ${
-                      isUser
-                        ? 'bg-[#132E20] text-[#F9F3EE] border-[var(--border-ink)]'
-                        : 'bg-[var(--bg-card)] text-[var(--text-primary)] border-[var(--border-ink)]'
-                    }`}
-                  >
-                    <div className="whitespace-pre-line">{msg.content}</div>
-                    {msg.sourceComparisons && msg.sourceComparisons.length > 0 && (
-                      <div className="mt-2.5 pt-2.5 border-t border-[var(--border-subtle)] space-y-1.5">
-                        {msg.sourceComparisons[0].sources.map((s) => (
-                          <div key={s.sourceName} className="flex justify-between text-[11px]">
-                            <span>{s.sourceName}</span>
-                            <span className="font-bold font-mono-num">
-                              Rp {s.price.toLocaleString('id-ID')}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-[var(--bg-paper)]">
+            {messages.map((msg) => (
+              <AiMessageBubble key={msg.id} message={msg} />
+            ))}
             {isTyping && (
-              <div className="text-xs font-semibold text-[var(--text-muted)] px-2">
-                Gemini AI sedang menganalisis perbandingan sumber...
+              <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--bg-card)] border border-[var(--border-ink)] w-fit text-xs font-bold text-[var(--text-secondary)]">
+                <span>Rin sedang membandingkan sumber harga...</span>
               </div>
             )}
             <div ref={endRef} />
@@ -229,7 +210,7 @@ export function AiRecommendationView() {
                 type="button"
                 onClick={() => sendMessage(p.prompt)}
                 disabled={isTyping}
-                className="px-2.5 py-1 rounded-full bg-[var(--bg-muted)] border border-[var(--border-ink)] text-[11px] font-bold whitespace-nowrap shrink-0 cursor-pointer"
+                className="px-3 py-1 rounded-full bg-[var(--bg-muted)] hover:bg-[#EEF773] hover:text-[#132E20] border border-[var(--border-ink)] text-[11px] font-bold whitespace-nowrap shrink-0 transition-colors cursor-pointer"
               >
                 {p.label}
               </button>
@@ -241,14 +222,14 @@ export function AiRecommendationView() {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Tanyakan harga pasar, perbandingan sumber, atau kewajaran penawaran..."
+              placeholder="Tanya Rin soal harga pasar, tabel perbandingan, atau tips tawar..."
               disabled={isTyping}
-              className="flex-1 px-3.5 py-2 rounded-xl border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] text-xs text-[var(--text-primary)] focus:outline-none"
+              className="flex-1 px-3.5 py-2.5 rounded-xl border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] text-xs text-[var(--text-primary)] focus:outline-none"
             />
             <button
               type="submit"
               disabled={!inputText.trim() || isTyping}
-              className="market-btn-primary px-4 py-2 text-xs font-bold inline-flex items-center gap-1.5 disabled:opacity-40"
+              className="market-btn-primary px-4 py-2.5 text-xs font-bold inline-flex items-center gap-1.5 disabled:opacity-40 cursor-pointer"
             >
               <span>Kirim</span>
               <PaperPlaneRight size={14} weight="bold" />

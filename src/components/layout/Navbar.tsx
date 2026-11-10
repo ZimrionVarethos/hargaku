@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Robot } from '@phosphor-icons/react';
+import { ChatCircleDots } from '@phosphor-icons/react';
 import { useAssistant } from '@/lib/store/assistant-store';
 import { useTheme } from '@/lib/store/theme-store';
 
@@ -16,7 +16,7 @@ const NAV_LINKS = [
   { href: '/cek-harga', label: 'Cek Harga' },
   { href: '/peta', label: 'Peta' },
   { href: '/lapor', label: 'Lapor' },
-  { href: '/rekomendasi-ai', label: 'AI Harga' },
+  { href: '/rekomendasi-ai', label: 'Komparasi AI' },
 ];
 
 export function Navbar() {
@@ -72,7 +72,7 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Right Actions: Cari, Mode Subuh/Siang, Tanya AI */}
+        {/* Right Actions: Cari, Mode Subuh/Siang, Tanya Rin */}
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -101,11 +101,10 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => openAssistant()}
-            className="market-btn-primary px-3.5 py-1.5 text-xs min-h-[40px] inline-flex items-center gap-1.5"
+            className="market-btn-primary px-3.5 py-1.5 text-xs min-h-[40px] inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
           >
-            <Robot size={15} weight="bold" />
-            <span className="hidden sm:inline">Rekomendasi AI</span>
-            <span className="sm:hidden">AI</span>
+            <ChatCircleDots size={15} weight="bold" />
+            <span>Tanya Rin</span>
           </button>
 
           {/* Mobile hamburger toggle */}
