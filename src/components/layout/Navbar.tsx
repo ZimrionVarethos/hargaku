@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { ChatCircleDots } from '@phosphor-icons/react';
+import { ChatCircleDots, Moon, Sun } from '@phosphor-icons/react';
 import { useAssistant } from '@/lib/store/assistant-store';
 import { useTheme } from '@/lib/store/theme-store';
 
@@ -38,14 +38,17 @@ export function Navbar() {
         
         {/* Brand / Logo */}
         <Link href="/" className="flex items-center gap-2.5 no-underline shrink-0">
-          <Image
-            src="/images/pasarku/logo-nav.webp"
-            alt="Logo PasarKu"
-            width={110}
-            height={48}
-            priority
-            className="h-9 w-auto object-contain"
-          />
+          <span className="pasarku-logo-plaque">
+            <Image
+              src="/images/pasarku/logo-nav.webp"
+              alt="Logo PasarKu"
+              width={400}
+              height={173}
+              unoptimized
+              priority
+              className="h-8 w-auto object-contain"
+            />
+          </span>
           <span className="text-xs font-bold px-2 py-0.5 rounded bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-ink)]">
             Kota Bogor
           </span>
@@ -89,12 +92,15 @@ export function Navbar() {
           <button
             type="button"
             onClick={toggleTheme}
-            aria-label="Ganti tema tampilan terang atau gelap"
-            className="market-btn-secondary px-3 py-1.5 text-xs min-h-[40px] inline-flex items-center gap-1.5"
+            aria-label={theme === 'dark' ? 'Beralih ke Mode Siang' : 'Beralih ke Mode Subuh'}
+            title={theme === 'dark' ? 'Beralih ke Mode Siang' : 'Beralih ke Mode Subuh'}
+            className="market-btn-secondary w-10 h-10 p-0 inline-flex items-center justify-center shrink-0"
           >
-            <span className="font-bold">
-              {theme === 'dark' ? 'Mode Siang' : 'Mode Subuh'}
-            </span>
+            {theme === 'dark' ? (
+              <Sun size={18} weight="bold" className="text-[#EEF773]" aria-hidden="true" />
+            ) : (
+              <Moon size={18} weight="bold" className="text-[var(--text-primary)]" aria-hidden="true" />
+            )}
           </button>
 
           <button

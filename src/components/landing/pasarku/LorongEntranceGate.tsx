@@ -123,8 +123,9 @@ export function LorongEntranceGate({
           <Image
             src="/images/pasarku/logo-hero.webp"
             alt="PasarKu"
-            width={280}
-            height={121}
+            width={400}
+            height={173}
+            unoptimized
             priority
             className="w-44 sm:w-56 lg:w-60 h-auto mx-auto drop-shadow-xs"
           />

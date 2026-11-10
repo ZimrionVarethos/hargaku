@@ -20,6 +20,7 @@ interface Props {
   activeMarketId: string;
   flyRequestSeq: number;
   onSelectMarket: (marketId: string, shouldFly?: boolean) => void;
+  onOpenMarket: (marketId: string) => void;
 }
 
 export function Bogor3DMapCanvas({
@@ -28,6 +29,7 @@ export function Bogor3DMapCanvas({
   activeMarketId,
   flyRequestSeq,
   onSelectMarket,
+  onOpenMarket,
 }: Props) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -35,9 +37,19 @@ export function Bogor3DMapCanvas({
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const customLayerRef = useRef<Bogor3DMarketCustomLayer | null>(null);
+  const visibleMarketsRef = useRef<BogorMarket[]>(visibleMarkets);
+  const onOpenMarketRef = useRef(onOpenMarket);
   const markersRef = useRef<Map<string, { marker: mapboxgl.Marker; btn: HTMLButtonElement }>>(
     new Map()
   );
+
+  useEffect(() => {
+    visibleMarketsRef.current = visibleMarkets;
+  }, [visibleMarkets]);
+
+  useEffect(() => {
+    onOpenMarketRef.current = onOpenMarket;
+  }, [onOpenMarket]);
 
   const [mapboxToken, setMapboxToken] = useState<string | null>(null);
   const [configLoaded, setConfigLoaded] = useState(false);
@@ -100,13 +112,52 @@ export function Bogor3DMapCanvas({
         btn.className =
           'px-2.5 py-1 rounded-full border-2 text-[10px] font-bold shadow-md transition-transform hover:scale-105 cursor-pointer whitespace-nowrap';
         btn.textContent = `${m.code.replace('UNIT ', '#')} ${m.shortName.replace('Pasar ', '')}`;
-        btn.onclick = () => onSelectMarket(m.id, true);
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          onOpenMarketRef.current(m.id);
+        };
 
         const marker = new mapboxgl.Marker({ element: btn, anchor: 'bottom', offset: [0, -14] })
           .setLngLat([m.lng, m.lat])
           .addTo(map);
         markersRef.current.set(m.id, { marker, btn });
       }
+
+      const pickMarketAtPoint = (pt: mapboxgl.Point): string | null => {
+        const hitFeatures = map.queryRenderedFeatures(pt, {
+          layers: ['pasarku-market-halos', 'pasarku-market-active-halo'],
+        });
+        const featureId = hitFeatures[0]?.properties?.id;
+        if (typeof featureId === 'string') return featureId;
+
+        let closestId: string | null = null;
+        let closestDist = Infinity;
+        for (const m of visibleMarketsRef.current) {
+          const projected = map.project([m.lng, m.lat]);
+          const dx = Math.abs(pt.x - projected.x);
+          const dy = projected.y - pt.y;
+          if (dx <= 34 && dy >= -22 && dy <= 54) {
+            const dist = Math.hypot(dx, Math.max(0, dy - 14));
+            if (dist < closestDist) {
+              closestDist = dist;
+              closestId = m.id;
+            }
+          }
+        }
+        return closestId;
+      };
+
+      map.on('mousemove', (e) => {
+        map.getCanvas().style.cursor = pickMarketAtPoint(e.point) ? 'pointer' : '';
+      });
+
+      map.on('click', (e) => {
+        const pickedId = pickMarketAtPoint(e.point);
+        if (pickedId) {
+          onOpenMarketRef.current(pickedId);
+        }
+      });
+
       setMapReady(true);
     });
 
@@ -197,7 +248,7 @@ export function Bogor3DMapCanvas({
   };
 
   return (
-    <div className="market-card relative w-full h-[430px] sm:h-[490px] overflow-hidden bg-[var(--bg-stage)]">
+    <div className="market-card relative w-full h-[470px] sm:h-[550px] overflow-hidden bg-[var(--bg-stage)]">
       {!configLoaded && (
         <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-[#F9F3EE]">
           Menghubungkan Peta 3D Mapbox dari database Supabase...
@@ -222,6 +273,7 @@ export function Bogor3DMapCanvas({
         <Bogor3DMapOverlay
           activeMarket={activeMarket}
           onFocusMarket={(id) => onSelectMarket(id, true)}
+          onOpenDetail={(id) => onOpenMarket(id)}
           onOrbit={handleOrbit}
           onResetOverview={handleResetOverview}
         />

@@ -6,9 +6,14 @@
 
 ## 📌 Status Terkini (Current State)
 * **Tanggal Terakhir Diperbarui**: 2026-11-10
-* **Fase Saat Ini**: **Fase C: PUNTEN AI Multi-Sumber, Penghapusan Timbangan, & Peta 3D Mapbox 13 Unit Pasar Bogor**
-* **Fokus Pengerjaan**: Mengganti persona asisten menjadi **PUNTEN** (tombol seragam `Tanya PUNTEN`), menghapus section Meja Timbangan Mekanis & tautannya di Navbar, serta menghadirkan **Peta 3D Interaktif 13 Unit Pasar Rakyat Kota Bogor** berbasis Mapbox GL JS v3 (`standard` style + koridor distribusi + **Custom Layer 3D Three.js** bangunan paviliun pasar) dengan token Mapbox dinamis tersimpan di Supabase `system_settings`.
+* **Fase Saat Ini**: **Fase C: Polish UX Peta 3D Popup 13 Pasar, Navbar Tema Ikon, & Logo Plakat Mode Subuh**
+* **Fokus Pengerjaan**: Memindahkan daftar kotak detail 13 unit pasar ke dalam **Pop-up Detail Pasar Taktil (`BogorMarketDetailModal`)** yang terbuka saat pasar diklik pada Peta 3D Mapbox (bebas daftar kotak menumpuk di bawah peta, adaptif Mode Siang & Subuh sesuai `design.md`), meringkas tombol tema Navbar menjadi tombol ikon tunggal (`Sun` / `Moon`), serta menambahkan lapisan plakat kertas hangat berlapis (`.pasarku-logo-plaque`) dan resolusi gambar native pada logo agar tajam bebas artefak potongan di Mode Subuh.
 * **Fitur Utama Terkini**:
+  - **Popup Detail Pasar 3D (`BogorMarketDetailModal.tsx`, `PasarKuUnitPasarSection.tsx`, `Bogor3DMapCanvas.tsx`)**:
+    - Mengeliminasi grid 13 kartu besar di bawah peta dan menggantinya dengan bilah indeks pil ringkas 1 baris + interaksi klik langsung pada pin unit, halo bangunan 3D di peta, atau pil unit yang langsung menerbangkan kamera 3D sekaligus membuka popup detail taktil (Mode Siang `#FFFFFF`/`#F9F3EE` & Mode Subuh `#16241D`/`#0F1914`).
+  - **Navbar Tema Ikon & Logo Plakat Mode Subuh (`Navbar.tsx`, `globals.css`, `LorongEntranceGate.tsx`)**:
+    - Tombol pengalih tema Navbar diringkas menjadi ikon `Sun` / `Moon` (`40x40px`) lengkap dengan `aria-label` aksesibel.
+    - Logo `PasarKu` di Navbar memakai ukuran native `400x173` (`unoptimized`) dan dibingkai oleh `.pasarku-logo-plaque` berlapis di Mode Subuh (`#F9F3EE` core + lis dalam `#E6D5B8` + bingkai `var(--border-ink)` + `--shadow-hard-sm`) agar bebas halo potongan & kontras AAA.
   - **Peta 3D Interaktif 13 Unit Pasar Bogor (`Bogor3DMapCanvas.tsx`, `Bogor3DMarketCustomLayer.ts`, `BogorMapLayersHelper.ts`)**:
     - Basemap **Mapbox GL JS v3** (`standard` style) yang adaptif terhadap Mode Siang (`day`) dan Mode Subuh (`night` + kabut senja/malam) pada koordinat resmi 13 unit pasar Perumda PPJ (`src/lib/data/bogor-markets.ts`).
     - Lapisan **GeoJSON Koridor Distribusi & Halo Zona Pasar**, ditumpuk presisi bersama **Custom 3D Three.js Layer** (`MercatorCoordinate.fromLngLat`) yang membentuk 13 bangunan paviliun pasar beratap Pendopo Nusantara 2 tingkat plus suar aktif (`#EEF773`) dan kamera terbang `flyTo`.
