@@ -35,7 +35,7 @@ Membangun aplikasi perlombaan sering gagal bukan karena kekurangan ide, melainka
 | **Styling Library** | Styled Components / Emotion | Tailwind CSS | Runtime CSS overhead dan sering konflik dengan Next.js Server Components. |
 | **UI Component Bloat** | Ant Design / MUI | Tailwind CSS + Lucide Icons (atau Radix headless jika perlu) | Styling bawaan AntD/MUI sulit di-override dan membuat bundle membengkak. |
 | **Database ORM** | Query SQL tak terstruktur tanpa helper koneksi aman | `@supabase/supabase-js` + parameterized SQL (`pg` Pool) | Kompatibel langsung dengan Supabase Pooler & RLS tanpa overhead migration lock serverless. |
-| **Geospatial Library** | Google Maps API berbayar / Mapbox GL berat | **Leaflet.js** (OpenStreetMap / CartoDB) | Ringan, open-source tanpa billing credit card, kompatibel dengan Next.js client-side. |
+| **Geospatial Library** | Google Maps API berbayar | **Leaflet.js** (untuk `/peta` nasional) + **Mapbox GL JS v3 & Three.js Custom Layer** (khusus Peta 3D 13 Unit Pasar Bogor) | Leaflet tetap ringan untuk peta 64 sentra nasional, sedangkan Mapbox GL JS v3 dipakai dengan token dinamis di DB Supabase khusus visualisasi bangunan pasar 3D di landing page. |
 | **Setup Library Liar** | Instalasi paket tanpa verifikasi Context7 | **Context7 MCP** (`resolve-library-id` & `query-docs`) | Menghindari API deprecated atau breaking changes antar versi paket. |
 
 ---

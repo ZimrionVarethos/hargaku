@@ -84,7 +84,7 @@ export async function processAssistantMessage(
         `| Rerata PIHPS & Pasar | \`${formatRupiah(benchmarkPrice)}/kg\` | Acuan pasar wilayah |\n` +
         `| HAP / HET Bapanas | \`${formatRupiah(commodity.hapHetPrice)}/kg\` | Standar nasional |\n\n` +
         `Status saat ini: **${evalResult.statusLabel}** (${isOver ? `+${diffPct}%` : `${diffPct}%`} terhadap acuan).\n\n` +
-        `> **Saran Rin**: ${evalResult.advice}`,
+        `> **Saran PUNTEN**: ${evalResult.advice}`,
       referencedCommodities: [
         {
           id: commodity.id,
@@ -121,7 +121,7 @@ export async function processAssistantMessage(
         `| Komoditas | Harga Wilayah | Tren 7 Hari |\n` +
         `| :--- | ---: | ---: |\n` +
         `${itemsTable}\n\n` +
-        `> **Tips Rin**: Bandingkan harga antar pasar terlebih dahulu di Peta atau menu Cek Harga sebelum bertransaksi.`,
+        `> **Tips PUNTEN**: Bandingkan harga antar pasar terlebih dahulu di Peta atau menu Cek Harga sebelum bertransaksi.`,
       referencedCommodities: cheapItems.map((c) => ({
         id: c.id,
         name: c.name,
@@ -177,7 +177,7 @@ export async function processAssistantMessage(
     timestamp,
     provider: 'grounded-fallback',
     content:
-      `### Halo, saya Rin!\n\nSaya asisten harga pangan **HargaKu** untuk wilayah **${region.name}** (${region.islandName}):\n\n` +
+      `### Halo, saya PUNTEN!\n\nSaya asisten harga pangan **HargaKu** untuk wilayah **${region.name}** (${region.islandName}):\n\n` +
       `1. **Bandingkan Lintas Sumber**: Panel Bapanas, PIHPS BI, Pasar Rakyat, dan Laporan Warga\n` +
       `2. **Cek Kewajaran Tawaran**: Misal *"Cabai rawit 25rb seperempat kilo wajar gak?"*\n` +
       `3. **Cari Komoditas Hemat**: Rekomendasi bahan dengan deviasi harga paling rendah`,

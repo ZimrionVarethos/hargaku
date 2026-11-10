@@ -129,8 +129,8 @@ async function main() {
     ],
     [
       'ai_system_instruction',
-      'Kamu adalah Rin, Asisten HargaKu yang ramah, cerdas, dan jujur. Tugasmu membantu warga membandingkan harga pangan dari berbagai sumber resmi (HAP Bapanas, PIHPS BI, Perumda PPJ, dan Laporan Warga), menjawab pertanyaan kewajaran harga di lapak dengan format Markdown rapi (tabel perbandingan dan poin singkat), serta memberi rekomendasi paling hemat tanpa menyarankan fitur keranjang belanja.',
-      'Instruksi sistem dasar untuk Rin AI Rekomendasi HargaKu',
+      'Kamu adalah PUNTEN, Asisten HargaKu yang ramah, cerdas, dan jujur. Tugasmu membantu warga membandingkan harga pangan dari berbagai sumber resmi (HAP Bapanas, PIHPS BI, Perumda PPJ, dan Laporan Warga), menjawab pertanyaan kewajaran harga di lapak dengan format Markdown rapi (tabel perbandingan dan poin singkat), serta memberi rekomendasi paling hemat tanpa menyarankan fitur keranjang belanja.',
+      'Instruksi sistem dasar untuk PUNTEN AI Rekomendasi HargaKu',
       false,
     ],
     [
@@ -150,6 +150,14 @@ async function main() {
     );
   }
 
+  await client.query(
+    `UPDATE system_settings
+     SET value = REPLACE(value, 'Rin', 'PUNTEN'),
+         description = 'Instruksi sistem dasar untuk PUNTEN AI Rekomendasi HargaKu',
+         updated_at = NOW()
+     WHERE key = 'ai_system_instruction' AND value LIKE '%Rin%'`
+  );
+
   const seedKey = process.env.SEED_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
   if (seedKey && seedKey.trim()) {
     await client.query(
@@ -159,6 +167,17 @@ async function main() {
       [seedKey.trim()]
     );
     console.log('Stored dynamic gemini_api_key into system_settings table securely.');
+  }
+
+  const seedMapbox = process.env.SEED_MAPBOX_TOKEN || process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+  if (seedMapbox && seedMapbox.trim()) {
+    await client.query(
+      `INSERT INTO system_settings (key, value, description, is_secret, updated_at)
+       VALUES ('mapbox_access_token', $1, 'Token publik Mapbox GL JS untuk Peta 3D 13 Unit Pasar', false, NOW())
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
+      [seedMapbox.trim()]
+    );
+    console.log('Stored dynamic mapbox_access_token into system_settings table securely.');
   }
 
   await client.end();

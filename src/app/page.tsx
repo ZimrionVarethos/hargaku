@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { PasarKuLorongHero } from '@/components/landing/pasarku/PasarKuLorongHero';
-import { PasarKuStageSection } from '@/components/landing/pasarku/PasarKuStageSection';
 import { PasarKuSorotanSection } from '@/components/landing/pasarku/PasarKuSorotanSection';
 import { PasarKuAnalitikSection } from '@/components/landing/pasarku/PasarKuAnalitikSection';
 import { PasarKuUnitPasarSection } from '@/components/landing/pasarku/PasarKuUnitPasarSection';
@@ -16,9 +15,6 @@ export default function HomePage() {
     <div className="w-full flex flex-col bg-[var(--bg-paper)] text-[var(--text-primary)]">
       {/* Immersive Gate Zoom & Lorong Pasar Walkthrough */}
       <PasarKuLorongHero onSelectCommodity={setSelectedCommodity} />
-
-      {/* Meja Timbangan Mekanis */}
-      <PasarKuStageSection />
 
       {/* Papan Pokok & Sorotan Pangan */}
       <PasarKuSorotanSection />

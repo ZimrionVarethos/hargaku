@@ -3,6 +3,8 @@ import { dbQuery } from './db';
 export interface AiPublicSettings {
   hasApiKey: boolean;
   maskedApiKey: string;
+  hasMapboxToken: boolean;
+  maskedMapboxToken: string;
   geminiModel: string;
   systemInstruction: string;
   enabledSources: string[];
@@ -12,6 +14,12 @@ export interface AiPublicSettings {
 
 export interface AiRuntimeConfig extends AiPublicSettings {
   apiKey: string | null;
+  mapboxToken: string | null;
+}
+
+export interface PublicMapConfig {
+  mapboxToken: string;
+  source: 'supabase-db' | 'env-fallback' | 'unconfigured';
 }
 
 const DEFAULT_MODEL = 'gemini-3.8-flash';
@@ -22,7 +30,7 @@ const DEFAULT_SOURCES = [
   'Laporan Warga Terverifikasi',
 ];
 const DEFAULT_INSTRUCTION =
-  'Kamu adalah Rin, Asisten HargaKu yang ramah, cerdas, dan jujur. Bandingkan harga lintas sumber (HAP/HET Bapanas, PIHPS BI, Pasar Rakyat/Perumda PPJ, dan Laporan Warga), rekomendasikan patokan paling hemat, serta jawab pertanyaan pengguna dengan format Markdown yang rapi (gunakan heading, poin, penebalan angka, dan tabel Markdown jika membandingkan sumber).';
+  'Kamu adalah PUNTEN, Asisten HargaKu yang ramah, cerdas, dan jujur. Bandingkan harga lintas sumber (HAP/HET Bapanas, PIHPS BI, Pasar Rakyat/Perumda PPJ, dan Laporan Warga), rekomendasikan patokan paling hemat, serta jawab pertanyaan pengguna dengan format Markdown yang rapi (gunakan heading, poin, penebalan angka, dan tabel Markdown jika membandingkan sumber).';
 
 interface SettingRow {
   key: string;
@@ -42,7 +50,7 @@ export async function getAiRuntimeConfig(): Promise<AiRuntimeConfig> {
     const res = await dbQuery<SettingRow>(
       `SELECT key, value, updated_at::text
        FROM system_settings
-       WHERE key IN ('gemini_api_key', 'gemini_model', 'ai_system_instruction', 'price_sources_config')`
+       WHERE key IN ('gemini_api_key', 'gemini_model', 'ai_system_instruction', 'price_sources_config', 'mapbox_access_token')`
     );
 
     const map = new Map<string, { value: string; updatedAt: string }>();
@@ -53,6 +61,10 @@ export async function getAiRuntimeConfig(): Promise<AiRuntimeConfig> {
     const dbKey = map.get('gemini_api_key')?.value?.trim() || null;
     const envKey = process.env.GEMINI_API_KEY?.trim() || null;
     const activeKey = dbKey || envKey;
+
+    const dbMapbox = map.get('mapbox_access_token')?.value?.trim() || null;
+    const envMapbox = process.env.NEXT_PUBLIC_MAPBOX_TOKEN?.trim() || null;
+    const activeMapbox = dbMapbox || envMapbox;
 
     let enabledSources = DEFAULT_SOURCES;
     const rawSources = map.get('price_sources_config')?.value;
@@ -67,7 +79,13 @@ export async function getAiRuntimeConfig(): Promise<AiRuntimeConfig> {
       }
     }
 
+    const rawInstruction = map.get('ai_system_instruction')?.value?.trim();
+    const normalizedInstruction = rawInstruction
+      ? rawInstruction.replace(/\bRin\b/g, 'PUNTEN')
+      : DEFAULT_INSTRUCTION;
+
     const latestUpdated =
+      map.get('mapbox_access_token')?.updatedAt ||
       map.get('gemini_api_key')?.updatedAt ||
       map.get('gemini_model')?.updatedAt ||
       map.get('ai_system_instruction')?.updatedAt ||
@@ -77,18 +95,25 @@ export async function getAiRuntimeConfig(): Promise<AiRuntimeConfig> {
       apiKey: activeKey,
       hasApiKey: Boolean(activeKey),
       maskedApiKey: maskSecretValue(activeKey),
+      mapboxToken: activeMapbox,
+      hasMapboxToken: Boolean(activeMapbox),
+      maskedMapboxToken: maskSecretValue(activeMapbox),
       geminiModel: map.get('gemini_model')?.value?.trim() || DEFAULT_MODEL,
-      systemInstruction: map.get('ai_system_instruction')?.value?.trim() || DEFAULT_INSTRUCTION,
+      systemInstruction: normalizedInstruction,
       enabledSources,
       dbConnected: true,
       updatedAt: latestUpdated,
     };
   } catch {
     const envKey = process.env.GEMINI_API_KEY?.trim() || null;
+    const envMapbox = process.env.NEXT_PUBLIC_MAPBOX_TOKEN?.trim() || null;
     return {
       apiKey: envKey,
       hasApiKey: Boolean(envKey),
       maskedApiKey: maskSecretValue(envKey),
+      mapboxToken: envMapbox,
+      hasMapboxToken: Boolean(envMapbox),
+      maskedMapboxToken: maskSecretValue(envMapbox),
       geminiModel: DEFAULT_MODEL,
       systemInstruction: DEFAULT_INSTRUCTION,
       enabledSources: DEFAULT_SOURCES,
@@ -98,11 +123,34 @@ export async function getAiRuntimeConfig(): Promise<AiRuntimeConfig> {
   }
 }
 
+export async function getPublicMapConfig(): Promise<PublicMapConfig> {
+  try {
+    const res = await dbQuery<SettingRow>(
+      `SELECT key, value, updated_at::text FROM system_settings WHERE key = 'mapbox_access_token' LIMIT 1`
+    );
+    const dbToken = res.rows[0]?.value?.trim();
+    if (dbToken) {
+      return { mapboxToken: dbToken, source: 'supabase-db' };
+    }
+  } catch {
+    // Fallback to optional env if DB is momentarily unavailable
+  }
+
+  const envToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN?.trim();
+  if (envToken) {
+    return { mapboxToken: envToken, source: 'env-fallback' };
+  }
+
+  return { mapboxToken: '', source: 'unconfigured' };
+}
+
 export async function getPublicAiSettings(): Promise<AiPublicSettings> {
   const cfg = await getAiRuntimeConfig();
   return {
     hasApiKey: cfg.hasApiKey,
     maskedApiKey: cfg.maskedApiKey,
+    hasMapboxToken: cfg.hasMapboxToken,
+    maskedMapboxToken: cfg.maskedMapboxToken,
     geminiModel: cfg.geminiModel,
     systemInstruction: cfg.systemInstruction,
     enabledSources: cfg.enabledSources,
@@ -113,6 +161,7 @@ export async function getPublicAiSettings(): Promise<AiPublicSettings> {
 
 export async function saveAiSettings(input: {
   geminiApiKey?: string;
+  mapboxAccessToken?: string;
   geminiModel?: string;
   systemInstruction?: string;
   enabledSources?: string[];
@@ -123,6 +172,15 @@ export async function saveAiSettings(input: {
        VALUES ('gemini_api_key', $1, 'API Key Google Gemini dinamis via Admin Dashboard', true, NOW())
        ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, is_secret = true, updated_at = NOW()`,
       [input.geminiApiKey.trim()]
+    );
+  }
+
+  if (input.mapboxAccessToken && input.mapboxAccessToken.trim().length > 8) {
+    await dbQuery(
+      `INSERT INTO system_settings (key, value, description, is_secret, updated_at)
+       VALUES ('mapbox_access_token', $1, 'Token publik Mapbox GL JS untuk Peta 3D 13 Unit Pasar', false, NOW())
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
+      [input.mapboxAccessToken.trim()]
     );
   }
 

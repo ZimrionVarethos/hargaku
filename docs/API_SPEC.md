@@ -38,8 +38,8 @@ Mengevaluasi penawaran harga pedagang di lapak terhadap Lapis 1 (HAP/HET Bapanas
 ### 2.5. `POST /api/v1/reports`
 Menyimpan laporan harga warga baru ke tabel `citizen_reports` di Supabase lengkap dengan deteksi awal deviasi anomali.
 
-### 2.6. `POST /api/v1/assistant/chat` (Rin: Asisten AI Harga Multi-Sumber)
-Mengirimkan pertanyaan pengguna ke persona asisten **Rin** berbasis **Google Gemini API** (kunci & model dibaca dinamis dari tabel `system_settings` Supabase) dengan respons berformat **Markdown**, konteks live multi-sumber (`PIHPS BI`, `Bapanas`, `Perumda PPJ`, `Laporan Warga`), dan daftar komoditas di wilayah aktif.
+### 2.6. `POST /api/v1/assistant/chat` (PUNTEN: Asisten AI Harga Multi-Sumber)
+Mengirimkan pertanyaan pengguna ke persona asisten **PUNTEN** berbasis **Google Gemini API** (kunci & model dibaca dinamis dari tabel `system_settings` Supabase) dengan respons berformat **Markdown**, konteks live multi-sumber (`PIHPS BI`, `Bapanas`, `Perumda PPJ`, `Laporan Warga`), dan daftar komoditas di wilayah aktif.
 * **Request Body**: `{ "message": string, "regionId": string, "commoditySlug"?: string, "conversationHistory"?: Array<{ role, content }> }`
 * **Response `data`**:
 ```json
@@ -58,9 +58,13 @@ Mengirimkan pertanyaan pengguna ke persona asisten **Rin** berbasis **Google Gem
 }
 ```
 
+### 2.7. `GET /api/v1/map/config`
+Mengambil konfigurasi token publik **Mapbox GL JS** (`mapbox_access_token`) dari tabel `system_settings` Supabase secara dinamis untuk merender Peta 3D 13 Unit Pasar Bogor tanpa hardcode token di frontend.
+* **Response `data`**: `{ "mapboxToken": string, "source": "supabase-db" | "env-fallback" | "unconfigured" }`
+
 ---
 
-## 3. Daftar Endpoint Admin (Supabase CRUD & Dynamic AI Config)
+## 3. Daftar Endpoint Admin (Supabase CRUD & Dynamic API Config)
 
 ### 3.1. `GET /api/v1/admin/bootstrap`
 Memuat status lengkap admin dari Supabase: `commodities`, `markets`, `dailyPrices` (map `${marketId}_${commodityId}`), dan `reports`.
@@ -74,7 +78,7 @@ Endpoint mutasi terpadu (menerima header sesi admin) untuk menyinkronkan aksi CR
 * `RESET_DEFAULT`
 
 ### 3.3. `GET /api/v1/admin/settings` & `PUT /api/v1/admin/settings`
-Mengelola kredensial AI & sumber pembanding di tabel `system_settings` Supabase secara dinamis:
-* **`GET`**: Mengembalikan status kunci API tersamar (`maskedApiKey`: `AIzaSy......abcd`), `hasApiKey`, `geminiModel`, `systemInstruction`, `enabledSources`, `dbConnected`, dan `updatedAt`. Kunci mentah tidak pernah dikirim ke browser.
-* **`PUT`**: Menyimpan pembaruan `geminiApiKey` (opsional, diisi hanya saat ingin ganti kunci), `geminiModel`, `systemInstruction`, atau `enabledSources` ke Supabase.
+Mengelola kredensial AI, token Mapbox, dan sumber pembanding di tabel `system_settings` Supabase secara dinamis:
+* **`GET`**: Mengembalikan status kunci Gemini tersamar (`maskedApiKey`: `AIzaSy......abcd`), `hasApiKey`, `geminiModel`, `systemInstruction`, `enabledSources`, status token Mapbox (`hasMapboxToken`, `maskedMapboxToken`), `dbConnected`, dan `updatedAt`. Kunci sensitif server-only tidak pernah dikirim mentah ke browser.
+* **`PUT`**: Menyimpan pembaruan `geminiApiKey`, `geminiModel`, `systemInstruction`, `enabledSources`, atau `mapboxAccessToken` ke Supabase.
 * **`POST /api/v1/admin/settings` (`{ action: "test", geminiApiKey?: string, geminiModel?: string }`)**: Menguji koneksi langsung ke endpoint Google Gemini dan mengembalikan status & latensi respons.

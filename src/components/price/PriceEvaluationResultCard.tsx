@@ -144,7 +144,7 @@ export function PriceEvaluationResultCard({
           className="market-btn-primary w-full py-2.5 px-4 rounded-[10px] text-[12px] font-bold flex items-center justify-center gap-2 cursor-pointer"
         >
           <ChatCircleDots size={16} weight="bold" />
-          <span>Tanya Rin</span>
+          <span>Tanya PUNTEN</span>
         </button>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">

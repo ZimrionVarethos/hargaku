@@ -6,21 +6,21 @@
 
 ## 📌 Status Terkini (Current State)
 * **Tanggal Terakhir Diperbarui**: 2026-11-10
-* **Fase Saat Ini**: **Fase C: Integrasi Database Supabase, AI Rekomendasi Harga Multi-Sumber (Gemini), & Dinamisasi PasarKu 3D**
-* **Fokus Pengerjaan**: Menghapus harga statis dari poster/banner 3D, menghubungkan katalog/harga harian/laporan/pengaturan ke Supabase PostgreSQL, menambahkan konfigurasi API Key dinamis di Admin Console (`/admin` -> `Integrasi AI & API`), serta menggantikan seluruh fitur keranjang belanja menjadi **Rekomendasi Harga AI Multi-Sumber & Tanya Jawab** (`/rekomendasi-ai` & `AssistantDrawer`).
+* **Fase Saat Ini**: **Fase C: PUNTEN AI Multi-Sumber, Penghapusan Timbangan, & Peta 3D Mapbox 13 Unit Pasar Bogor**
+* **Fokus Pengerjaan**: Mengganti persona asisten menjadi **PUNTEN** (tombol seragam `Tanya PUNTEN`), menghapus section Meja Timbangan Mekanis & tautannya di Navbar, serta menghadirkan **Peta 3D Interaktif 13 Unit Pasar Rakyat Kota Bogor** berbasis Mapbox GL JS v3 (`standard` style + koridor distribusi + **Custom Layer 3D Three.js** bangunan paviliun pasar) dengan token Mapbox dinamis tersimpan di Supabase `system_settings`.
 * **Fitur Utama Terkini**:
+  - **Peta 3D Interaktif 13 Unit Pasar Bogor (`Bogor3DMapCanvas.tsx`, `Bogor3DMarketCustomLayer.ts`, `BogorMapLayersHelper.ts`)**:
+    - Basemap **Mapbox GL JS v3** (`standard` style) yang adaptif terhadap Mode Siang (`day`) dan Mode Subuh (`night` + kabut senja/malam) pada koordinat resmi 13 unit pasar Perumda PPJ (`src/lib/data/bogor-markets.ts`).
+    - Lapisan **GeoJSON Koridor Distribusi & Halo Zona Pasar**, ditumpuk presisi bersama **Custom 3D Three.js Layer** (`MercatorCoordinate.fromLngLat`) yang membentuk 13 bangunan paviliun pasar beratap Pendopo Nusantara 2 tingkat plus suar aktif (`#EEF773`) dan kamera terbang `flyTo`.
+  - **Konfigurasi Dinamis Gemini & Mapbox di DB (`src/lib/server/settings-db.ts`, `/api/v1/map/config`, `AdminSettingsFormCard.tsx`)**:
+    - `gemini_api_key` (server-only, disamarkan di Admin) dan `mapbox_access_token` (disajikan ke browser via `/api/v1/map/config`) dikelola penuh lewat tabel `system_settings` Supabase serta menu Admin `/admin` (`Integrasi AI & Peta`) tanpa hardcode di kode sumber.
+  - **Persona Asisten "PUNTEN" & Markdown Renderer (`MarkdownMessage.tsx`, `AiMessageBubble.tsx`, `AssistantDrawer.tsx`, `AiRecommendationView.tsx`)**:
+    - Seluruh tombol pemicu konsultasi AI diseragamkan menjadi **`Tanya PUNTEN`** (Navbar, Modal Komoditas, Peta 3D Unit Pasar, Sorotan Pangan, Laci Komoditas 3D, Evaluasi Cek Harga, dan `/rekomendasi-ai`).
+    - Section Meja Timbangan Mekanis (`#etagStageSection`) dan menu `Timbangan` di Navbar dihapus agar alur halaman padat dari Lorong Pasar 3D menuju Papan Pokok & Peta 3D 13 Unit Pasar.
   - **Integrasi Database Supabase PostgreSQL (`supabase/schema.sql`, `src/lib/server/admin-db.ts`, `src/lib/store/admin-store.tsx`)**:
-    - Tabel `commodities`, `markets`, `daily_prices`, `citizen_reports`, dan `system_settings` (dilindungi RLS) berjalan di Supabase PostgreSQL 17.11 via Session Pooler `pg` + `@supabase/supabase-js`.
-    - Endpoint `/api/v1/admin/bootstrap`, `/api/v1/admin/sync`, `/api/v1/admin/settings`, `/api/v1/reports`, dan `/api/v1/assistant/chat` tersinkron dua arah antara Konsol Admin, halaman publik `/`, `/cek-harga`, `/lapor`, dan `/rekomendasi-ai`.
-  - **Konfigurasi Gemini API Key Dinamis di DB (`AdminSettingsView.tsx`, `src/lib/server/settings-db.ts`)**:
-    - API key, model aktif (`gemini-3.8-flash`), instruksi sistem, dan sumber pembanding harga disimpan dinamis di tabel `system_settings` Supabase dan dapat diuji serta diganti langsung di dashboard admin (`/admin` -> `Integrasi AI & API`) tanpa hardcode.
-  - **Persona Asisten "Rin" & Markdown Renderer (`MarkdownMessage.tsx`, `AiMessageBubble.tsx`, `AssistantDrawer.tsx`, `AiRecommendationView.tsx`)**:
-    - Seluruh tombol pemicu konsultasi AI diseragamkan menjadi **`Tanya Rin`** (Navbar, Modal Komoditas, Meja Timbangan, Sorotan Pangan, Laci Komoditas 3D, Evaluasi Cek Harga, dan `/rekomendasi-ai`).
-    - Balon pesan **Rin** mendukung rendering **Markdown (`md`)** lengkap bebas dependensi eksternal (heading, tabel komparasi responsif, daftar berurut/poin, kutipan, inline code nominal Rupiah, dan tautan aman) di Mode Siang maupun Mode Subuh.
-  - **Penggantian Total Keranjang -> Tanya Rin & Komparasi Multi-Sumber (`AiRecommendationView.tsx`, `AssistantDrawer.tsx`, `src/lib/server/gemini-service.ts`)**:
-    - Menghapus fitur keranjang belanja dan membandingkan harga dari `Panel Harga Bapanas`, `Survei PIHPS BI`, `Perumda PPJ / Pasar Rakyat`, dan `Laporan Warga Terverifikasi`, lengkap dengan tanya jawab Gemini AI di drawer navbar, modal komoditas, timbangan stage, sorotan, hasil cek harga, serta halaman khusus `/rekomendasi-ai`.
+    - Tabel `commodities`, `markets`, `daily_prices`, `citizen_reports`, dan `system_settings` (RLS aktif) berjalan di Supabase PostgreSQL via Session Pooler `pg` + `@supabase/supabase-js` dengan singleton pool produksi (`globalForPg`).
   - **Banner 3D Bebas Harga Statis & Sinkronisasi Harga Live (`three-banners.ts`, `three-stalls.ts`, `three-scene-manager.ts`, `LorongThreeMarketAlley.tsx`)**:
-    - Poster dinding dan spanduk gantung 3D kini hanya menampilkan ilustrasi gambar komoditas, nomor lapak, kategori, dan nama barang. Harga dinamis dari Admin/Supabase diperbarui secara efisien ke papan harga meja, hover tooltip, dan popup modal tanpa rebuild WebGL context.
+    - Poster dinding dan spanduk gantung 3D hanya menampilkan gambar komoditas & nama barang, sementara harga dinamis diperbarui langsung ke papan harga meja & modal tanpa rebuild WebGL context.
 
 ---
 

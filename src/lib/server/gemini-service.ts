@@ -205,7 +205,7 @@ export async function generateMultiSourceAiReply(input: {
           .join('\n')
       : '';
     return {
-      reply: `${fallback.content}${bestLine}\n\n> *Catatan: Kunci Gemini API belum diisi di Admin Console (menu Integrasi AI & API), jadi Rin saat ini memakai acuan lokal terverifikasi.*`,
+      reply: `${fallback.content}${bestLine}\n\n> *Catatan: Kunci Gemini API belum diisi di Admin Console (menu Integrasi AI & API), jadi PUNTEN saat ini memakai acuan lokal terverifikasi.*`,
       intent: 'PRICE_RECOMMENDATION',
       provider: 'grounded-fallback',
       model: cfg.geminiModel,
@@ -226,17 +226,17 @@ export async function generateMultiSourceAiReply(input: {
 
   const historyText = (input.conversationHistory || [])
     .slice(-6)
-    .map((m) => `${m.role === 'user' ? 'Pengguna' : 'Rin'}: ${m.content}`)
+    .map((m) => `${m.role === 'user' ? 'Pengguna' : 'PUNTEN'}: ${m.content}`)
     .join('\n');
 
   const prompt = [
-    `PERAN: Kamu adalah Rin, asisten harga pangan resmi di web HargaKu.`,
+    `PERAN: Kamu adalah PUNTEN, asisten harga pangan resmi di web HargaKu.`,
     `WILAYAH AKTIF: ${region.name} (${region.islandName}, ${region.zone}, toleransi logistik +${region.logisticsCostPct}%).`,
     `SUMBER PERBANDINGAN DATA HARGA NYATA DARI DATABASE:`,
     contextLines,
     historyText ? `\nRIWAYAT SINGKAT:\n${historyText}` : '',
     `\nPERTANYAAN PENGGUNA:\n${input.message}`,
-    `\nATURAN JAWABAN RIN: Jawab dalam Bahasa Indonesia yang ramah menggunakan format Markdown rapi (gunakan ### heading singkat, tabel Markdown jika membandingkan antar sumber, bullet points, dan penebalan angka/backtick nominal Rupiah). Sebutkan angka antar sumber secara jujur, rekomendasikan sumber/pasar yang paling hemat, JANGAN menyarankan fitur keranjang belanja, dan JANGAN gunakan karakter em-dash.`,
+    `\nATURAN JAWABAN PUNTEN: Jawab dalam Bahasa Indonesia yang ramah menggunakan format Markdown rapi (gunakan ### heading singkat, tabel Markdown jika membandingkan antar sumber, bullet points, dan penebalan angka/backtick nominal Rupiah). Sebutkan angka antar sumber secara jujur, rekomendasikan sumber/pasar yang paling hemat, JANGAN menyarankan fitur keranjang belanja, dan JANGAN gunakan karakter em-dash.`,
   ]
     .filter(Boolean)
     .join('\n');

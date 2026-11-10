@@ -119,7 +119,7 @@ export function LorongCommodityDrawer({
                   onClick={(e) => handleQuickAi(e, item)}
                   className="market-btn-secondary px-2 py-0.5 text-[9px] font-bold cursor-pointer"
                 >
-                  Tanya Rin
+                  Tanya PUNTEN
                 </button>
               </div>
             </div>

@@ -33,9 +33,9 @@ export function AiMessageBubble({ message, onNavigate }: Props) {
         <div className="flex items-center justify-between gap-2 pb-2 border-b border-[var(--border-subtle)]">
           <div className="flex items-center gap-2">
             <span className="w-6 h-6 rounded-lg bg-[#EEF773] border border-[#132E20] text-[#132E20] text-[11px] font-bold flex items-center justify-center shrink-0">
-              R
+              P
             </span>
-            <span className="text-[12px] font-bold text-[var(--text-primary)]">Rin</span>
+            <span className="text-[12px] font-bold text-[var(--text-primary)]">PUNTEN</span>
             <span
               className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                 message.provider === 'gemini'

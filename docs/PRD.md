@@ -118,27 +118,26 @@ HargaKu hadir sebagai **pendamping belanja pangan cerdas** yang memberikan acuan
 * **Keamanan & Privasi**: Penghapusan metadata EXIF dan lokasi presisi perangkat secara otomatis di browser sebelum upload; enkripsi hash IP untuk pencegahan spam (*rate limiting*).
 * Status moderasi: `PENDING`, `APPROVED`, `REJECTED`.
 
-### Modul 6: Peta Harga Antar-Pasar (Fase B)
-* Peta interaktif (Leaflet) yang menampilkan titik-titik pasar tradisional sesuai wilayah/kota yang dipilih (64 sentra pasar nasional).
-* Tabel peringkat pasar terurut dari paling hemat ke tertinggi dengan kolom berdampingan: `Harga Lapak`, `Rerata Wilayah`, dan `Selisih (%)`.
-* Mode Ringan (*Tabel Langsung*) untuk akses cepat dan rute navigasi langsung ke Google Maps.
+### Modul 6: Peta Harga Antar-Pasar & Peta 3D 13 Unit Pasar (Fase B & Fase C)
+* Halaman `/peta` menggunakan Leaflet untuk titik-titik pasar nasional (64 sentra) dan tabel peringkat harga lapak vs rerata wilayah.
+* Halaman utama (`#unitPasarSection`) menghadirkan **Peta 3D Interaktif 13 Unit Pasar Kota Bogor** berbasis **Mapbox GL JS v3** + **Three.js 3D Building Custom Layer** (token Mapbox dibaca dinamis dari Supabase `system_settings`) lengkap dengan jalur koridor pasar, bangunan paviliun 3D pada koordinat asli Perumda PPJ, navigasi kamera `flyTo`, serta penyaring kecamatan.
 
-### Modul 7: Rin, Asisten AI Multi-Sumber & Tanya Jawab Harga (Menggantikan Keranjang)
-* Karena HargaKu berfokus penuh pada transparansi & pengecekan harga (bukan e-commerce), fitur keranjang belanja dihapus dan digantikan oleh **Rin** (`/rekomendasi-ai` & Drawer **Tanya Rin**).
-* Seluruh tombol pemicu konsultasi AI di aplikasi memakai label seragam **`Tanya Rin`**.
-* **Rin** (didukung Google Gemini API dengan kunci dinamis dari Supabase `system_settings`) membandingkan harga dari **beberapa sumber resmi dan warga** (`PIHPS Bank Indonesia`, `Panel Harga Bapanas`, `Perumda Pasar Pakuan Jaya / Pasar Rakyat`, dan `Laporan Warga Terverifikasi`) sesuai wilayah aktif (`selectedRegion`), serta merender jawaban berformat **Markdown (`md`)** lengkap (tabel komparasi, heading, daftar poin, dan penekanan nominal).
-* Pengguna dapat langsung **bertanya secara bebas** kepada Rin (contoh: *"Lebih hemat beli Cabai Rawit berdasarkan acuan mana?"*, *"Ayam 45rb/kg di pasar wajar gak?"*, atau *"Bandingkan sumber harga beras & minyak minggu ini"*).
+### Modul 7: PUNTEN, Asisten AI Multi-Sumber & Tanya Jawab Harga (Menggantikan Keranjang)
+* Karena HargaKu berfokus penuh pada transparansi & pengecekan harga (bukan e-commerce), fitur keranjang belanja dihapus dan digantikan oleh **PUNTEN** (`/rekomendasi-ai` & Drawer **Tanya PUNTEN**).
+* Seluruh tombol pemicu konsultasi AI di aplikasi memakai label seragam **`Tanya PUNTEN`**.
+* **PUNTEN** (didukung Google Gemini API dengan kunci dinamis dari Supabase `system_settings`) membandingkan harga dari **beberapa sumber resmi dan warga** (`PIHPS Bank Indonesia`, `Panel Harga Bapanas`, `Perumda Pasar Pakuan Jaya / Pasar Rakyat`, dan `Laporan Warga Terverifikasi`) sesuai wilayah aktif (`selectedRegion`), serta merender jawaban berformat **Markdown (`md`)** lengkap (tabel komparasi, heading, daftar poin, dan penekanan nominal).
+* Pengguna dapat langsung **bertanya secara bebas** kepada PUNTEN (contoh: *"Lebih hemat beli Cabai Rawit berdasarkan acuan mana?"*, *"Ayam 45rb/kg di pasar wajar gak?"*, atau *"Bandingkan sumber harga beras & minyak minggu ini"*).
 
-### Modul 8: Portal Admin Moderasi, Supabase CRUD, & Pengaturan AI Dinamis
+### Modul 8: Portal Admin Moderasi, Supabase CRUD, & Pengaturan AI + Peta Dinamis
 * **Integrasi Supabase PostgreSQL**: Seluruh CRUD komoditas, pasar tradisional, entri harga harian (`daily_prices`), moderasi laporan warga (`citizen_reports`), dan konfigurasi API tersimpan langsung di database Supabase.
-* **Modul Pengaturan & Integrasi AI Dinamis (`system_settings`)**: Admin dapat mengganti **Gemini API Key**, memilih model aktif (misal `gemini-3.8-flash`), mengatur instruksi dasar, serta menguji koneksi API Gemini langsung dari Dashboard Admin tanpa mengubah kode sumber atau deploy ulang.
+* **Modul Pengaturan & Integrasi AI + Peta Dinamis (`system_settings`)**: Admin dapat mengganti **Gemini API Key**, **Mapbox Access Token**, memilih model aktif, mengatur instruksi dasar, serta menguji koneksi API Gemini langsung dari Dashboard Admin tanpa mengubah kode sumber atau deploy ulang.
 * **Tata Letak Sidebar SaaS**: Konsol kerja terpadu bagi administrator & tim pemantau pasar.
 * **Modul Moderasi Laporan Warga**: Peninjauan antrean laporan warga, pendeteksian anomali statistik MAD, dan aksi persetujuan/penolakan.
 * **CRUD Master Komoditas & Pasar Tradisional**: Pengelolaan lengkap komoditas dan pasar di seluruh koridor wilayah.
 * **Fast-Entry Entri Harga Resmi Harian**: Matriks input cepat harga survei harian per pasar yang langsung memperbarui data publik dan harga lapak 3D.
 
-### Modul 9: Slide-Over Drawer Konsultasi Harga Rin (`/api/v1/assistant/chat`)
-* Menggantikan tombol Keranjang di Top Navbar dan CTA halaman dengan tombol seragam **`[ Tanya Rin ]`** yang membuka **Slide-over Drawer** interaktif maupun halaman penuh `/rekomendasi-ai`.
+### Modul 9: Slide-Over Drawer Konsultasi Harga PUNTEN (`/api/v1/assistant/chat`)
+* Menggantikan tombol Keranjang di Top Navbar dan CTA halaman dengan tombol seragam **`[ Tanya PUNTEN ]`** yang membuka **Slide-over Drawer** interaktif maupun halaman penuh `/rekomendasi-ai`.
 * Mendukung penuh rendering **Markdown** untuk tabel pembanding sumber, ringkasan poin, dan sorotan angka Rupiah. Grounded 100% pada data Supabase (`commodities`, `daily_prices`, `citizen_reports`).
 
 ---

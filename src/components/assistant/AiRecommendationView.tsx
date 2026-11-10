@@ -78,10 +78,10 @@ export function AiRecommendationView() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-[var(--border-ink)] pb-5">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
-            Tanya Rin &amp; Komparasi Harga Multi-Sumber
+            Tanya PUNTEN &amp; Komparasi Harga Multi-Sumber
           </h1>
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
-            Bandingkan acuan Panel Bapanas, PIHPS Bank Indonesia, Pasar Rakyat, dan Laporan Warga dari data harian lalu konsultasikan langsung dengan Rin.
+            Bandingkan acuan Panel Bapanas, PIHPS Bank Indonesia, Pasar Rakyat, dan Laporan Warga dari data harian lalu konsultasikan langsung dengan PUNTEN.
           </p>
         </div>
 
@@ -160,21 +160,21 @@ export function AiRecommendationView() {
             className="market-btn-primary w-full py-3 text-xs font-bold inline-flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             <ChatCircleDots size={16} weight="bold" />
-            <span>Tanya Rin</span>
+            <span>Tanya PUNTEN</span>
           </button>
         </div>
 
-        {/* Right: Conversational Rin Q&A Panel with Markdown Support */}
+        {/* Right: Conversational PUNTEN Q&A Panel with Markdown Support */}
         <div className="lg:col-span-7 market-card bg-[var(--bg-card)] flex flex-col h-[560px] md:h-[620px] overflow-hidden">
           <div className="px-5 py-3.5 border-b-2 border-[var(--border-ink)] flex items-center justify-between bg-[var(--bg-muted)]">
             <div className="flex items-center gap-3">
               <div className="relative w-9 h-9 rounded-xl bg-[#EEF773] border-2 border-[#132E20] flex items-center justify-center text-[#132E20] font-bold text-sm">
-                R
+                P
                 <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#15803D] border-2 border-[var(--bg-muted)]" />
               </div>
               <div>
                 <div className="text-xs font-bold text-[var(--text-primary)]">
-                  Rin &middot; Asisten Harga Multi-Sumber
+                  PUNTEN &middot; Asisten Harga Multi-Sumber
                 </div>
                 <div className="text-[11px] text-[var(--text-muted)]">
                   Wilayah acuan: {selectedRegion.name} &bull; Format Markdown aktif
@@ -197,7 +197,7 @@ export function AiRecommendationView() {
             ))}
             {isTyping && (
               <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--bg-card)] border border-[var(--border-ink)] w-fit text-xs font-bold text-[var(--text-secondary)]">
-                <span>Rin sedang membandingkan sumber harga...</span>
+                <span>PUNTEN sedang membandingkan sumber harga...</span>
               </div>
             )}
             <div ref={endRef} />
@@ -222,7 +222,7 @@ export function AiRecommendationView() {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Tanya Rin soal harga pasar, tabel perbandingan, atau tips tawar..."
+              placeholder="Tanya PUNTEN soal harga pasar, tabel perbandingan, atau tips tawar..."
               disabled={isTyping}
               className="flex-1 px-3.5 py-2.5 rounded-xl border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] text-xs text-[var(--text-primary)] focus:outline-none"
             />

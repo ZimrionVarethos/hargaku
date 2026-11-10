@@ -68,7 +68,7 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
   const hudOpacity = Math.max(0, 1 - exitBloomOpacity * 1.5);
 
   const scrollToNextSection = () => {
-    const el = document.getElementById('etagStageSection');
+    const el = document.getElementById('sorotanSection');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
@@ -149,17 +149,17 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
                 Ujung Lorong Pasar Selesai
               </span>
               <h2 className="text-xl sm:text-2xl font-bold text-[#132E20] mb-2">
-                Keluar ke Pelataran Timbangan
+                Keluar ke Papan Harga &amp; Peta 3D
               </h2>
               <p className="text-xs text-[#263E30] mb-4 leading-relaxed">
-                Kamu telah menyusuri 100 meter lorong lapak pasar rakyat. Terus scroll atau tekan tombol untuk menuju Meja Timbangan Mekanis.
+                Kamu telah menyusuri 100 meter lorong lapak pasar rakyat. Terus scroll atau tekan tombol untuk melihat papan pokok dan peta 3D 13 unit pasar.
               </p>
               <button
                 type="button"
                 onClick={scrollToNextSection}
                 className="market-btn-primary px-5 py-2.5 text-xs font-bold shadow-md inline-flex items-center gap-2"
               >
-                <span>Lanjut ke Meja Timbangan</span>
+                <span>Lanjut ke Papan Harga</span>
                 <span>&darr;</span>
               </button>
             </div>

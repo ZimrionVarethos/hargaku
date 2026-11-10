@@ -62,7 +62,7 @@ export function AdminSidebar({
     { id: 'commodities', label: 'Katalog Komoditas', icon: <Plant size={18} weight="bold" />, badge: commodities.length },
     { id: 'markets', label: 'Sentra Pasar', icon: <Storefront size={18} weight="bold" />, badge: markets.length },
     { id: 'daily-prices', label: 'Entri Harga Harian', icon: <Lightning size={18} weight="bold" /> },
-    { id: 'settings', label: 'Integrasi AI & API', icon: <GearSix size={18} weight="bold" /> },
+    { id: 'settings', label: 'Integrasi AI & Peta', icon: <GearSix size={18} weight="bold" /> },
   ];
 
   const navContent = (

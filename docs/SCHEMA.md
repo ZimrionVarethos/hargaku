@@ -213,12 +213,12 @@ Akun internal tim moderator / admin HargaKu.
 * `full_name` (VARCHAR(100), NOT NULL).
 * `role` (VARCHAR(20), DEFAULT 'MODERATOR'): `SUPERADMIN` atau `MODERATOR`.
 
-### 3.8. Tabel `system_settings` (Integrasi API & AI Dinamis)
-Menyimpan kredensial API eksternal dan konfigurasi layanan AI Gemini secara dinamis agar tidak di-hardcode di kode sumber dan dapat diganti langsung melalui Konsol Admin (`/admin`). Dilindungi Row Level Security (RLS) ketat sehingga hanya route server-side Next.js yang dapat membacanya.
-* `key` (VARCHAR(100), PK): Kunci pengaturan (misal: `gemini_api_key`, `gemini_model`, `ai_system_instruction`, `price_sources_config`).
-* `value` (TEXT, NOT NULL): Nilai pengaturan atau API key aktif.
+### 3.8. Tabel `system_settings` (Integrasi API, AI, & Peta 3D Dinamis)
+Menyimpan kredensial API eksternal, token peta Mapbox, dan konfigurasi layanan AI Gemini secara dinamis agar tidak di-hardcode di kode sumber dan dapat diganti langsung melalui Konsol Admin (`/admin`). Dilindungi Row Level Security (RLS) ketat sehingga hanya route server-side Next.js yang dapat membacanya, lalu mengekspos token publik Mapbox secara aman lewat endpoint `/api/v1/map/config`.
+* `key` (VARCHAR(100), PK): Kunci pengaturan (`gemini_api_key`, `gemini_model`, `ai_system_instruction`, `price_sources_config`, `mapbox_access_token`).
+* `value` (TEXT, NOT NULL): Nilai pengaturan atau API key/token aktif.
 * `description` (TEXT, NULL): Keterangan fungsi parameter.
-* `is_secret` (BOOLEAN, DEFAULT false): Penanda apakah nilai harus disamarkan (`masked`) saat dikirim ke UI Admin.
+* `is_secret` (BOOLEAN, DEFAULT false): Penanda apakah nilai bersifat rahasia server-only dan disamarkan (`masked`) saat dikirim ke UI Admin.
 * `updated_at` (TIMESTAMPTZ, DEFAULT NOW()).
 
 ---

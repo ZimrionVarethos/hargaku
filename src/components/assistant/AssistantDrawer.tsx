@@ -61,19 +61,19 @@ export function AssistantDrawer() {
         className="fixed inset-y-0 right-0 max-w-full flex pl-4 sm:pl-10"
         role="dialog"
         aria-modal="true"
-        aria-label="Tanya Rin - Asisten HargaKu"
+        aria-label="Tanya PUNTEN - Asisten HargaKu"
       >
         <div className="w-screen max-w-lg bg-[var(--bg-paper)] border-l-2 border-[var(--border-ink)] shadow-2xl flex flex-col justify-between text-[var(--text-primary)]">
           {/* Header */}
           <div className="px-4 sm:px-5 py-3.5 bg-[var(--bg-card)] border-b-2 border-[var(--border-ink)] flex items-center justify-between gap-2">
             <div className="flex items-center gap-3 min-w-0">
               <div className="relative w-10 h-10 rounded-xl bg-[#EEF773] border-2 border-[var(--border-ink)] shadow-[2px_2px_0px_var(--border-ink)] flex items-center justify-center text-[#132E20] font-bold text-base shrink-0">
-                R
+                P
                 <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#15803D] border-2 border-[var(--bg-card)]" />
               </div>
               <div className="flex flex-col min-w-0">
                 <h2 className="text-[15px] font-bold tracking-tight truncate">
-                  Rin &middot; Asisten Harga
+                  PUNTEN &middot; Asisten Harga
                 </h2>
                 <div className="flex items-center gap-1 text-[11px] text-[var(--text-muted)] truncate">
                   <MapPin size={11} weight="fill" className="text-[var(--accent-chili)] shrink-0" />
@@ -97,7 +97,7 @@ export function AssistantDrawer() {
                 onClick={clearConversation}
                 className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors cursor-pointer"
                 title="Reset Percakapan"
-                aria-label="Reset percakapan dengan Rin"
+                aria-label="Reset percakapan dengan PUNTEN"
               >
                 <ArrowsCounterClockwise size={16} weight="bold" />
               </button>
@@ -106,7 +106,7 @@ export function AssistantDrawer() {
                 onClick={closeAssistant}
                 className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors cursor-pointer"
                 title="Tutup Panel"
-                aria-label="Tutup panel Rin"
+                aria-label="Tutup panel PUNTEN"
               >
                 <X size={18} weight="bold" />
               </button>
@@ -122,10 +122,10 @@ export function AssistantDrawer() {
             {isTyping && (
               <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border-2 border-[var(--border-ink)] w-fit shadow-xs">
                 <span className="w-5 h-5 rounded-md bg-[#EEF773] border border-[#132E20] text-[#132E20] text-[10px] font-bold flex items-center justify-center">
-                  R
+                  P
                 </span>
                 <span className="text-[11px] font-bold text-[var(--text-secondary)]">
-                  Rin sedang menganalisis data sumber...
+                  PUNTEN sedang menganalisis data sumber...
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-chili)] animate-bounce" />
@@ -162,7 +162,7 @@ export function AssistantDrawer() {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Tanya Rin soal harga atau komparasi sumber..."
+              placeholder="Tanya PUNTEN soal harga atau komparasi sumber..."
               disabled={isTyping}
               className="flex-1 px-3.5 py-2.5 rounded-xl bg-[var(--bg-paper)] border-2 border-[var(--border-ink)] text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none"
             />
@@ -170,7 +170,7 @@ export function AssistantDrawer() {
               type="submit"
               disabled={!inputText.trim() || isTyping}
               className="market-btn-primary px-4 py-2.5 rounded-xl text-[13px] font-bold disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center shrink-0"
-              aria-label="Kirim pertanyaan ke Rin"
+              aria-label="Kirim pertanyaan ke PUNTEN"
             >
               <PaperPlaneRight size={16} weight="bold" />
             </button>

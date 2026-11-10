@@ -20,13 +20,14 @@ Dokumen ini adalah spesifikasi resmi seluruh variabel lingkungan (**Environment 
 | `NEXT_PUBLIC_USE_MOCK` | Opsional | Client | Toggle mode mock (`false` saat Supabase aktif, `true` saat offline demo) |
 | `ADMIN_SESSION_SECRET` | **Wajib** | Backend / Server | Kunci rahasia minimal 32 karakter untuk token sesi admin |
 | `GEMINI_API_KEY` | Opsional | Backend / Server | Cadangan opsional jika kunci Gemini belum tersimpan di tabel `system_settings` Supabase |
+| `NEXT_PUBLIC_MAPBOX_TOKEN` | Opsional | Client | Cadangan opsional jika token publik Mapbox (`mapbox_access_token`) belum tersimpan di `system_settings` Supabase |
 
 ---
 
-## 2. Pengelolaan Dinamis Kunci API di Database Supabase
+## 2. Pengelolaan Dinamis Kunci API & Peta di Database Supabase
 
-1. Kredensial API Gemini (`gemini_api_key`) dan konfigurasi model (`gemini_model`, misal `gemini-3.8-flash`) **wajib disimpan di tabel `system_settings` database Supabase**, tidak boleh di-hardcode di kode sumber frontend/backend.
-2. Administrator dapat memperbarui kunci API Gemini dan menguji koneksi secara langsung melalui menu **Integrasi AI & DB** di Konsol Admin (`/admin`).
+1. Kredensial API Gemini (`gemini_api_key`), token publik Mapbox (`mapbox_access_token`), dan konfigurasi model (`gemini_model`) **wajib disimpan di tabel `system_settings` database Supabase**, tidak boleh di-hardcode di kode sumber frontend/backend.
+2. Administrator dapat memperbarui kunci API Gemini serta token Mapbox secara langsung melalui menu **Integrasi AI & Peta** di Konsol Admin (`/admin`).
 3. Nilai `value` bertanda `is_secret = true` selalu disamarkan (*masked*) pada respons API ke antarmuka admin dan hanya dibaca secara utuh di sisi server saat memanggil endpoint Google Gemini API.
 
 ---

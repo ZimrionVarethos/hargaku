@@ -9,7 +9,7 @@ Dokumen ini adalah acuan resmi (**Design System & UI Guidelines**) untuk seluruh
 * **Design Read**: `Platform Digital Eksplorasi & Pantauan Harga Komoditas Pasar Rakyat for Warga, Pedagang, dan Pemantau Pangan Kota Bogor, in a Warm Realistic Market Diorama & Tactile Broadsheet Card style, dial ENERGY 3 / RHYTHM 3 / MOTION 3.`
 * **Warm Paper Canvas (`#F9F3EE`)**: Latar belakang gading hangat yang menyatu alami dengan karya seni lorong pasar realistis Kota Bogor.
 * **Tinta Hutan Gelap (`#132E20`)**: Warna struktural tipografi utama, garis bingkai kartu tegas 2px, dan teks judul tebal.
-* **Aksen Merah Cabai PasarKu (`#A92717`)**: Aksen tunggal untuk tombol aksi utama (CTA `Mulai Sekarang`), lencana pantauan utama, jarum timbangan mekanis, dan fokus papan ketik.
+* **Aksen Merah Cabai PasarKu (`#A92717`)**: Aksen tunggal untuk tombol aksi utama (CTA `Mulai Sekarang`), lencana pantauan utama, markah pasar 3D aktif, dan fokus papan ketik.
 * **Gaya Kartu Tiket Taktil (`Tactile Market Ticket`)**: Bingkai padat 2px solid dengan bayangan tegas tanpa kabur (`3px 3px 0px #132E20` di mode siang, `3px 3px 0px #060B08` di mode subuh).
 * **Dua Tema Lengkap**: Mode Siang (`data-theme="light"`) dan Mode Subuh (`data-theme="dark"`).
 
@@ -22,7 +22,7 @@ Dokumen ini adalah acuan resmi (**Design System & UI Guidelines**) untuk seluruh
 | `--bg-paper` | `#F9F3EE` | `#0F1914` | Latar utama halaman & Hero Section |
 | `--bg-card` | `#FFFFFF` | `#16241D` | Kartu komoditas, tabel, & modal |
 | `--bg-muted` | `#EFE4D4` | `#1E3127` | Latar bagian sekunder & footer |
-| `--bg-stage` | `#132A1E` | `#0A120E` | Panggung meja timbangan mekanis |
+| `--bg-stage` | `#132A1E` | `#0A120E` | Panggung kanvas 3D gelap & aksen kontras tinggi |
 | `--text-primary` | `#132E20` | `#F9F3EE` | Judul `h1`-`h3`, nama komoditas |
 | `--text-secondary` | `#263E30` | `#D0DDD4` | Subjudul, alamat pasar, deskripsi |
 | `--text-muted` | `#566B5D` | `#9AB0A1` | Satuan `/kg`, nomor indeks `#16` |
@@ -65,11 +65,10 @@ Seluruh elemen teks antarmuka **MANDATORI** menggunakan keluarga huruf [Google F
 ## 5. Tata Letak Panggung Halaman Utama PasarKu
 
 * **Hero Section Diorama Pasar (`#heroSection`)**: Sayap pasar kiri (`#leftMarketWing`) dan sayap pasar kanan (`#rightMarketWing`) proporsional tanpa distorsi, dilengkapi pendar lampu kios (`animate-lamp-glow`), pin harga interaktif (`.market-hotspot-pin`), kurva gelombang SVG dinamis (`animatePasarKuHeroWaves`), dan kanvas partikel pagi.
-* **Panggung Timbangan & Pembanding Sumber (`#etagStageSection`)**: Pembagian asimetris 5:7 antara panel kontrol kecepatan/mode dan meja timbangan mekanis yang membandingkan selisih antar sumber harga (`PIHPS BI`, `Bapanas`, `Perumda PPJ`, `Laporan Warga`) dengan tombol **`Tanya Rin`**.
-* **Papan Pokok & Sorotan Pangan (`#sorotanSection`)**: Pembagian asimetris 5:7 antara metrik pangan utama dan papan harga cepat 10 komoditas harian dengan aksi langsung **`Tanya Rin`**.
+* **Papan Pokok & Sorotan Pangan (`#sorotanSection`)**: Pembagian asimetris 5:7 antara metrik pangan utama dan papan harga cepat 10 komoditas harian dengan aksi langsung **`Tanya PUNTEN`** (bagian timbangan mekanis dihilangkan agar alur fokus ke data pokok dan peta 3D).
 * **Grafik Kategori (`#analitikSection`)**: Pembagian asimetris 4:8 antara 3 metrik kelompok dan grafik batang SVG taktil dengan garis batas rerata kategori.
-* **Direktori 13 Unit Pasar (`#unitPasarSection`)**: Grid 3 kolom memuat 13 unit pasar rakyat dengan penyaring kecamatan.
-* **Panel Tanya Rin Multi-Sumber & Markdown (`AssistantDrawer`, `AiMessageBubble`, `MarkdownMessage`, `/rekomendasi-ai`)**: Menggantikan keranjang belanja; menghadirkan persona asisten **Rin** dengan avatar taktil, tombol konsisten **`Tanya Rin`**, serta parser **Markdown (`md`)** responsif untuk tabel perbandingan sumber, heading, kutipan, daftar poin, dan badge harga pada Mode Siang maupun Mode Subuh.
+* **Peta 3D & Direktori 13 Unit Pasar (`#unitPasarSection`)**: Panggung interaktif **Mapbox GL JS v3** (gaya *Standard* yang sinkron dengan Mode Siang `'day'` / Mode Subuh `'dusk'`, koridor jalur pasar GeoJSON, halo zona pasar, dan **Custom Layer 3D Three.js** berupa 13 bangunan paviliun pasar rakyat atap pendopo bertingkat via `MercatorCoordinate.fromLngLat`), dilengkapi animasi kamera `flyTo`, kartu detail melayang dengan aksi **`Tanya PUNTEN`**, penyaring kecamatan, serta grid 13 kartu pasar di bawahnya.
+* **Panel Tanya PUNTEN Multi-Sumber & Markdown (`AssistantDrawer`, `AiMessageBubble`, `MarkdownMessage`, `/rekomendasi-ai`)**: Menggantikan keranjang belanja; menghadirkan persona asisten **PUNTEN** dengan avatar monogram `P`, tombol konsisten **`Tanya PUNTEN`**, serta parser **Markdown (`md`)** responsif untuk tabel perbandingan sumber, heading, kutipan, daftar poin, dan badge harga pada Mode Siang maupun Mode Subuh.
 
 ---
 

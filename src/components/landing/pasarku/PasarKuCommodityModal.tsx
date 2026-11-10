@@ -126,7 +126,7 @@ export function PasarKuCommodityModal({ item, onClose, categoryAvg = 0 }: Props)
             onClick={handleAskAi}
             className="market-btn-primary flex-1 py-3 text-sm font-bold cursor-pointer"
           >
-            Tanya Rin
+            Tanya PUNTEN
           </button>
         </div>
       </div>

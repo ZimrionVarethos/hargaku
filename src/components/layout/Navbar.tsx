@@ -10,7 +10,6 @@ import { useTheme } from '@/lib/store/theme-store';
 
 const NAV_LINKS = [
   { href: '/#heroSection', label: 'Lorong Pasar' },
-  { href: '/#etagStageSection', label: 'Timbangan' },
   { href: '/#sorotanSection', label: 'Papan Pokok' },
   { href: '/#unitPasarSection', label: '13 Unit Pasar' },
   { href: '/cek-harga', label: 'Cek Harga' },
@@ -72,7 +71,7 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Right Actions: Cari, Mode Subuh/Siang, Tanya Rin */}
+        {/* Right Actions: Cari, Mode Subuh/Siang, Tanya PUNTEN */}
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -104,7 +103,7 @@ export function Navbar() {
             className="market-btn-primary px-3.5 py-1.5 text-xs min-h-[40px] inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
           >
             <ChatCircleDots size={15} weight="bold" />
-            <span>Tanya Rin</span>
+            <span>Tanya PUNTEN</span>
           </button>
 
           {/* Mobile hamburger toggle */}

@@ -22,6 +22,7 @@ export async function PUT(req: NextRequest) {
   try {
     const body = (await req.json()) as {
       geminiApiKey?: string;
+      mapboxAccessToken?: string;
       geminiModel?: string;
       systemInstruction?: string;
       enabledSources?: string[];
@@ -30,7 +31,7 @@ export async function PUT(req: NextRequest) {
     const updated = await saveAiSettings(body);
     return NextResponse.json({
       success: true,
-      message: 'Konfigurasi AI & API Key berhasil disimpan ke database Supabase.',
+      message: 'Konfigurasi AI, Mapbox, dan API Key berhasil disimpan ke database Supabase.',
       data: updated,
     });
   } catch (err) {
@@ -52,9 +53,36 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as {
       action?: string;
       geminiApiKey?: string;
+      mapboxAccessToken?: string;
       geminiModel?: string;
     };
     const runtime = await getAiRuntimeConfig();
+
+    if (body.action === 'test-mapbox') {
+      const tokenToTest = body.mapboxAccessToken?.trim() || runtime.mapboxToken;
+      if (!tokenToTest) {
+        return NextResponse.json(
+          { success: false, message: 'Belum ada Mapbox Access Token yang tersimpan atau dimasukkan.' },
+          { status: 400 }
+        );
+      }
+      const start = Date.now();
+      const probeRes = await fetch(
+        `https://api.mapbox.com/styles/v1/mapbox/light-v11?access_token=${encodeURIComponent(tokenToTest)}`
+      );
+      const latencyMs = Date.now() - start;
+      if (!probeRes.ok) {
+        return NextResponse.json({
+          success: false,
+          message: `Token Mapbox ditolak server Mapbox (HTTP ${probeRes.status}).`,
+        });
+      }
+      return NextResponse.json({
+        success: true,
+        message: `Token Mapbox valid & aktif (${latencyMs}ms).`,
+      });
+    }
+
     const keyToTest = body.geminiApiKey?.trim() || runtime.apiKey;
     const modelToTest = body.geminiModel?.trim() || runtime.geminiModel;
 
