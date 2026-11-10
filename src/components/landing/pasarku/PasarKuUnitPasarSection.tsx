@@ -120,7 +120,7 @@ export function PasarKuUnitPasarSection() {
             </span>
           </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto pb-1.5">
+          <div className="flex items-center gap-2 overflow-x-auto md:overflow-visible md:flex-wrap pb-1.5">
             {visibleMarkets.map((market) => {
               const isSelected = market.id === activeMarketId;
               return (
