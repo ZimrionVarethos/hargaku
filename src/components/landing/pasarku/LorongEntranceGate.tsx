@@ -37,18 +37,38 @@ export function LorongEntranceGate({
 
       <svg
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full pointer-events-none z-10"
-        viewBox="0 0 1440 720"
+        className="absolute top-0 right-0 w-[62vw] sm:w-[54vw] md:w-[46vw] lg:w-[44vw] max-w-[660px] h-auto pointer-events-none z-10"
+        viewBox="0 0 640 340"
         fill="none"
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMaxYMin meet"
       >
-        <path id="trWaveFill" d="M 880 0 C 930 55, 1020 35, 1090 110 L 1440 290 L 1440 0 Z" fill="rgba(239, 228, 212, 0.18)" />
-        <path id="trWaveGold" d="M 865 0 C 920 62, 1012 42, 1082 118" stroke="#B39C7A" strokeWidth="2.2" strokeOpacity="0.7" fill="none" />
-        <path id="trWaveDark" d="M 842 0 C 898 72, 995 52, 1066 130" stroke="#132E20" strokeWidth="2.8" strokeOpacity="0.82" fill="none" />
+        <path
+          id="trWaveFill"
+          d="M 80 -4 C 130 55, 220 35, 290 110 C 350 175, 410 175, 485 245 C 540 295, 595 295, 644 290 L 644 -4 Z"
+          fill="rgba(239, 228, 212, 0.24)"
+        />
+        <path
+          id="trWaveGold"
+          d="M 65 -4 C 120 62, 212 42, 282 118 C 342 184, 404 184, 478 254 C 535 304, 592 302, 644 298"
+          stroke="#B39C7A"
+          strokeWidth="2.2"
+          strokeOpacity="0.78"
+          vectorEffect="non-scaling-stroke"
+          fill="none"
+        />
+        <path
+          id="trWaveDark"
+          d="M 42 -4 C 98 72, 195 52, 266 130 C 328 196, 392 196, 466 268 C 526 318, 588 314, 644 310"
+          stroke="#132E20"
+          strokeWidth="2.8"
+          strokeOpacity="0.86"
+          vectorEffect="non-scaling-stroke"
+          fill="none"
+        />
       </svg>
 
       <div
-        className="absolute bottom-0 left-0 w-[62%] sm:w-[52%] lg:w-[46%] max-w-[760px] z-0 transition-transform duration-100 ease-out"
+        className="absolute bottom-0 left-0 w-[64%] sm:w-[52%] lg:w-[46%] max-w-[740px] z-0 transition-transform duration-100 ease-out"
         style={{
           transform: `scale(${zoomFactor}) translate(-${wingLeftTranslateX}%, ${wingLeftTranslateX * 0.15}%)`,
           transformOrigin: 'bottom left',
@@ -77,7 +97,7 @@ export function LorongEntranceGate({
       </div>
 
       <div
-        className="absolute bottom-0 right-0 w-[60%] sm:w-[50%] lg:w-[44%] max-w-[730px] z-0 transition-transform duration-100 ease-out"
+        className="absolute bottom-0 right-0 w-[64%] sm:w-[52%] lg:w-[46%] max-w-[740px] z-0 transition-transform duration-100 ease-out"
         style={{
           transform: `scale(${zoomFactor}) translate(${wingRightTranslateX}%, ${wingRightTranslateX * 0.15}%)`,
           transformOrigin: 'bottom right',
@@ -85,17 +105,17 @@ export function LorongEntranceGate({
       >
         <div className="relative w-full animate-market-right">
           <Image
-            src="/images/pasarku/market-wing-right.webp"
+            src="/images/pasarku/market-wing-right-v2.webp"
             alt="Deretan kios beras pasar rakyat"
             width={829}
-            height={732}
+            height={362}
             priority
             className="w-full h-auto block select-none"
           />
           <div
             className="animate-lamp-glow absolute rounded-full pointer-events-none"
             style={{
-              bottom: '16%',
+              bottom: '34%',
               right: '14%',
               width: 70,
               height: 70,
@@ -106,7 +126,7 @@ export function LorongEntranceGate({
       </div>
 
       <div
-        className="relative z-20 max-w-xl mx-auto text-center flex flex-col items-center px-4 pt-8 sm:pt-12 pb-4 transition-all duration-200"
+        className="relative z-20 max-w-xl mx-auto text-center flex flex-col items-center px-4 pt-4 sm:pt-6 pb-2 transition-all duration-200"
         style={{
           opacity: heroTextOpacity,
           transform: `translateY(-${(1 - heroTextOpacity) * 70}px)`,

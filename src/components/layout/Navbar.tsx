@@ -34,7 +34,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--bg-paper)]/95 backdrop-blur-xs border-b-2 border-[var(--border-ink)] transition-colors">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-h-[60px] sm:min-h-[64px] py-2 flex items-center justify-between gap-2 sm:gap-3">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-[60px] sm:h-[64px] flex items-center justify-between gap-2 sm:gap-3">
 
         <Link href="/" className="flex items-center gap-2 sm:gap-2.5 no-underline shrink-0">
           <span className="pasarku-logo-plaque">

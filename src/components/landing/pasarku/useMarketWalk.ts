@@ -13,14 +13,20 @@ export function useMarketWalk() {
   useEffect(() => {
     let animId: number;
 
+    const getStickyTop = () => {
+      const stickyEl = containerRef.current?.firstElementChild as HTMLElement | null;
+      return stickyEl ? parseFloat(getComputedStyle(stickyEl).top) || 0 : 0;
+    };
+
     const handleScroll = () => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
-      const totalScrollable = rect.height - window.innerHeight;
+      const stickyTop = getStickyTop();
+      const totalScrollable = rect.height - (window.innerHeight - stickyTop);
 
       if (totalScrollable <= 0) return;
 
-      const scrolled = -rect.top;
+      const scrolled = stickyTop - rect.top;
       const progress = Math.max(0, Math.min(1, scrolled / totalScrollable));
 
       setScrollProgress(progress);
@@ -53,25 +59,32 @@ export function useMarketWalk() {
     };
   }, []);
 
+  const getMetrics = () => {
+    if (!containerRef.current) return null;
+    const stickyEl = containerRef.current.firstElementChild as HTMLElement | null;
+    const stickyTop = stickyEl ? parseFloat(getComputedStyle(stickyEl).top) || 0 : 0;
+    const top = Math.max(0, containerRef.current.offsetTop - stickyTop);
+    const totalScrollable = containerRef.current.clientHeight - (window.innerHeight - stickyTop);
+    return { top, totalScrollable };
+  };
+
   const scrollToMarket = useCallback(() => {
-    if (!containerRef.current) return;
-    const top = containerRef.current.offsetTop;
-    const totalScrollable = containerRef.current.clientHeight - window.innerHeight;
-    window.scrollTo({ top: top + totalScrollable * 0.14, behavior: 'smooth' });
+    const m = getMetrics();
+    if (!m) return;
+    window.scrollTo({ top: m.top + m.totalScrollable * 0.14, behavior: 'smooth' });
   }, []);
 
   const scrollToEntrance = useCallback(() => {
-    if (!containerRef.current) return;
-    const top = containerRef.current.offsetTop;
-    window.scrollTo({ top, behavior: 'smooth' });
+    const m = getMetrics();
+    if (!m) return;
+    window.scrollTo({ top: m.top, behavior: 'smooth' });
   }, []);
 
   const scrollToStall = useCallback((index: number) => {
-    if (!containerRef.current) return;
-    const top = containerRef.current.offsetTop;
-    const totalScrollable = containerRef.current.clientHeight - window.innerHeight;
+    const m = getMetrics();
+    if (!m) return;
     const targetProgress = 0.14 + (index / 6) * 0.82;
-    window.scrollTo({ top: top + totalScrollable * targetProgress, behavior: 'smooth' });
+    window.scrollTo({ top: m.top + m.totalScrollable * targetProgress, behavior: 'smooth' });
   }, []);
 
   return {
