@@ -227,3 +227,11 @@ html[data-theme="dark"] .pasarku-logo-plaque {
 }
 .leaflet-popup-content { margin: 10px 14px !important; line-height: 1.4 !important; }
 .leaflet-popup-tip { background: var(--bg-card) !important; border: 2px solid var(--border-ink) !important; }
+
+.footer-market-photo {
+  filter: contrast(1.02) saturate(1.05);
+  transition: filter 0.25s ease;
+}
+html[data-theme="dark"] .footer-market-photo {
+  filter: brightness(0.74) contrast(1.08) saturate(0.92);
+}

@@ -60,11 +60,10 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                  isActive
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${isActive
                     ? 'text-[var(--accent-chili)] hover:bg-[var(--bg-muted)]'
                     : 'text-[var(--text-primary)] hover:bg-[var(--bg-muted)]'
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>
