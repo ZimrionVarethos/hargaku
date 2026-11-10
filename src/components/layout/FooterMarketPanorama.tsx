@@ -3,7 +3,7 @@ import Image from 'next/image';
 export function FooterMarketPanorama() {
   return (
     <div className="w-full overflow-hidden select-none leading-none" aria-hidden="true">
-      <div className="w-full h-4 sm:h-5 border-t-2 border-b border-[var(--border-ink)] bg-[var(--ochre-surface)]">
+      <div className="w-full h-4 sm:h-5 border-b border-[var(--border-ink)] bg-[var(--ochre-surface)]">
         <svg className="w-full h-full block">
           <defs>
             <pattern id="pasarkuKawungTop" width="36" height="20" patternUnits="userSpaceOnUse">
@@ -92,7 +92,7 @@ export function FooterMarketPanorama() {
         </div>
       </div>
 
-      <div className="w-full h-3.5 sm:h-4 border-t-[1.5px] border-[var(--border-ink)] bg-[var(--ochre-surface)]">
+      <div className="w-full h-3.5 sm:h-4 border-t-[1.5px] border-b-2 border-[var(--border-ink)] bg-[var(--ochre-surface)]">
         <svg className="w-full h-full block">
           <defs>
             <pattern id="tegelKunciBase" width="32" height="16" patternUnits="userSpaceOnUse">

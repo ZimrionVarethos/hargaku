@@ -3,7 +3,9 @@ import { FooterMarketPanorama } from '@/components/layout/FooterMarketPanorama';
 export function Footer() {
   return (
     <footer className="bg-[var(--bg-muted)] border-t-2 border-[var(--border-ink)] mt-auto overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-4 sm:pt-7 sm:pb-5">
+      <FooterMarketPanorama />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-6 sm:pt-7 sm:pb-7">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-7">
 
           <div className="md:col-span-5 space-y-2">
@@ -66,8 +68,6 @@ export function Footer() {
 
         </div>
       </div>
-
-      <FooterMarketPanorama />
     </footer>
   );
 }
