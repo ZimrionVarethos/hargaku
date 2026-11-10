@@ -51,10 +51,10 @@ export function AdminReportQueue({
       <div className="flex items-center justify-between gap-2 pb-3 border-b-2 border-[var(--border-ink)]">
         <div>
           <h2 className="text-[17px] font-bold text-[var(--text-primary)] tracking-tight">
-            Antrean Laporan Warga
+            Antrean Moderasi Laporan
           </h2>
           <p className="text-[11px] text-[var(--text-secondary)]">
-            Pilih baris untuk meninjau rincian dan bukti nota.
+            Laporan harga warga &amp; laporan kelangkaan pasokan pedagang.
           </p>
         </div>
         <span className="text-[11px] font-bold text-[var(--text-muted)] bg-[var(--bg-muted)] px-2.5 py-1 rounded-full border border-[var(--border-subtle)] shrink-0">
@@ -109,15 +109,14 @@ export function AdminReportQueue({
       <div className="divide-y divide-[var(--border-subtle)] max-h-[540px] overflow-y-auto">
         {filteredReports.map((r, idx) => {
           const isSelected = r.id === selectedReportId;
+          const isShortage = r.reportType === 'SHORTAGE';
 
           return (
             <div
               key={r.id}
               onClick={() => onSelectReport(r.id)}
               className={`py-3.5 px-2.5 cursor-pointer transition-colors flex flex-col gap-2 ${
-                isSelected
-                  ? 'bg-[var(--bg-muted)]/70'
-                  : 'hover:bg-[var(--bg-muted)]/35'
+                isSelected ? 'bg-[var(--bg-muted)]/70' : 'hover:bg-[var(--bg-muted)]/35'
               }`}
             >
               <div className="flex items-start justify-between gap-2">
@@ -132,9 +131,20 @@ export function AdminReportQueue({
                     {idx + 1}
                   </span>
                   <div className="min-w-0">
-                    <h4 className="text-[13px] font-bold text-[var(--text-primary)] leading-snug truncate">
-                      {r.commodityName}
-                    </h4>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h4 className="text-[13px] font-bold text-[var(--text-primary)] leading-snug truncate">
+                        {r.commodityName}
+                      </h4>
+                      <span
+                        className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                          isShortage
+                            ? 'bg-[#FEF3C7] text-[#92400E]'
+                            : 'bg-[var(--bg-muted)] text-[var(--text-secondary)]'
+                        }`}
+                      >
+                        {isShortage ? 'PEDAGANG · STOK' : 'WARGA · HARGA'}
+                      </span>
+                    </div>
                     <span className="text-[11px] text-[var(--text-muted)] block truncate">
                       {r.marketName} &middot; {r.id}
                     </span>
@@ -168,9 +178,15 @@ export function AdminReportQueue({
               </div>
 
               <div className="flex items-center justify-between gap-2 pl-8 text-[11px]">
-                <span className="font-mono-num font-extrabold text-[var(--forest-ink)] tabular-nums text-[12px]">
-                  {formatRupiah(r.reportedPrice)} / {r.unit}
-                </span>
+                {isShortage ? (
+                  <span className="px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] font-bold text-[10px]">
+                    Status: {r.stockStatus || 'TERBATAS'}
+                  </span>
+                ) : (
+                  <span className="font-mono-num font-extrabold text-[var(--forest-ink)] tabular-nums text-[12px]">
+                    {formatRupiah(r.reportedPrice)} / {r.unit}
+                  </span>
+                )}
 
                 <div className="flex items-center gap-2 text-[var(--text-muted)]">
                   {r.hasPhoto && (

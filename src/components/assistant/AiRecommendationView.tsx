@@ -5,13 +5,15 @@ import { ChatCircleDots, PaperPlaneRight, ArrowsCounterClockwise, MapPin } from 
 import { useAssistant } from '@/lib/store/assistant-store';
 import { useRegion } from '@/lib/store/region-store';
 import { useLiveCatalog } from '@/lib/store/use-live-catalog';
+import { filterMarketsForRegion } from '@/lib/mock/markets.data';
+import { computeCommodityCitizenStats, matchesCommodityRecord } from '@/lib/market-insights';
 import { DEFAULT_PROMPT_PRESETS } from '@/lib/assistant/assistant-presets';
 import { AiMessageBubble } from './AiMessageBubble';
 
 export function AiRecommendationView() {
   const { messages, isTyping, sendMessage, clearConversation } = useAssistant();
   const { selectedRegion, allRegions, setSelectedRegion } = useRegion();
-  const { commodities, rawMarkets, dailyPrices } = useLiveCatalog();
+  const { commodities, rawMarkets, dailyPrices, reports } = useLiveCatalog();
   const [selectedSlug, setSelectedSlug] = useState(commodities[0]?.slug || 'cabai-rawit-merah');
   const [inputText, setInputText] = useState('');
   const endRef = useRef<HTMLDivElement>(null);
@@ -26,8 +28,9 @@ export function AiRecommendationView() {
 
   const comparisonSources = useMemo(() => {
     if (!activeCom) return [];
-    const regionMarkets = rawMarkets.filter((m) => m.isActive && m.regionId === selectedRegion.id);
-    const scope = regionMarkets.length > 0 ? regionMarkets : rawMarkets.filter((m) => m.isActive);
+    const activeOnly = rawMarkets.filter((m) => m.isActive);
+    const regionMarkets = filterMarketsForRegion(activeOnly, selectedRegion.id);
+    const scope = regionMarkets.length > 0 ? regionMarkets : activeOnly;
     const prices: Array<{ name: string; price: number }> = [];
 
     for (const m of scope) {
@@ -37,27 +40,49 @@ export function AiRecommendationView() {
     prices.sort((a, b) => a.price - b.price);
 
     const factor = selectedRegion.disparityIndex || 1;
-    const hapRegional = Math.round((activeCom.hapHetPrice * factor) / 100) * 100;
+    const nationalHap = activeCom.hapHetPrice;
     const pihpsAvg =
       prices.length > 0
         ? Math.round(prices.reduce((s, p) => s + p.price, 0) / prices.length / 100) * 100
-        : activeCom.currentAvgPrice;
+        : Math.round((activeCom.currentAvgPrice * factor) / 100) * 100;
     const cheapestMarket = prices[0]?.price || pihpsAvg;
-    const citizenMedian = Math.round((cheapestMarket * 0.99) / 100) * 100;
+    const citizenStats = computeCommodityCitizenStats(activeCom, reports);
+    const shortageCount = reports.filter(
+      (r) => r.status === 'APPROVED' && r.reportType === 'SHORTAGE' && matchesCommodityRecord(r, activeCom)
+    ).length;
+    const citizenMedian = citizenStats.cityCount > 0 ? citizenStats.cityMedian : pihpsAvg;
 
     const rows = [
-      { source: 'Panel Harga Bapanas (HAP/HET)', price: hapRegional, note: `Batas acuan resmi ${selectedRegion.name}` },
-      { source: 'Survei PIHPS Bank Indonesia', price: pihpsAvg, note: `Rerata ${prices.length || 1} pasar terpantau` },
       {
-        source: prices[0] ? `${prices[0].name} (Pasar Rakyat)` : 'Perumda PPJ / Pasar Rakyat',
-        price: cheapestMarket,
-        note: 'Harga lapak terendah di wilayah',
+        source: 'Acuan Nasional Bapanas (HAP/HET)',
+        price: nationalHap,
+        note:
+          factor !== 1
+            ? `Dasar nasional (+${selectedRegion.logisticsCostPct}% logistik ${selectedRegion.name})`
+            : 'Batas acuan resmi pemerintah nasional',
       },
-      { source: 'Laporan Warga Terverifikasi', price: citizenMedian, note: 'Median pantauan langsung warga' },
+      {
+        source: `Acuan Daerah (${selectedRegion.name})`,
+        price: pihpsAvg,
+        note: `Pelengkap survei PIHPS BI di ${prices.length || 1} pasar aktif`,
+      },
+      {
+        source: prices[0] ? `${prices[0].name} (Pasar Rakyat)` : 'Pasar Rakyat Termurah',
+        price: cheapestMarket,
+        note: 'Harga terendah terpantau di wilayah aktif',
+      },
+      {
+        source: 'Laporan Warga & Pedagang',
+        price: citizenMedian,
+        note:
+          citizenStats.cityCount > 0
+            ? `Median ${citizenStats.cityCount} laporan warga${shortageCount > 0 ? ` · ${shortageCount} info stok` : ''}`
+            : 'Belum ada laporan tambahan, memakai acuan rerata',
+      },
     ];
     const minPrice = Math.min(...rows.map((r) => r.price));
     return rows.map((r) => ({ ...r, isLowest: r.price === minPrice }));
-  }, [activeCom, rawMarkets, dailyPrices, selectedRegion]);
+  }, [activeCom, rawMarkets, dailyPrices, reports, selectedRegion]);
 
   const handleAskSelected = () => {
     if (!activeCom) return;
@@ -81,7 +106,7 @@ export function AiRecommendationView() {
             Tanya PUNTEN &amp; Komparasi Harga Multi-Sumber
           </h1>
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
-            Bandingkan acuan Panel Bapanas, PIHPS Bank Indonesia, Pasar Rakyat, dan Laporan Warga dari data harian lalu konsultasikan langsung dengan PUNTEN.
+            Alat bantu keputusan belanja pelengkap PIHPS BI &amp; Bapanas dengan data acuan nasional, daerah, pasar setempat, laporan warga, dan info kelangkaan.
           </p>
         </div>
 
@@ -97,7 +122,7 @@ export function AiRecommendationView() {
           >
             {allRegions.map((reg) => (
               <option key={reg.id} value={reg.id}>
-                {reg.name}
+                {reg.phaseLabel ? `${reg.phaseLabel.split(' · ')[0]} · ` : ''}{reg.name}
               </option>
             ))}
           </select>
@@ -130,7 +155,7 @@ export function AiRecommendationView() {
                 key={src.source}
                 className={`p-3 rounded-xl border-2 flex items-center justify-between gap-3 ${
                   src.isLowest
-                    ? 'bg-[#E2EFE6] border-[#132E20] text-[#132E20]'
+                    ? 'bg-[var(--forest-surface)] border-[var(--forest-ink)] text-[var(--forest-ink)]'
                     : 'bg-[var(--bg-paper)] border-[var(--border-subtle)] text-[var(--text-primary)]'
                 }`}
               >
@@ -143,7 +168,7 @@ export function AiRecommendationView() {
                     Rp {src.price.toLocaleString('id-ID')}
                   </div>
                   {src.isLowest && (
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#245034]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--forest-ink)]">
                       Acuan Terhemat
                     </span>
                   )}

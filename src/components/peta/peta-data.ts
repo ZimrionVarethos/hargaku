@@ -14,6 +14,11 @@ export interface PetaMarketPrice {
   status: 'cheaper' | 'average' | 'expensive';
   stock?: 'Melimpah' | 'Cukup' | 'Terbatas';
   reportsCount: number;
+  nearStation?: boolean;
+  landmarkNote?: string;
+  expensiveItemsCount?: number;
+  shortageCount?: number;
+  alertHeadline?: string;
   lastUpdated: string;
   googleMapsUrl: string;
 }
@@ -42,9 +47,9 @@ export const PETA_MARKETS_INFO = [
   {
     id: 'pasar-anyar',
     name: 'Pasar Kebon Kembang (Pasar Anyar)',
-    shortName: 'Pasar Anyar',
+    shortName: 'Pasar Kebon Kembang',
     district: 'Pusat Kota',
-    address: 'Pusat Kota & Induk Sembako',
+    address: 'Pusat Kota & Dekat Stasiun Bogor',
     latitude: -6.591245,
     longitude: 106.792512,
     xPercent: 44,
@@ -52,16 +57,16 @@ export const PETA_MARKETS_INFO = [
     googleMapsUrl: 'https://maps.google.com/?q=Pasar+Anyar+Bogor',
   },
   {
-    id: 'kebon-kembang',
-    name: 'Pasar Kebon Kembang Blok F',
-    shortName: 'Kebon Kembang F',
-    district: 'Pusat Grosir',
-    address: 'Pusat Grosir & Komoditas Pangan',
-    latitude: -6.592812,
-    longitude: 106.791245,
+    id: 'devries',
+    name: 'Pasar Devries',
+    shortName: 'Devries',
+    district: 'Bogor Tengah',
+    address: 'Jl. Veteran Dekat Stasiun Bogor',
+    latitude: -6.59441,
+    longitude: 106.78791,
     xPercent: 38,
     yPercent: 50,
-    googleMapsUrl: 'https://maps.google.com/?q=Pasar+Kebon+Kembang',
+    googleMapsUrl: 'https://maps.google.com/?q=Pasar+Devries+Bogor',
   },
   {
     id: 'gunung-batu',
@@ -96,63 +101,60 @@ export const PETA_COMMODITIES: PetaCommodityOption[] = [
     unit: 'kg',
     cityAvgPrice: 60400,
     markets: {
-      sukasari: { price: 58000, diffPercent: -4.0, status: 'cheaper', stock: 'Melimpah', reportsCount: 14, lastUpdated: '06:00 WIB' },
-      'jambu-dua': { price: 59500, diffPercent: -1.5, status: 'cheaper', stock: 'Cukup', reportsCount: 8, lastUpdated: '06:00 WIB' },
-      'gunung-batu': { price: 60500, diffPercent: 0.2, status: 'average', stock: 'Cukup', reportsCount: 9, lastUpdated: '05:30 WIB' },
-      'pasar-anyar': { price: 61000, diffPercent: 1.0, status: 'average', stock: 'Melimpah', reportsCount: 22, lastUpdated: '06:00 WIB' },
-      'kebon-kembang': { price: 63500, diffPercent: 5.1, status: 'expensive', stock: 'Terbatas', reportsCount: 11, lastUpdated: '06:00 WIB' },
+      sukasari: { price: 58000, diffPercent: -4.0, status: 'cheaper', stock: 'Melimpah', reportsCount: 1, lastUpdated: '06:00 WIB' },
+      'jambu-dua': { price: 59500, diffPercent: -1.5, status: 'cheaper', stock: 'Cukup', reportsCount: 1, lastUpdated: '06:00 WIB' },
+      'gunung-batu': { price: 60500, diffPercent: 0.2, status: 'average', stock: 'Cukup', reportsCount: 1, lastUpdated: '05:30 WIB' },
+      'pasar-anyar': { price: 61000, diffPercent: 1.0, status: 'average', stock: 'Terbatas', reportsCount: 3, lastUpdated: '06:00 WIB' },
+      devries: { price: 63500, diffPercent: 5.1, status: 'expensive', stock: 'Terbatas', reportsCount: 2, lastUpdated: '06:00 WIB' },
     },
   },
   {
-    id: 'bawang-merah',
+    id: 'bawang-merah-brebes',
     name: 'Bawang Merah Brebes',
     unit: 'kg',
-    cityAvgPrice: 34500,
-    markets: {
-      'pasar-anyar': { price: 33000, diffPercent: -4.3, status: 'cheaper', stock: 'Melimpah', reportsCount: 18, lastUpdated: '06:00 WIB' },
-      'kebon-kembang': { price: 34000, diffPercent: -1.4, status: 'cheaper', stock: 'Melimpah', reportsCount: 15, lastUpdated: '06:00 WIB' },
-      sukasari: { price: 34500, diffPercent: 0.0, status: 'average', stock: 'Cukup', reportsCount: 12, lastUpdated: '06:00 WIB' },
-      'jambu-dua': { price: 35000, diffPercent: 1.4, status: 'average', stock: 'Cukup', reportsCount: 7, lastUpdated: '06:00 WIB' },
-      'gunung-batu': { price: 36000, diffPercent: 4.3, status: 'expensive', stock: 'Terbatas', reportsCount: 6, lastUpdated: '05:30 WIB' },
-    },
+    cityAvgPrice: 36500,
+    markets: {},
   },
   {
-    id: 'daging-ayam',
+    id: 'cabai-merah-keriting',
+    name: 'Cabai Merah Keriting',
+    unit: 'kg',
+    cityAvgPrice: 40000,
+    markets: {},
+  },
+  {
+    id: 'daging-ayam-broiler',
     name: 'Daging Ayam Broiler',
     unit: 'kg',
-    cityAvgPrice: 36600,
-    markets: {
-      sukasari: { price: 36000, diffPercent: -1.6, status: 'cheaper', stock: 'Melimpah', reportsCount: 16, lastUpdated: '06:00 WIB' },
-      'pasar-anyar': { price: 36500, diffPercent: -0.3, status: 'average', stock: 'Melimpah', reportsCount: 19, lastUpdated: '06:00 WIB' },
-      'jambu-dua': { price: 36500, diffPercent: -0.3, status: 'average', stock: 'Cukup', reportsCount: 10, lastUpdated: '06:00 WIB' },
-      'gunung-batu': { price: 37000, diffPercent: 1.1, status: 'average', stock: 'Cukup', reportsCount: 8, lastUpdated: '05:30 WIB' },
-      'kebon-kembang': { price: 37500, diffPercent: 2.5, status: 'expensive', stock: 'Cukup', reportsCount: 12, lastUpdated: '06:00 WIB' },
-    },
+    cityAvgPrice: 36750,
+    markets: {},
   },
   {
-    id: 'daging-sapi',
+    id: 'daging-sapi-murni',
     name: 'Daging Sapi Murni',
     unit: 'kg',
-    cityAvgPrice: 137000,
-    markets: {
-      sukasari: { price: 134000, diffPercent: -2.2, status: 'cheaper', stock: 'Melimpah', reportsCount: 11, lastUpdated: '05:00 WIB' },
-      'pasar-anyar': { price: 136000, diffPercent: -0.7, status: 'average', stock: 'Cukup', reportsCount: 10, lastUpdated: '06:00 WIB' },
-      'kebon-kembang': { price: 138000, diffPercent: 0.7, status: 'average', stock: 'Cukup', reportsCount: 9, lastUpdated: '06:00 WIB' },
-      'jambu-dua': { price: 139000, diffPercent: 1.5, status: 'average', stock: 'Terbatas', reportsCount: 6, lastUpdated: '06:00 WIB' },
-      'gunung-batu': { price: 140000, diffPercent: 2.2, status: 'expensive', stock: 'Terbatas', reportsCount: 5, lastUpdated: '05:30 WIB' },
-    },
+    cityAvgPrice: 140000,
+    markets: {},
   },
   {
-    id: 'beras-medium',
+    id: 'minyak-goreng-curah',
+    name: 'Minyak Goreng Curah',
+    unit: 'liter',
+    cityAvgPrice: 15700,
+    markets: {},
+  },
+  {
+    id: 'beras-medium-ir64',
     name: 'Beras Medium IR-64',
     unit: 'kg',
-    cityAvgPrice: 13900,
-    markets: {
-      'kebon-kembang': { price: 13500, diffPercent: -2.9, status: 'cheaper', stock: 'Melimpah', reportsCount: 21, lastUpdated: '06:00 WIB' },
-      'pasar-anyar': { price: 13700, diffPercent: -1.4, status: 'average', stock: 'Melimpah', reportsCount: 16, lastUpdated: '06:00 WIB' },
-      'gunung-batu': { price: 13900, diffPercent: 0.0, status: 'average', stock: 'Cukup', reportsCount: 11, lastUpdated: '05:30 WIB' },
-      sukasari: { price: 14100, diffPercent: 1.4, status: 'average', stock: 'Cukup', reportsCount: 9, lastUpdated: '06:00 WIB' },
-      'jambu-dua': { price: 14200, diffPercent: 2.2, status: 'expensive', stock: 'Cukup', reportsCount: 8, lastUpdated: '06:00 WIB' },
-    },
+    cityAvgPrice: 14500,
+    markets: {},
+  },
+  {
+    id: 'telur-ayam-ras',
+    name: 'Telur Ayam Ras',
+    unit: 'kg',
+    cityAvgPrice: 28000,
+    markets: {},
   },
 ];

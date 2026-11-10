@@ -19,7 +19,7 @@ export function getPgPool(): Pool | null {
     ssl: { rejectUnauthorized: false },
     max: 3,
     idleTimeoutMillis: 15000,
-    connectionTimeoutMillis: 8000,
+    connectionTimeoutMillis: 3500,
   });
 
   pool.on('error', () => {

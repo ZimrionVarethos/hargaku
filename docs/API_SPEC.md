@@ -28,15 +28,18 @@ Daftar provinsi dalam 6 koridor pulau beserta zonasi Bapanas dan `logisticsCostP
 ### 2.2. `GET /api/v1/commodities` & `GET /api/v1/commodities/:slug`
 Mengambil daftar atau detail komoditas pangan terkini dari database Supabase (`commodities` + agregasi `daily_prices`), dengan query `region` dan `category`.
 
-### 2.3. `GET /api/v1/markets`
-Mengambil daftar pasar tradisional aktif pada wilayah terpilih dari Supabase `markets`.
+### 2.3. `GET /api/v1/markets` & `GET /api/v1/markets/insights`
+Mengambil daftar pasar tradisional aktif pada wilayah terpilih dari Supabase `markets`, beserta ringkasan intelijen per pasar (`/api/v1/markets/insights`): komoditas yang dilaporkan mahal oleh warga (`APPROVED`), laporan kelangkaan komoditas dari pedagang (`APPROVED`), serta komparasi harga pasar vs acuan nasional.
 
 ### 2.4. `POST /api/v1/price-check`
-Mengevaluasi penawaran harga pedagang di lapak terhadap Lapis 1 (HAP/HET Bapanas terkalibrasi), Lapis 2 (Rerata survei harian DB), dan Lapis 3 (Laporan warga terverifikasi).
+Mengevaluasi penawaran harga pedagang (menerima `commodityId`, `marketId`, `regionSlug`, dan `offeredPrice` maupun kombinasi `quantity`, `unitId`, `offeredTotalPrice`) terhadap Lapis 1 (`lapis1NationalHap` & `lapis1RegionalHap`), Lapis 2 (Survei harian pasar terpilih / PIHPS BI & PPJ), dan Lapis 3 (Laporan warga terverifikasi di pasar terpilih terlebih dahulu sebelum fallback kota). Mengembalikan pula `marketContext` (informasi pasar setempat, barang yang lagi mahal menurut laporan warga di pasar tersebut, serta peringatan kelangkaan pedagang) dan `positioningNote` bahwa HargaKu melengkapi PIHPS.
 * Status evaluasi: `FAIR`, `SLIGHTLY_EXPENSIVE` (`Agak Mahal`), `OVERPRICED` (`Terlalu Mahal`), `MUCH_CHEAPER`.
 
-### 2.5. `POST /api/v1/reports`
-Menyimpan laporan harga warga baru ke tabel `citizen_reports` di Supabase lengkap dengan deteksi awal deviasi anomali.
+### 2.5. `GET /api/v1/reports` & `POST /api/v1/reports`
+* **`GET`**: Mengambil laporan terverifikasi (`APPROVED`) teranonimkan (opsi filter `marketId`, `commodity`, `reportType`) untuk widget modal pasar, `/peta`, dan `/komoditas/[slug]`.
+* **`POST`**: Menyimpan laporan baru ke `citizen_reports` di Supabase untuk dua jalur pelaporan:
+  * **`PRICE` (`reporterRole: 'WARGA'`)**: Pelaporan harga riil atau harga tidak wajar beserta jumlah, satuan, normalisasi `/kg`, dan deteksi anomali MAD (`> 25%`).
+  * **`SHORTAGE` (`reporterRole: 'PEDAGANG'`)**: Pelaporan kelangkaan / keterbatasan pasokan komoditas di suatu pasar (`stockStatus: 'TERBATAS' | 'LANGKA' | 'PULIH'`) secara anonim tanpa mengekspos nama kios.
 
 ### 2.6. `POST /api/v1/assistant/chat` (PUNTEN: Asisten AI Harga Multi-Sumber)
 Mengirimkan pertanyaan pengguna ke persona asisten **PUNTEN** berbasis **Google Gemini API** (kunci & model dibaca dinamis dari tabel `system_settings` Supabase) dengan respons berformat **Markdown**, konteks live multi-sumber (`PIHPS BI`, `Bapanas`, `Perumda PPJ`, `Laporan Warga`), dan daftar komoditas di wilayah aktif.

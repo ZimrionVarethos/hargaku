@@ -7,6 +7,7 @@ import {
   INITIAL_DAILY_PRICES,
   INITIAL_ADMIN_REPORTS,
 } from '../src/lib/store/admin-seed.ts';
+import { MOCK_REGIONS } from '../src/lib/mock/regions.data.ts';
 
 function loadEnvLocal() {
   const envPath = path.join(process.cwd(), '.env.local');
@@ -50,6 +51,29 @@ async function main() {
   console.log('Applied supabase/schema.sql');
 
   await client.query(
+    `INSERT INTO regions (id, name, slug, province, island, island_name, zone, logistics_cost_pct, disparity_index, phase, phase_label, latitude, longitude, is_active)
+     SELECT * FROM UNNEST($1::text[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[], $7::text[], $8::int[], $9::double precision[], $10::int[], $11::text[], $12::double precision[], $13::double precision[], $14::boolean[])
+     ON CONFLICT (id) DO UPDATE SET phase = EXCLUDED.phase, phase_label = EXCLUDED.phase_label, is_active = EXCLUDED.is_active`,
+    [
+      MOCK_REGIONS.map((r) => r.id),
+      MOCK_REGIONS.map((r) => r.name),
+      MOCK_REGIONS.map((r) => r.slug),
+      MOCK_REGIONS.map((r) => r.province || null),
+      MOCK_REGIONS.map((r) => r.island),
+      MOCK_REGIONS.map((r) => r.islandName),
+      MOCK_REGIONS.map((r) => r.zone),
+      MOCK_REGIONS.map((r) => r.logisticsCostPct),
+      MOCK_REGIONS.map((r) => r.disparityIndex),
+      MOCK_REGIONS.map((r) => r.phase || 4),
+      MOCK_REGIONS.map((r) => r.phaseLabel || 'Fase 4 · Nasional'),
+      MOCK_REGIONS.map((r) => r.latitude ?? null),
+      MOCK_REGIONS.map((r) => r.longitude ?? null),
+      MOCK_REGIONS.map((r) => r.isActive),
+    ]
+  );
+  console.log(`Seeded check for ${MOCK_REGIONS.length} regions`);
+
+  await client.query(
     `INSERT INTO commodities (id, name, slug, category, unit, hap_het_price, tolerance_percentage, image_url, is_active)
      SELECT * FROM UNNEST($1::text[], $2::text[], $3::text[], $4::text[], $5::text[], $6::int[], $7::int[], $8::text[], $9::boolean[])
      ON CONFLICT (id) DO NOTHING`,
@@ -68,12 +92,12 @@ async function main() {
   console.log(`Seeded check for ${INITIAL_COMMODITIES.length} commodities`);
 
   await client.query(
-    `INSERT INTO markets (id, region_id, name, slug, city, district, address, latitude, longitude, operating_hours, specialty, is_active)
-     SELECT * FROM UNNEST($1::text[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[], $7::text[], $8::double precision[], $9::double precision[], $10::text[], $11::text[], $12::boolean[])
-     ON CONFLICT (id) DO NOTHING`,
+    `INSERT INTO markets (id, region_id, name, slug, city, district, address, latitude, longitude, operating_hours, specialty, near_station, landmark_note, is_active)
+     SELECT * FROM UNNEST($1::text[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[], $7::text[], $8::double precision[], $9::double precision[], $10::text[], $11::text[], $12::boolean[], $13::text[], $14::boolean[])
+     ON CONFLICT (id) DO UPDATE SET region_id = EXCLUDED.region_id, near_station = EXCLUDED.near_station, landmark_note = EXCLUDED.landmark_note`,
     [
       INITIAL_MARKETS.map((m) => m.id),
-      INITIAL_MARKETS.map((m) => m.regionId || 'reg_jabar'),
+      INITIAL_MARKETS.map((m) => m.regionId || 'reg_bogor'),
       INITIAL_MARKETS.map((m) => m.name),
       INITIAL_MARKETS.map((m) => m.slug),
       INITIAL_MARKETS.map((m) => m.city),
@@ -83,6 +107,8 @@ async function main() {
       INITIAL_MARKETS.map((m) => m.longitude),
       INITIAL_MARKETS.map((m) => m.operatingHours),
       INITIAL_MARKETS.map((m) => m.specialty),
+      INITIAL_MARKETS.map((m) => Boolean(m.nearStation)),
+      INITIAL_MARKETS.map((m) => m.landmarkNote || null),
       INITIAL_MARKETS.map((m) => m.isActive),
     ]
   );
@@ -105,19 +131,25 @@ async function main() {
   console.log(`Seeded check for ${entries.length} daily_prices`);
 
   await client.query(
-    `INSERT INTO citizen_reports (id, commodity_name, market_name, reported_price, unit, normalized_price_per_kg, official_hap_price, city_avg_price, diff_percent, submitted_at, has_photo, photo_url, citizen_notes, status, anomaly_reason, exif_sanitized)
-     SELECT * FROM UNNEST($1::text[], $2::text[], $3::text[], $4::int[], $5::text[], $6::int[], $7::int[], $8::int[], $9::double precision[], $10::text[], $11::boolean[], $12::text[], $13::text[], $14::text[], $15::text[], $16::boolean[])
+    `INSERT INTO citizen_reports (id, commodity_id, commodity_name, market_id, market_name, report_type, reporter_role, quantity, reported_price, unit, normalized_price_per_kg, official_hap_price, city_avg_price, diff_percent, stock_status, submitted_at, has_photo, photo_url, citizen_notes, status, anomaly_reason, exif_sanitized)
+     SELECT * FROM UNNEST($1::text[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[], $7::text[], $8::double precision[], $9::int[], $10::text[], $11::int[], $12::int[], $13::int[], $14::double precision[], $15::text[], $16::text[], $17::boolean[], $18::text[], $19::text[], $20::text[], $21::text[], $22::boolean[])
      ON CONFLICT (id) DO NOTHING`,
     [
       INITIAL_ADMIN_REPORTS.map((r) => r.id),
+      INITIAL_ADMIN_REPORTS.map((r) => r.commodityId || null),
       INITIAL_ADMIN_REPORTS.map((r) => r.commodityName),
+      INITIAL_ADMIN_REPORTS.map((r) => r.marketId || null),
       INITIAL_ADMIN_REPORTS.map((r) => r.marketName),
+      INITIAL_ADMIN_REPORTS.map((r) => r.reportType || 'PRICE'),
+      INITIAL_ADMIN_REPORTS.map((r) => r.reporterRole || 'WARGA'),
+      INITIAL_ADMIN_REPORTS.map((r) => r.quantity || 1),
       INITIAL_ADMIN_REPORTS.map((r) => Math.round(r.reportedPrice)),
       INITIAL_ADMIN_REPORTS.map((r) => r.unit),
       INITIAL_ADMIN_REPORTS.map((r) => Math.round(r.normalizedPricePerKg)),
       INITIAL_ADMIN_REPORTS.map((r) => Math.round(r.officialHapPrice)),
       INITIAL_ADMIN_REPORTS.map((r) => Math.round(r.cityAvgPrice)),
       INITIAL_ADMIN_REPORTS.map((r) => r.diffPercent),
+      INITIAL_ADMIN_REPORTS.map((r) => r.stockStatus || null),
       INITIAL_ADMIN_REPORTS.map((r) => r.submittedAt),
       INITIAL_ADMIN_REPORTS.map((r) => r.hasPhoto),
       INITIAL_ADMIN_REPORTS.map((r) => r.photoUrl || null),

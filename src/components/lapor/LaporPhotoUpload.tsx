@@ -11,21 +11,24 @@ interface Props {
 export function LaporPhotoUpload({ photoFile, setPhotoFile, fileInputId }: Props) {
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-[12px] font-semibold text-[#1B1A18]">
-        Foto Bukti Nota / Timbangan <span className="font-normal text-[#8E8D86]">(Opsional)</span>
+      <label className="text-[12px] font-bold text-[var(--text-primary)]">
+        Foto Bukti Nota / Papan Harga{' '}
+        <span className="font-normal text-[var(--text-muted)]">(Opsional)</span>
       </label>
 
       {photoFile ? (
-        <div className="p-3 rounded-[12px] bg-[#FAF9F5] outline outline-1 outline-[#E5E3DE] flex items-center justify-between">
-          <div className="flex items-center gap-2 text-[12px] text-[#1B1A18] font-medium truncate">
-            <FileText size={18} weight="bold" className="text-[#8E8D86] shrink-0" />
+        <div className="p-3 rounded-[12px] bg-[var(--bg-paper)] border border-[var(--border-ink)] flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-[12px] text-[var(--text-primary)] font-medium truncate">
+            <FileText size={18} weight="bold" className="text-[var(--text-muted)] shrink-0" />
             <span className="truncate">{photoFile.name}</span>
-            <span className="text-[10px] text-[#8E8D86]">({Math.round(photoFile.size / 1024)} KB)</span>
+            <span className="text-[10px] text-[var(--text-muted)]">
+              ({Math.round(photoFile.size / 1024)} KB)
+            </span>
           </div>
           <button
             type="button"
             onClick={() => setPhotoFile(null)}
-            className="p-1 rounded text-[#8E8D86] hover:text-[#991B1B]"
+            className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--accent-chili)] cursor-pointer"
           >
             <X size={16} weight="bold" />
           </button>
@@ -33,15 +36,15 @@ export function LaporPhotoUpload({ photoFile, setPhotoFile, fileInputId }: Props
       ) : (
         <label
           htmlFor={fileInputId}
-          className="border-2 border-dashed border-[#E5E3DE] hover:border-[#1B1A18] bg-[#FAF9F5] hover:bg-white rounded-[14px] p-5 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors text-center"
+          className="border-2 border-dashed border-[var(--border-subtle)] hover:border-[var(--border-ink)] bg-[var(--bg-paper)] hover:bg-[var(--bg-muted)] rounded-[14px] p-5 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors text-center"
         >
-          <UploadSimple size={24} weight="bold" className="text-[#8E8D86]" />
+          <UploadSimple size={24} weight="bold" className="text-[var(--text-muted)]" />
           <div className="flex flex-col gap-0.5">
-            <span className="text-[13px] font-semibold text-[#1B1A18]">
-              Unggah foto struk atau papan harga lapak
+            <span className="text-[13px] font-semibold text-[var(--text-primary)]">
+              Unggah foto struk, label harga, atau kondisi stok lapak
             </span>
-            <span className="text-[11px] text-[#8E8D86]">
-              JPG, PNG, atau WebP hingga 5MB. Koordinat GPS langsung distrip otomatis.
+            <span className="text-[11px] text-[var(--text-muted)]">
+              JPG, PNG, atau WebP hingga 5MB. Metadata EXIF GPS dihapus otomatis.
             </span>
           </div>
           <input
@@ -60,4 +63,3 @@ export function LaporPhotoUpload({ photoFile, setPhotoFile, fileInputId }: Props
     </div>
   );
 }
-

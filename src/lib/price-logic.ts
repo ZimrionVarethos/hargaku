@@ -8,11 +8,17 @@ export function evaluatePrice(
     lapis1NationalHap?: number;
     lapis1RegionalHap?: number;
     lapis2OfficialAvg: number;
+    lapis2PihpsCityAvg?: number;
     lapis3CitizenMedian: number;
+    nationalVsLocalDiffPct?: number;
   },
   confidenceLevel: ConfidenceLevel = 'HIGH',
   confidenceReason?: string,
-  regionName: string = 'Wilayah Anda'
+  regionName: string = 'Wilayah Anda',
+  extras?: {
+    marketContext?: PriceCheckResult['marketContext'];
+    positioningNote?: string;
+  }
 ): PriceCheckResult {
   const diffPercentage = Number(
     (((offeredPrice - comparisonPrice) / comparisonPrice) * 100).toFixed(2)
@@ -56,6 +62,11 @@ export function evaluatePrice(
   }
 
   const defaultReason = confidenceReason || `Dihitung dari kombinasi survei resmi harian dan laporan warga di ${regionName}.`;
+  const nationalHap = layers.lapis1NationalHap ?? layers.lapis1HapHet;
+  const pihpsCityAvg = layers.lapis2PihpsCityAvg ?? layers.lapis2OfficialAvg;
+  const computedNatVsLocalDiff =
+    layers.nationalVsLocalDiffPct ??
+    (nationalHap > 0 ? Number((((pihpsCityAvg - nationalHap) / nationalHap) * 100).toFixed(1)) : 0);
 
   return {
     offeredPrice,
@@ -71,11 +82,15 @@ export function evaluatePrice(
     confidenceReason: defaultReason,
     layers: {
       lapis1HapHet: layers.lapis1HapHet,
-      lapis1NationalHap: layers.lapis1NationalHap ?? layers.lapis1HapHet,
+      lapis1NationalHap: nationalHap,
       lapis1RegionalHap: layers.lapis1RegionalHap ?? layers.lapis1HapHet,
       lapis2OfficialAvg: layers.lapis2OfficialAvg,
+      lapis2PihpsCityAvg: pihpsCityAvg,
       lapis3CitizenMedian: layers.lapis3CitizenMedian,
+      nationalVsLocalDiffPct: computedNatVsLocalDiff,
     },
+    marketContext: extras?.marketContext,
+    positioningNote: extras?.positioningNote,
     regionName,
   };
 }

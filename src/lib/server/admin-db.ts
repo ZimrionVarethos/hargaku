@@ -1,11 +1,5 @@
 import { dbQuery } from './db';
-import type {
-  AdminCommodity,
-  AdminMarket,
-  DailyPriceRecord,
-  AdminReport,
-  CommodityCategory,
-} from '@/lib/types/admin';
+import type { AdminCommodity, AdminMarket, DailyPriceRecord, AdminReport, CommodityCategory } from '@/lib/types/admin';
 
 interface CommodityRow {
   id: string;
@@ -31,6 +25,8 @@ interface MarketRow {
   longitude: number;
   operating_hours: string;
   specialty: string;
+  near_station?: boolean;
+  landmark_note?: string | null;
   is_active: boolean;
 }
 
@@ -44,14 +40,20 @@ interface DailyPriceRow {
 
 interface ReportRow {
   id: string;
+  commodity_id?: string | null;
   commodity_name: string;
+  market_id?: string | null;
   market_name: string;
+  report_type?: string | null;
+  reporter_role?: string | null;
+  quantity?: number | null;
   reported_price: number;
   unit: string;
   normalized_price_per_kg: number;
   official_hap_price: number;
   city_avg_price: number;
   diff_percent: number;
+  stock_status?: string | null;
   submitted_at: string;
   has_photo: boolean;
   photo_url: string | null;
@@ -88,6 +90,8 @@ function mapMarketRow(r: MarketRow): AdminMarket {
     longitude: Number(r.longitude),
     operatingHours: r.operating_hours,
     specialty: r.specialty,
+    nearStation: Boolean(r.near_station),
+    landmarkNote: r.landmark_note || undefined,
     isActive: r.is_active,
   };
 }
@@ -109,14 +113,20 @@ function mapDailyPriceRows(rows: DailyPriceRow[]): Record<string, DailyPriceReco
 function mapReportRow(r: ReportRow): AdminReport {
   return {
     id: r.id,
+    commodityId: r.commodity_id || undefined,
     commodityName: r.commodity_name,
+    marketId: r.market_id || undefined,
     marketName: r.market_name,
+    reportType: (r.report_type === 'SHORTAGE' ? 'SHORTAGE' : 'PRICE'),
+    reporterRole: (r.reporter_role === 'PEDAGANG' ? 'PEDAGANG' : 'WARGA'),
+    quantity: r.quantity !== null && r.quantity !== undefined ? Number(r.quantity) : 1,
     reportedPrice: Number(r.reported_price),
     unit: r.unit,
     normalizedPricePerKg: Number(r.normalized_price_per_kg),
     officialHapPrice: Number(r.official_hap_price),
     cityAvgPrice: Number(r.city_avg_price),
     diffPercent: Number(r.diff_percent),
+    stockStatus: (r.stock_status as AdminReport['stockStatus']) || undefined,
     submittedAt: r.submitted_at,
     hasPhoto: r.has_photo,
     photoUrl: r.photo_url || undefined,
@@ -148,7 +158,7 @@ export async function fetchCatalogFromDb() {
 export async function fetchBootstrapFromDb() {
   const [catalog, repRes] = await Promise.all([
     fetchCatalogFromDb(),
-    dbQuery<ReportRow>('SELECT * FROM citizen_reports ORDER BY created_at DESC LIMIT 100'),
+    dbQuery<ReportRow>('SELECT * FROM citizen_reports ORDER BY created_at DESC LIMIT 120'),
   ]);
   return {
     ...catalog,
@@ -160,56 +170,33 @@ export async function upsertCommodityDb(c: AdminCommodity) {
   await dbQuery(
     `INSERT INTO commodities (id, name, slug, category, unit, hap_het_price, tolerance_percentage, image_url, is_active, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
-     ON CONFLICT (id) DO UPDATE SET
-       name = EXCLUDED.name,
-       slug = EXCLUDED.slug,
-       category = EXCLUDED.category,
-       unit = EXCLUDED.unit,
-       hap_het_price = EXCLUDED.hap_het_price,
-       tolerance_percentage = EXCLUDED.tolerance_percentage,
-       image_url = EXCLUDED.image_url,
-       is_active = EXCLUDED.is_active,
-       updated_at = NOW()`,
+     ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, slug = EXCLUDED.slug, category = EXCLUDED.category, unit = EXCLUDED.unit,
+       hap_het_price = EXCLUDED.hap_het_price, tolerance_percentage = EXCLUDED.tolerance_percentage, image_url = EXCLUDED.image_url, is_active = EXCLUDED.is_active, updated_at = NOW()`,
     [c.id, c.name, c.slug, c.category, c.unit, c.hapHetPrice, c.tolerancePercentage, c.imageUrl || null, c.isActive]
   );
 }
 
 export async function deleteCommodityDb(id: string) {
-  await dbQuery(
-    'WITH del_prices AS (DELETE FROM daily_prices WHERE commodity_id = $1) DELETE FROM commodities WHERE id = $1',
-    [id]
-  );
+  await dbQuery('WITH del_prices AS (DELETE FROM daily_prices WHERE commodity_id = $1) DELETE FROM commodities WHERE id = $1', [id]);
 }
 
 export async function upsertMarketDb(m: AdminMarket) {
   await dbQuery(
-    `INSERT INTO markets (id, region_id, name, slug, city, district, address, latitude, longitude, operating_hours, specialty, is_active, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
-     ON CONFLICT (id) DO UPDATE SET
-       region_id = EXCLUDED.region_id,
-       name = EXCLUDED.name,
-       slug = EXCLUDED.slug,
-       city = EXCLUDED.city,
-       district = EXCLUDED.district,
-       address = EXCLUDED.address,
-       latitude = EXCLUDED.latitude,
-       longitude = EXCLUDED.longitude,
-       operating_hours = EXCLUDED.operating_hours,
-       specialty = EXCLUDED.specialty,
-       is_active = EXCLUDED.is_active,
-       updated_at = NOW()`,
+    `INSERT INTO markets (id, region_id, name, slug, city, district, address, latitude, longitude, operating_hours, specialty, near_station, landmark_note, is_active, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW())
+     ON CONFLICT (id) DO UPDATE SET region_id = EXCLUDED.region_id, name = EXCLUDED.name, slug = EXCLUDED.slug, city = EXCLUDED.city,
+       district = EXCLUDED.district, address = EXCLUDED.address, latitude = EXCLUDED.latitude, longitude = EXCLUDED.longitude,
+       operating_hours = EXCLUDED.operating_hours, specialty = EXCLUDED.specialty, near_station = EXCLUDED.near_station, landmark_note = EXCLUDED.landmark_note,
+       is_active = EXCLUDED.is_active, updated_at = NOW()`,
     [
-      m.id, m.regionId || 'reg_jabar', m.name, m.slug, m.city, m.district,
-      m.address, m.latitude, m.longitude, m.operatingHours, m.specialty, m.isActive,
+      m.id, m.regionId || 'reg_bogor', m.name, m.slug, m.city, m.district,
+      m.address, m.latitude, m.longitude, m.operatingHours, m.specialty, Boolean(m.nearStation), m.landmarkNote || null, m.isActive,
     ]
   );
 }
 
 export async function deleteMarketDb(id: string) {
-  await dbQuery(
-    'WITH del_prices AS (DELETE FROM daily_prices WHERE market_id = $1) DELETE FROM markets WHERE id = $1',
-    [id]
-  );
+  await dbQuery('WITH del_prices AS (DELETE FROM daily_prices WHERE market_id = $1) DELETE FROM markets WHERE id = $1', [id]);
 }
 
 export async function upsertDailyPricesDb(
@@ -223,44 +210,29 @@ export async function upsertDailyPricesDb(
      SELECT $1, u.commodity_id, u.price, u.price, $4, 'ADMIN_CHECKUP', NOW()
      FROM UNNEST($2::text[], $3::int[]) AS u(commodity_id, price)
      ON CONFLICT (market_id, commodity_id) DO UPDATE SET
-       previous_price = daily_prices.price,
-       price = EXCLUDED.price,
-       recorded_date = EXCLUDED.recorded_date,
-       source_type = 'ADMIN_CHECKUP',
-       updated_at = NOW()`,
-    [
-      marketId,
-      entries.map((e) => e.commodityId),
-      entries.map((e) => Math.round(e.price)),
-      recordedDate,
-    ]
+       previous_price = daily_prices.price, price = EXCLUDED.price, recorded_date = EXCLUDED.recorded_date, source_type = 'ADMIN_CHECKUP', updated_at = NOW()`,
+    [marketId, entries.map((e) => e.commodityId), entries.map((e) => Math.round(e.price)), recordedDate]
   );
 }
 
 export async function insertReportDb(r: AdminReport) {
   await dbQuery(
-    `INSERT INTO citizen_reports (id, commodity_name, market_name, reported_price, unit, normalized_price_per_kg, official_hap_price, city_avg_price, diff_percent, submitted_at, has_photo, photo_url, citizen_notes, status, anomaly_reason, exif_sanitized)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+    `INSERT INTO citizen_reports (id, commodity_id, commodity_name, market_id, market_name, report_type, reporter_role, quantity, reported_price, unit, normalized_price_per_kg, official_hap_price, city_avg_price, diff_percent, stock_status, submitted_at, has_photo, photo_url, citizen_notes, status, anomaly_reason, exif_sanitized)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
      ON CONFLICT (id) DO NOTHING`,
     [
-      r.id, r.commodityName, r.marketName, r.reportedPrice, r.unit,
-      r.normalizedPricePerKg, r.officialHapPrice, r.cityAvgPrice, r.diffPercent,
-      r.submittedAt, r.hasPhoto, r.photoUrl || null, r.citizenNotes || null,
+      r.id, r.commodityId || null, r.commodityName, r.marketId || null, r.marketName,
+      r.reportType || 'PRICE', r.reporterRole || 'WARGA', r.quantity || 1,
+      r.reportedPrice, r.unit, r.normalizedPricePerKg, r.officialHapPrice, r.cityAvgPrice, r.diffPercent,
+      r.stockStatus || null, r.submittedAt, r.hasPhoto, r.photoUrl || null, r.citizenNotes || null,
       r.status, r.anomalyReason || null, r.exifSanitized,
     ]
   );
 }
 
-export async function updateReportStatusDb(
-  id: string,
-  status: AdminReport['status'],
-  noteOrReason?: string
-) {
+export async function updateReportStatusDb(id: string, status: AdminReport['status'], noteOrReason?: string) {
   if (status === 'REJECTED') {
-    await dbQuery(
-      'UPDATE citizen_reports SET status = $2, anomaly_reason = COALESCE($3, anomaly_reason) WHERE id = $1',
-      [id, status, noteOrReason || null]
-    );
+    await dbQuery('UPDATE citizen_reports SET status = $2, anomaly_reason = COALESCE($3, anomaly_reason) WHERE id = $1', [id, status, noteOrReason || null]);
   } else {
     await dbQuery('UPDATE citizen_reports SET status = $2 WHERE id = $1', [id, status]);
   }
@@ -268,10 +240,7 @@ export async function updateReportStatusDb(
 
 export async function appendReportNoteDb(id: string, note: string) {
   await dbQuery(
-    `UPDATE citizen_reports
-     SET citizen_notes = COALESCE(citizen_notes, '') || ' [Moderator: ' || $2 || ']'
-     WHERE id = $1`,
+    `UPDATE citizen_reports SET citizen_notes = COALESCE(citizen_notes, '') || ' [Moderator: ' || $2 || ']' WHERE id = $1`,
     [id, note]
   );
 }
-

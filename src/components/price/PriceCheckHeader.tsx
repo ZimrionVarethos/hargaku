@@ -3,12 +3,15 @@
 export function PriceCheckHeader() {
   return (
     <div className="flex flex-col gap-2 pb-2">
-      <h1 className="text-[32px] sm:text-[40px] font-bold text-[var(--text-primary)] leading-[1.12] tracking-tight">
-        Cek Kewajaran Harga Belanja
+      <div className="inline-flex w-fit items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border border-[var(--border-ink)] bg-[var(--bg-muted)] text-[var(--accent-chili)]">
+        ALAT BANTU KEPUTUSAN PEMBELI &bull; MELENGKAPI PIHPS &amp; BAPANAS
+      </div>
+      <h1 className="text-[30px] sm:text-[40px] font-bold text-[var(--text-primary)] leading-[1.12] tracking-tight">
+        Cek Kewajaran Harga Lapak
       </h1>
 
-      <p className="text-[14px] sm:text-[15px] text-[var(--text-secondary)] max-w-[720px] leading-[1.5]">
-        Tameng belanja pangan cerdas. Cek acuan resmi sebelum ke pasar atau masukkan harga yang ditawarkan pedagang di lapak: sistem langsung memvalidasi kewajaran harga secara objektif agar Anda belanja lebih tenang dan hemat.
+      <p className="text-[14px] sm:text-[15px] text-[var(--text-secondary)] max-w-[740px] leading-[1.55]">
+        Masukkan jumlah, satuan, dan harga yang ditawarkan di lapak untuk membandingkan langsung dengan acuan nasional Bapanas, acuan daerah, dan laporan warga serta info kelangkaan pedagang di pasar tujuan.
       </p>
     </div>
   );

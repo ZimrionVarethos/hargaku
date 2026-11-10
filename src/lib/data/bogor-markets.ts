@@ -12,6 +12,8 @@ export interface BogorMarket {
   address: string;
   details: string;
   highlight: string;
+  nearStation?: boolean;
+  landmarkNote?: string;
   url: string;
 }
 
@@ -31,6 +33,8 @@ export const BOGOR_MARKETS: BogorMarket[] = [
     details:
       'Luas Tanah 9.665 m2 dan Bangunan 15.650 m2. Pusat perdagangan sayur-mayur, sembako, tekstil, serta lokasi Kantor Pusat Perumda PPJ (Blok F Lt. 3).',
     highlight: 'Pasar Induk & Trade Center',
+    nearStation: true,
+    landmarkNote: 'Dekat Stasiun Bogor (±350 m)',
     url: 'https://pasarpakuanjaya.co.id/pasar/info/53072266507240242459',
   },
   {
@@ -91,6 +95,8 @@ export const BOGOR_MARKETS: BogorMarket[] = [
     details:
       'Luas Tanah 400 m2, Bangunan 160 m2, 43 Kios dan 15 Los. Komoditas utama kuliner, sembako, serta pusat batu akik dan permata.',
     highlight: '43 Kios & 15 Los',
+    nearStation: true,
+    landmarkNote: 'Dekat Stasiun Bogor (±400 m)',
     url: 'https://pasarpakuanjaya.co.id/pasar/info/33421789654907634444',
   },
   {
@@ -121,6 +127,8 @@ export const BOGOR_MARKETS: BogorMarket[] = [
     details:
       'Unit pasar rakyat yang dikelola Perumda Pasar Pakuan Jaya untuk pemenuhan komoditas harian masyarakat.',
     highlight: 'Unit Pasar Perumda PPJ',
+    nearStation: true,
+    landmarkNote: 'Dekat Stasiun Bogor (±250 m)',
     url: 'https://www.pasarpakuanjaya.co.id/pasar',
   },
   {

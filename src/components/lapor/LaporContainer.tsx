@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { CommoditySummary, Market } from '@/types';
+import { useMemo, useState } from 'react';
+import { CommoditySummary, Market, ReportType, ReporterRole, StockStatus } from '@/types';
 import { LaporFormCard } from './LaporFormCard';
 import { LaporVerificationCard } from './LaporVerificationCard';
 import { LaporSuccessCard } from './LaporSuccessCard';
 import { submitCitizenReport } from '@/lib/api/reports.api';
+import { filterMarketsForRegion } from '@/lib/mock/markets.data';
+import { resolveCanonicalMarket } from '@/lib/market-insights';
 import { useRegion } from '@/lib/store/region-store';
 import { useAdminStore } from '@/lib/store/admin-store';
 import { useLiveCatalog } from '@/lib/store/use-live-catalog';
@@ -13,6 +15,10 @@ import { useLiveCatalog } from '@/lib/store/use-live-catalog';
 interface Props {
   commodities: CommoditySummary[];
   markets: Market[];
+  initialCommoditySlug?: string;
+  initialMarketId?: string;
+  initialPrice?: string;
+  initialMode?: ReportType;
 }
 
 interface SubmittedReportState {
@@ -22,28 +28,44 @@ interface SubmittedReportState {
   pricePerUnit: number;
   unitLabel: string;
   normalizedPricePerKg: number;
+  reportType: ReportType;
+  stockStatus?: StockStatus;
   hasPhoto: boolean;
 }
 
-export function LaporContainer({ commodities, markets }: Props) {
-  const { regionMarkets } = useRegion();
+export function LaporContainer({
+  commodities,
+  markets,
+  initialCommoditySlug,
+  initialMarketId,
+  initialPrice,
+  initialMode = 'PRICE',
+}: Props) {
+  const { selectedRegion, regionMarkets } = useRegion();
   const { addReport } = useAdminStore();
   const { commodities: liveCommodities, markets: liveMarkets } = useLiveCatalog();
 
   const currentCommodities = liveCommodities.length > 0 ? liveCommodities : commodities;
-  const currentMarkets =
-    liveMarkets.length > 0 ? liveMarkets : regionMarkets.length > 0 ? regionMarkets : markets;
+  const currentMarkets = useMemo(() => {
+    const base = liveMarkets.length > 0 ? liveMarkets : markets;
+    const filtered = filterMarketsForRegion(base, selectedRegion.id);
+    if (filtered.length > 0) return filtered;
+    return regionMarkets.length > 0 ? regionMarkets : markets;
+  }, [liveMarkets, markets, regionMarkets, selectedRegion.id]);
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [submittedReport, setSubmittedReport] =
-    useState<SubmittedReportState | null>(null);
+  const [submittedReport, setSubmittedReport] = useState<SubmittedReportState | null>(null);
 
   const handleSubmit = async (data: {
     commodityId: string;
     marketId: string;
     price: number;
+    quantity: number;
     unit: string;
     normalizedPrice: number;
+    reportType: ReportType;
+    reporterRole: ReporterRole;
+    stockStatus?: StockStatus;
     purchaseDate: string;
     photoFile: File | null;
     notes: string;
@@ -54,24 +76,26 @@ export function LaporContainer({ commodities, markets }: Props) {
         commodityId: data.commodityId,
         marketId: data.marketId,
         reportedPrice: data.price,
+        quantity: data.quantity,
         unit: data.unit,
         normalizedPrice: data.normalizedPrice,
+        reportType: data.reportType,
+        reporterRole: data.reporterRole,
+        stockStatus: data.stockStatus,
         purchaseDate: data.purchaseDate,
         photoFile: data.photoFile,
         notes: data.notes,
       });
 
-      const matchedCommodity = currentCommodities.find(
-        (c) => c.id === data.commodityId
-      );
-      const matchedMarket = currentMarkets.find((m) => m.id === data.marketId);
+      const matchedCommodity = currentCommodities.find((c) => c.id === data.commodityId);
+      const matchedMarket = resolveCanonicalMarket(currentMarkets, data.marketId);
 
       const hapPrice = matchedCommodity?.hapHetPrice || data.normalizedPrice;
       const diffPercent =
-        hapPrice > 0
+        data.reportType === 'PRICE' && hapPrice > 0
           ? Math.round(((data.normalizedPrice - hapPrice) / hapPrice) * 1000) / 10
           : 0;
-      const isAnomaly = Math.abs(diffPercent) > 25;
+      const isAnomaly = data.reportType === 'PRICE' && Math.abs(diffPercent) > 25;
 
       const recordToAdd = res.data.reportRecord
         ? {
@@ -80,14 +104,20 @@ export function LaporContainer({ commodities, markets }: Props) {
           }
         : {
             id: res.data.reportId,
+            commodityId: matchedCommodity?.id || data.commodityId,
             commodityName: matchedCommodity?.name || 'Komoditas Pangan',
-            marketName: matchedMarket?.name || 'Pasar Tradisional',
+            marketId: matchedMarket?.id || data.marketId,
+            marketName: matchedMarket?.name || 'Pasar Rakyat',
+            reportType: data.reportType,
+            reporterRole: data.reporterRole,
+            quantity: data.quantity,
             reportedPrice: data.price,
             unit: data.unit,
-            normalizedPricePerKg: data.normalizedPrice,
+            normalizedPricePerKg: data.reportType === 'SHORTAGE' ? 0 : data.normalizedPrice,
             officialHapPrice: hapPrice,
             cityAvgPrice: matchedCommodity?.currentAvgPrice || hapPrice,
             diffPercent,
+            stockStatus: data.stockStatus,
             submittedAt: 'Baru saja',
             hasPhoto: Boolean(data.photoFile),
             photoUrl: data.photoFile ? URL.createObjectURL(data.photoFile) : undefined,
@@ -104,11 +134,13 @@ export function LaporContainer({ commodities, markets }: Props) {
       setSubmittedReport({
         reportId: res.data.reportId,
         commodityName: matchedCommodity?.name || 'Komoditas Pangan',
-        marketName: matchedMarket?.name || 'Pasar Tradisional',
+        marketName: matchedMarket?.name || 'Pasar Rakyat',
         pricePerUnit: data.price,
         unitLabel: data.unit,
         normalizedPricePerKg: data.normalizedPrice,
-        hasPhoto: !!data.photoFile,
+        reportType: data.reportType,
+        stockStatus: data.stockStatus,
+        hasPhoto: Boolean(data.photoFile),
       });
     } catch {
     } finally {
@@ -127,6 +159,8 @@ export function LaporContainer({ commodities, markets }: Props) {
             pricePerUnit={submittedReport.pricePerUnit}
             unitLabel={submittedReport.unitLabel}
             normalizedPricePerKg={submittedReport.normalizedPricePerKg}
+            reportType={submittedReport.reportType}
+            stockStatus={submittedReport.stockStatus}
             hasPhoto={submittedReport.hasPhoto}
             onReset={() => setSubmittedReport(null)}
           />
@@ -135,6 +169,10 @@ export function LaporContainer({ commodities, markets }: Props) {
             commodities={currentCommodities}
             markets={currentMarkets}
             isSubmitting={isSubmitting}
+            initialCommoditySlug={initialCommoditySlug}
+            initialMarketId={initialMarketId}
+            initialPrice={initialPrice}
+            initialMode={initialMode}
             onSubmit={handleSubmit}
           />
         )}

@@ -50,6 +50,8 @@ export function mapAdminMarketToPublic(m: AdminMarket): Market {
     district: m.district,
     latitude: m.latitude,
     longitude: m.longitude,
+    nearStation: m.nearStation,
+    landmarkNote: m.landmarkNote,
     isActive: m.isActive,
   };
 }

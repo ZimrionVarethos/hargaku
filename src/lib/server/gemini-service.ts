@@ -1,11 +1,10 @@
 import { getAiRuntimeConfig } from './settings-db';
 import { fetchBootstrapFromDb } from './admin-db';
 import { MOCK_REGIONS, DEFAULT_REGION } from '@/lib/mock/regions.data';
-import { INITIAL_COMMODITIES, INITIAL_MARKETS, INITIAL_DAILY_PRICES } from '@/lib/store/admin-seed';
+import { INITIAL_ADMIN_STATE } from '@/lib/store/admin-seed';
 import { processAssistantMessage } from '@/lib/assistant/assistant-engine';
-import type { AssistantChatResponse, SourceComparisonItem } from '@/types/assistant';
-import type { AdminCommodity, AdminMarket, DailyPriceRecord, AdminReport } from '@/lib/types/admin';
-import type { Region } from '@/types';
+import { buildMarketAlertContextPrompt, buildSourceComparisons } from './punten-context';
+import type { AssistantChatResponse } from '@/types/assistant';
 
 interface GeminiApiResponse {
   candidates?: Array<{
@@ -14,120 +13,6 @@ interface GeminiApiResponse {
     };
   }>;
   error?: { message?: string };
-}
-
-function buildSourceComparisons(
-  query: string,
-  region: Region,
-  commodities: AdminCommodity[],
-  markets: AdminMarket[],
-  dailyPrices: Record<string, DailyPriceRecord>,
-  reports: AdminReport[],
-  enabledSources: string[]
-): SourceComparisonItem[] {
-  const lower = query.toLowerCase();
-  const regionMarkets = markets.filter((m) => m.isActive && m.regionId === region.id);
-  const scopeMarkets = regionMarkets.length > 0 ? regionMarkets : markets.filter((m) => m.isActive);
-
-  let picked = commodities.filter(
-    (c) =>
-      c.isActive &&
-      (lower.includes(c.name.toLowerCase()) ||
-        lower.includes(c.name.split(' ')[0].toLowerCase()) ||
-        lower.includes(c.slug.replace(/-/g, ' ')))
-  );
-
-  if (picked.length === 0) {
-    picked = commodities.filter((c) => c.isActive).slice(0, 3);
-  } else {
-    picked = picked.slice(0, 3);
-  }
-
-  const approvedReports = reports.filter((r) => r.status === 'APPROVED');
-
-  return picked.map((com) => {
-    let priceSum = 0;
-    let priceCount = 0;
-    let cheapestMarket: { market: AdminMarket; price: number } | undefined;
-
-    for (const m of scopeMarkets) {
-      const rec = dailyPrices[`${m.id}_${com.id}`];
-      if (rec && rec.price > 0) {
-        priceSum += rec.price;
-        priceCount++;
-        if (!cheapestMarket || rec.price < cheapestMarket.price) {
-          cheapestMarket = { market: m, price: rec.price };
-        }
-      }
-    }
-
-    const regionalFactor = region.disparityIndex || 1.0;
-    const hapRegional = Math.round((com.hapHetPrice * regionalFactor) / 100) * 100;
-    const pihpsAvg =
-      priceCount > 0
-        ? Math.round(priceSum / priceCount / 100) * 100
-        : Math.round((hapRegional * 1.04) / 100) * 100;
-
-    const localMarketPrice = cheapestMarket
-      ? cheapestMarket.price
-      : Math.round((pihpsAvg * 0.97) / 100) * 100;
-
-    const comFirstWord = com.name.split(' ')[0].toLowerCase();
-    const approvedReport = approvedReports.find((r) =>
-      r.commodityName.toLowerCase().includes(comFirstWord)
-    );
-    const citizenPrice = approvedReport
-      ? approvedReport.normalizedPricePerKg
-      : Math.round((localMarketPrice * 0.99) / 100) * 100;
-
-    const candidates = [
-      {
-        sourceName: 'Panel Harga Bapanas (HAP/HET)',
-        price: hapRegional,
-        note: `Batas acuan resmi ${region.name} (+${region.logisticsCostPct}% logistik)`,
-      },
-      {
-        sourceName: 'Survei PIHPS Bank Indonesia',
-        price: pihpsAvg,
-        note: `Rerata ${priceCount || 1} pasar terpantau`,
-      },
-      {
-        sourceName: cheapestMarket ? `${cheapestMarket.market.name} (Data Lapak)` : 'Perumda PPJ / Pasar Rakyat',
-        price: localMarketPrice,
-        note: cheapestMarket ? `Pasar terhemat di ${region.name}` : 'Data survei pasar rakyat',
-      },
-      {
-        sourceName: 'Laporan Warga Terverifikasi',
-        price: citizenPrice,
-        note: approvedReport ? `Nota ${approvedReport.marketName}` : 'Median laporan warga 7 hari',
-      },
-    ].filter((src) => {
-      if (enabledSources.length === 0) return true;
-      if (src.sourceName.includes('Bapanas')) return enabledSources.some((e) => e.includes('Bapanas'));
-      if (src.sourceName.includes('PIHPS')) return enabledSources.some((e) => e.includes('PIHPS'));
-      if (src.sourceName.includes('Warga')) return enabledSources.some((e) => e.includes('Warga'));
-      return true;
-    });
-
-    const activeList = candidates.length > 0
-      ? candidates
-      : [{ sourceName: 'Panel Harga Bapanas (HAP/HET)', price: hapRegional, note: `Acuan ${region.name}` }];
-
-    let minPrice = Infinity;
-    for (const s of activeList) {
-      if (s.price < minPrice) minPrice = s.price;
-    }
-    const sources = activeList.map((s) => ({ ...s, isLowest: s.price === minPrice }));
-    const best = sources.find((s) => s.isLowest) || sources[0];
-
-    return {
-      commodityName: com.name,
-      unit: com.unit,
-      regionName: region.name,
-      recommendedSource: `${best.sourceName} (Rp ${best.price.toLocaleString('id-ID')}/${com.unit})`,
-      sources,
-    };
-  });
 }
 
 export async function testGeminiConnection(
@@ -152,7 +37,11 @@ export async function testGeminiConnection(
     const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'OK';
     return { ok: true, latencyMs, reply: replyText };
   } catch (err) {
-    return { ok: false, latencyMs: Date.now() - start, error: err instanceof Error ? err.message : 'Network error' };
+    return {
+      ok: false,
+      latencyMs: Date.now() - start,
+      error: err instanceof Error ? err.message : 'Network error',
+    };
   }
 }
 
@@ -164,22 +53,22 @@ export async function generateMultiSourceAiReply(input: {
   const region =
     MOCK_REGIONS.find((r) => r.id === input.regionId || r.slug === input.regionId) || DEFAULT_REGION;
 
-  let commodities = INITIAL_COMMODITIES;
-  let markets = INITIAL_MARKETS;
-  let dailyPrices = INITIAL_DAILY_PRICES;
-  let reports: AdminReport[] = [];
-
   const [dbData, cfg] = await Promise.all([
     fetchBootstrapFromDb().catch(() => null),
     getAiRuntimeConfig(),
   ]);
 
-  if (dbData) {
-    if (dbData.commodities.length > 0) commodities = dbData.commodities;
-    if (dbData.markets.length > 0) markets = dbData.markets;
-    if (Object.keys(dbData.dailyPrices).length > 0) dailyPrices = dbData.dailyPrices;
-    reports = dbData.reports;
-  }
+  const commodities =
+    dbData && dbData.commodities.length > 0 ? dbData.commodities : INITIAL_ADMIN_STATE.commodities;
+  const markets =
+    dbData && dbData.markets.length > 0 ? dbData.markets : INITIAL_ADMIN_STATE.markets;
+  const dailyPrices =
+    dbData && Object.keys(dbData.dailyPrices).length > 0
+      ? dbData.dailyPrices
+      : INITIAL_ADMIN_STATE.dailyPrices;
+  const reports =
+    dbData && dbData.reports.length > 0 ? dbData.reports : INITIAL_ADMIN_STATE.reports;
+
   const sourceComparisons = buildSourceComparisons(
     input.message,
     region,
@@ -188,6 +77,15 @@ export async function generateMultiSourceAiReply(input: {
     dailyPrices,
     reports,
     cfg.enabledSources
+  );
+
+  const marketAlertsContext = buildMarketAlertContextPrompt(
+    input.message,
+    region,
+    commodities,
+    markets,
+    dailyPrices,
+    reports
   );
 
   const referencedCommodities = sourceComparisons.map((sc, idx) => {
@@ -202,14 +100,19 @@ export async function generateMultiSourceAiReply(input: {
 
   const suggestedActions = [
     { label: 'Cek Harga Wajar Lapak', href: '/cek-harga' },
-    { label: 'Peta Pasar Termurah', href: '/peta' },
-    { label: 'Komparasi Multi-Sumber', href: '/rekomendasi-ai' },
+    { label: 'Lapor Harga / Kelangkaan', href: '/lapor' },
+    { label: 'Peta Pasar & Stasiun', href: '/peta' },
   ];
 
   if (!cfg.apiKey) {
     const fallback = await processAssistantMessage(input.message, region);
-    const bestLine = sourceComparisons[0]
-      ? `\n\n#### Komparasi Sumber: ${sourceComparisons[0].commodityName} (${region.name})\n\n| Sumber Harga | Nominal | Keterangan |\n| :--- | ---: | :--- |\n` +
+    const showComp =
+      !fallback.content.includes('Komparasi Sumber') &&
+      !fallback.content.includes('Laporan Pasar') &&
+      sourceComparisons[0];
+
+    const bestLine = showComp
+      ? `\n\n#### Komparasi Acuan: ${sourceComparisons[0].commodityName} (${region.name})\n\n| Sumber Harga | Nominal | Keterangan |\n| :--- | ---: | :--- |\n` +
         sourceComparisons[0].sources
           .map(
             (s) =>
@@ -217,14 +120,15 @@ export async function generateMultiSourceAiReply(input: {
           )
           .join('\n')
       : '';
+
     return {
-      reply: `${fallback.content}${bestLine}\n\n> *Catatan: Kunci Gemini API belum diisi di Admin Console (menu Integrasi AI & API), jadi PUNTEN saat ini memakai acuan lokal terverifikasi.*`,
+      reply: `${fallback.content}${bestLine}\n\n> *Catatan: PUNTEN berjalan dengan data lokal terverifikasi dan aturan keputusan PasarKu yang melengkapi PIHPS & Bapanas.*`,
       intent: 'PRICE_RECOMMENDATION',
       provider: 'grounded-fallback',
       model: cfg.geminiModel,
       sourceComparisons,
       referencedCommodities,
-      suggestedActions,
+      suggestedActions: fallback.suggestedActions || suggestedActions,
     };
   }
 
@@ -243,13 +147,14 @@ export async function generateMultiSourceAiReply(input: {
     .join('\n');
 
   const prompt = [
-    `PERAN: Kamu adalah PUNTEN, asisten harga pangan resmi di web HargaKu.`,
-    `WILAYAH AKTIF: ${region.name} (${region.islandName}, ${region.zone}, toleransi logistik +${region.logisticsCostPct}%).`,
-    `SUMBER PERBANDINGAN DATA HARGA NYATA DARI DATABASE:`,
+    `PERAN: Kamu adalah PUNTEN, asisten keputusan belanja di platform PasarKu / HargaKu.`,
+    `WILAYAH AKTIF: ${region.name} (${region.islandName}, ${region.zone}, Fase ${region.phase || 1} ${region.phaseLabel || 'Kota Bogor'}).`,
+    `SUMBER PERBANDINGAN DATA HARGA:`,
     contextLines,
+    marketAlertsContext,
     historyText ? `\nRIWAYAT SINGKAT:\n${historyText}` : '',
     `\nPERTANYAAN PENGGUNA:\n${input.message}`,
-    `\nATURAN JAWABAN PUNTEN: Jawab dalam Bahasa Indonesia yang ramah menggunakan format Markdown rapi (gunakan ### heading singkat, tabel Markdown jika membandingkan antar sumber, bullet points, dan penebalan angka/backtick nominal Rupiah). Sebutkan angka antar sumber secara jujur, rekomendasikan sumber/pasar yang paling hemat, JANGAN menyarankan fitur keranjang belanja, dan JANGAN gunakan karakter em-dash.`,
+    `\nATURAN JAWABAN PUNTEN: Jawab ramah dalam Bahasa Indonesia memakai Markdown rapi (### heading singkat, tabel Markdown, dan nominal backtick). JANGAN pernah menyebut nama pedagang atau nama lapak/kios individu (hanya agregat per pasar). Jelaskan acuan nasional Bapanas vs acuan lokal serta laporan warga/kelangkaan pedagang jika relevan, posisikan PasarKu sebagai alat bantu keputusan pembeli yang melengkapi PIHPS BI (bukan menggantikan), dan JANGAN gunakan karakter em-dash.`,
   ]
     .filter(Boolean)
     .join('\n');

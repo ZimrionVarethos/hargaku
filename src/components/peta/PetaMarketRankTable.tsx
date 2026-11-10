@@ -1,6 +1,6 @@
 'use client';
 
-import { NavigationArrow } from '@phosphor-icons/react';
+import { NavigationArrow, Train } from '@phosphor-icons/react';
 import { PetaMarketPrice } from './peta-data';
 import { formatRupiah } from '@/lib/utils';
 
@@ -9,6 +9,7 @@ interface Props {
   selectedMarketId: string;
   onSelectMarket: (id: string) => void;
   commodityName: string;
+  commodityUnit?: string;
 }
 
 export function PetaMarketRankTable({
@@ -16,6 +17,7 @@ export function PetaMarketRankTable({
   selectedMarketId,
   onSelectMarket,
   commodityName,
+  commodityUnit = 'kg',
 }: Props) {
   const sortedMarkets = [...markets].sort((a, b) => a.price - b.price);
 
@@ -27,23 +29,22 @@ export function PetaMarketRankTable({
             Urutan Harga Pasar &middot; {commodityName}
           </h2>
           <p className="text-[12px] text-[var(--text-secondary)]">
-            Data terurut dari pasar yang paling hemat hingga yang tertinggi di wilayah terpilih.
+            Diurutkan dari pasar terhemat di wilayah terpilih, beserta sinyal stasiun &amp; laporan aktif.
           </p>
         </div>
         <span className="text-[11px] font-bold text-[var(--text-muted)] bg-[var(--bg-muted)] px-2.5 py-1 rounded-full border border-[var(--border-subtle)] w-fit">
-          Pasar Pantauan Aktif
+          {markets.length} Pasar Terpantau
         </span>
       </div>
 
       <div className="overflow-x-auto -mx-5 sm:mx-0 px-5 sm:px-0">
-        <table className="w-full text-left border-collapse min-w-[620px]">
+        <table className="w-full text-left border-collapse min-w-[640px]">
           <thead>
             <tr className="border-b border-[var(--border-subtle)] text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
               <th className="py-2.5 pl-3.5 sm:pl-4 pr-4">Peringkat &amp; Pasar</th>
-              <th className="py-2.5 px-4 text-right">Harga Lapak / kg</th>
-              <th className="py-2.5 px-4 text-right">Rerata Wilayah</th>
-              <th className="py-2.5 px-4 text-center">Selisih</th>
-              <th className="py-2.5 px-4 text-right">Laporan Warga</th>
+              <th className="py-2.5 px-4 text-right">Harga / {commodityUnit}</th>
+              <th className="py-2.5 px-4 text-center">Selisih Acuan</th>
+              <th className="py-2.5 px-4 text-left">Sinyal Warga &amp; Stok</th>
               <th className="py-2.5 pr-3.5 sm:pr-4 pl-4 text-right">Aksi</th>
             </tr>
           </thead>
@@ -56,35 +57,37 @@ export function PetaMarketRankTable({
                 <tr
                   key={m.marketId}
                   className={`transition-colors cursor-pointer ${
-                    isSelected
-                      ? 'bg-[var(--bg-muted)]/70'
-                      : 'hover:bg-[var(--bg-muted)]/30'
+                    isSelected ? 'bg-[var(--bg-muted)]/70' : 'hover:bg-[var(--bg-muted)]/30'
                   }`}
                   onClick={() => onSelectMarket(m.marketId)}
                 >
                   <td className="py-3.5 pl-3.5 sm:pl-4 pr-4">
                     <div className="flex items-center gap-3">
                       <span
-                        className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-transform ${
+                        className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
                           isCheapest
-                            ? 'bg-[#E2EFE6] text-[#245034] border border-[#245034]'
+                            ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border border-[var(--forest-ink)]'
                             : 'bg-[var(--bg-muted)] text-[var(--text-secondary)] border border-[var(--border-subtle)]'
                         }`}
                       >
                         {idx + 1}
                       </span>
                       <div>
-                        <div className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                        <div className="font-bold text-[var(--text-primary)] flex flex-wrap items-center gap-1.5">
                           <span>{m.name}</span>
+                          {m.nearStation && (
+                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-[var(--accent-chili-soft)] text-[var(--accent-chili)] px-1.5 py-0.5 rounded">
+                              <Train size={10} weight="bold" />
+                              <span>Stasiun</span>
+                            </span>
+                          )}
                           {isCheapest && (
-                            <span className="text-[10px] font-bold bg-[#E2EFE6] text-[#245034] px-1.5 py-0.5 rounded border border-[#245034]">
+                            <span className="text-[10px] font-bold bg-[var(--forest-surface)] text-[var(--forest-ink)] px-1.5 py-0.5 rounded border border-[var(--forest-ink)]">
                               Termurah
                             </span>
                           )}
                         </div>
-                        <span className="text-[11px] text-[var(--text-muted)]">
-                          {m.address}
-                        </span>
+                        <span className="text-[11px] text-[var(--text-muted)]">{m.address}</span>
                       </div>
                     </div>
                   </td>
@@ -93,31 +96,32 @@ export function PetaMarketRankTable({
                     {formatRupiah(m.price)}
                   </td>
 
-                  <td className="py-3.5 px-4 text-right font-medium text-[var(--text-secondary)] tabular-nums text-[13px]">
-                    {formatRupiah(m.regionalAvgPrice ?? m.price)}
-                  </td>
-
                   <td className="py-3.5 px-4 text-center">
                     {m.diffPercent < 0 ? (
-                      <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#E2EFE6] text-[#245034] border border-[#245034]/30 tabular-nums">
+                      <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--forest-surface)] text-[var(--forest-ink)] border border-[var(--forest-ink)]/30 tabular-nums">
                         {m.diffPercent}%
                       </span>
                     ) : m.diffPercent === 0 ? (
                       <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[var(--bg-muted)] text-[var(--text-muted)] tabular-nums">
-                        Sama (0%)
+                        0%
                       </span>
                     ) : (
-                      <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#FBE9E6] text-[var(--accent-chili)] border border-[var(--accent-chili)]/30 tabular-nums">
+                      <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--accent-chili-soft)] text-[var(--accent-chili)] border border-[var(--accent-chili)]/30 tabular-nums">
                         +{m.diffPercent}%
                       </span>
                     )}
                   </td>
 
-                  <td className="py-3.5 px-4 text-right text-[12px] text-[var(--text-secondary)] tabular-nums">
-                    <span>{m.reportsCount} laporan</span>
-                    <span className="block text-[10px] text-[var(--text-muted)]">
-                      {m.lastUpdated}
-                    </span>
+                  <td className="py-3.5 px-4 text-[12px] text-[var(--text-secondary)]">
+                    {m.alertHeadline ? (
+                      <span className="inline-block px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold">
+                        {m.alertHeadline}
+                      </span>
+                    ) : (
+                      <span className="text-[var(--text-muted)]">
+                        {m.reportsCount > 0 ? `${m.reportsCount} laporan aktif` : 'Survei harian stabil'}
+                      </span>
+                    )}
                   </td>
 
                   <td className="py-3.5 pr-3.5 sm:pr-4 pl-4 text-right">
@@ -129,9 +133,7 @@ export function PetaMarketRankTable({
                           onSelectMarket(m.marketId);
                         }}
                         className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                          isSelected
-                            ? 'market-btn-primary'
-                            : 'market-btn-secondary'
+                          isSelected ? 'market-btn-primary' : 'market-btn-secondary'
                         }`}
                       >
                         {isSelected ? 'Terpilih' : 'Pilih'}

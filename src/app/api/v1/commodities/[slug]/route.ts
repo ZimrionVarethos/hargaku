@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchBootstrapFromDb } from '@/lib/server/admin-db';
 import { MOCK_COMMODITY_DETAILS, MOCK_COMMODITY_SUMMARIES } from '@/lib/mock/commodities.data';
+import { computeCommodityCitizenStats } from '@/lib/market-insights';
 import { mapAdminCategoryToPublic } from '@/lib/utils';
 import type { CommodityDetail } from '@/types';
 
@@ -35,11 +36,7 @@ export async function GET(
 
     const cityAvg = count > 0 ? Math.round(sumPrice / count) : com.hapHetPrice;
     const prevAvg = count > 0 ? Math.round(sumPrev / count) : com.hapHetPrice;
-
-    const firstWord = com.name.split(' ')[0].toLowerCase();
-    const approvedCount = reports.filter(
-      (r) => r.status === 'APPROVED' && r.commodityName.toLowerCase().includes(firstWord)
-    ).length;
+    const citizenStats = computeCommodityCitizenStats(com, reports);
 
     const detail: CommodityDetail = {
       id: com.id,
@@ -49,14 +46,17 @@ export async function GET(
       category: mapAdminCategoryToPublic(com.category),
       reference: {
         priceHapHet: com.hapHetPrice,
-        type: com.name.toLowerCase().includes('beras') || com.name.toLowerCase().includes('minyak') ? 'HET' : 'HAP',
+        type:
+          com.name.toLowerCase().includes('beras') || com.name.toLowerCase().includes('minyak')
+            ? 'HET'
+            : 'HAP',
         legalDoc: 'Peraturan Bapanas RI',
       },
       currentPriceStats: {
         cityAverage: cityAvg,
         highestMarket: highest || { name: 'Pasar Rakyat', price: cityAvg },
         lowestMarket: lowest || { name: 'Pasar Rakyat', price: cityAvg },
-        citizenReportsCount: Math.max(3, approvedCount),
+        citizenReportsCount: Math.max(1, citizenStats.cityCount),
       },
       priceHistory: [
         { date: 'H-2', avgPrice: prevAvg },
@@ -71,4 +71,3 @@ export async function GET(
     return NextResponse.json({ success: true, message: 'Detail fallback dimuat.', data: found || null });
   }
 }
-

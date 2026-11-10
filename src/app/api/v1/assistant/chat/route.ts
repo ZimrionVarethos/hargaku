@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as Partial<AssistantChatRequest>;
     const message = (body.message || '').trim();
-    const regionId = (body.regionId || 'reg_jabar').trim();
+    const regionId = (body.regionId || 'reg_bogor').trim();
 
     if (!message) {
       return NextResponse.json(
@@ -36,4 +36,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

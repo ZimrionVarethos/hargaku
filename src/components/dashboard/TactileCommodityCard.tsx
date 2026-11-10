@@ -12,19 +12,19 @@ export function TactileCommodityCard({ commodity }: Props) {
   const isDropping = commodity.changePercentage < 0;
 
   let statusLabel = 'Wajar';
-  let statusBadgeStyle = 'bg-[#F4F3F0] text-[#1B1A18] outline-[#E5E3DE]';
+  let statusBadgeStyle = 'bg-[var(--bg-muted)] text-[var(--text-primary)] border-[var(--border-subtle)]';
 
   if (commodity.changePercentage > 10 || commodity.statusVsHap === 'ABOVE_HAP' && commodity.changePercentage > 5) {
     if (commodity.changePercentage > 12) {
       statusLabel = 'Terlalu Mahal';
-      statusBadgeStyle = 'bg-[#FEE2E2] text-[#991B1B] outline-[#FECACA]';
+      statusBadgeStyle = 'bg-[var(--accent-chili-soft)] text-[var(--accent-chili)] border-[var(--accent-chili)]';
     } else {
       statusLabel = 'Agak Mahal';
-      statusBadgeStyle = 'bg-[#FEF3C7] text-[#92400E] outline-[#FDE68A]';
+      statusBadgeStyle = 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]';
     }
   } else if (commodity.changePercentage < -2 || commodity.statusVsHap === 'BELOW_HAP') {
     statusLabel = 'Murah';
-    statusBadgeStyle = 'bg-[#EEF773] text-[#1B1A18] outline-[#1B1A18]';
+    statusBadgeStyle = 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border-[var(--forest-ink)]';
   }
 
   const sparkline = commodity.sparkline || [
@@ -40,14 +40,14 @@ export function TactileCommodityCard({ commodity }: Props) {
   return (
     <Link
       href={`/komoditas/${commodity.slug}`}
-      className="group flex flex-col justify-between p-5 rounded-[16px] bg-white outline outline-1 outline-[#E5E3DE] hover:outline-[#1B1A18] hover:shadow-[0_4px_16px_rgba(27,26,24,0.06)] transition-all gap-4"
+      className="group market-card flex flex-col justify-between p-5 gap-4 no-underline"
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="text-[15px] font-semibold text-[#1B1A18] group-hover:text-[#FF7714] transition-colors leading-[1.3]">
+        <span className="text-[15px] font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-chili)] transition-colors leading-[1.3]">
           {commodity.name}
         </span>
         <span
-          className={`shrink-0 text-[11px] font-bold px-2.5 py-0.5 rounded-[4px] outline outline-1 ${statusBadgeStyle}`}
+          className={`shrink-0 text-[11px] font-bold px-2.5 py-0.5 rounded-[4px] border ${statusBadgeStyle}`}
         >
           {statusLabel}
         </span>
@@ -55,10 +55,10 @@ export function TactileCommodityCard({ commodity }: Props) {
 
       <div className="flex flex-col gap-1">
         <div className="flex items-baseline gap-1">
-          <span className="text-[22px] font-bold text-[#1B1A18] tabular-nums tracking-tight">
+          <span className="text-[22px] font-extrabold text-[var(--forest-ink)] tabular-nums tracking-tight font-mono-num">
             Rp {commodity.currentAvgPrice.toLocaleString('id-ID')}
           </span>
-          <span className="text-[12px] font-medium text-[#78716C]">
+          <span className="text-[12px] font-medium text-[var(--text-muted)]">
             /{commodity.unit}
           </span>
         </div>
@@ -67,10 +67,10 @@ export function TactileCommodityCard({ commodity }: Props) {
           <span
             className={`font-bold tabular-nums ${
               isRising
-                ? 'text-[#DC2626]'
+                ? 'text-[var(--accent-chili)]'
                 : isDropping
-                ? 'text-[#15803D]'
-                : 'text-[#6E6D67]'
+                ? 'text-[var(--forest-ink)]'
+                : 'text-[var(--text-muted)]'
             }`}
           >
             {isRising
@@ -79,12 +79,12 @@ export function TactileCommodityCard({ commodity }: Props) {
               ? `▼ ${commodity.changePercentage}%`
               : '~ 0.0% Stabil'}
           </span>
-          <span className="text-[#8C8B85]">dibanding 7 hari lalu</span>
+          <span className="text-[var(--text-muted)]">dibanding 7 hari lalu</span>
         </div>
       </div>
 
       <div className="flex flex-col gap-1">
-        <div className="h-8 flex items-end gap-[3px] p-1.5 bg-[#FAF9F5] rounded-[8px] outline outline-1 outline-[#E5E3DE]/70">
+        <div className="h-8 flex items-end gap-[3px] p-1.5 bg-[var(--bg-muted)] rounded-[8px] border border-[var(--border-subtle)]">
           {sparkline.map((val, idx) => {
             const heightPercent = Math.max(
               20,
@@ -99,11 +99,11 @@ export function TactileCommodityCard({ commodity }: Props) {
                   height: `${heightPercent}%`,
                   backgroundColor: isLast
                     ? isRising
-                      ? '#DC2626'
+                      ? 'var(--accent-chili)'
                       : isDropping
-                      ? '#15803D'
-                      : '#1B1A18'
-                    : '#D6D4CE',
+                      ? 'var(--forest-ink)'
+                      : 'var(--text-primary)'
+                    : 'var(--border-ink)',
                 }}
                 title={`Rp ${val.toLocaleString('id-ID')}`}
               />
@@ -112,11 +112,11 @@ export function TactileCommodityCard({ commodity }: Props) {
         </div>
       </div>
 
-      <div className="pt-3 border-t border-[#E5E3DE] flex items-center justify-between text-[11px]">
-        <span className="text-[#8E8D86]">
+      <div className="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-[11px]">
+        <span className="text-[var(--text-muted)]">
           Sumber: {commodity.source || 'PIHPS'} · 06:00
         </span>
-        <span className="font-semibold text-[#6E6D67] tabular-nums">
+        <span className="font-bold text-[var(--text-secondary)] tabular-nums">
           HAP: Rp {commodity.hapHetPrice.toLocaleString('id-ID')}
         </span>
       </div>

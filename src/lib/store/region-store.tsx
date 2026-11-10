@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { Region, Market } from '@/types';
 import { MOCK_REGIONS, DEFAULT_REGION } from '@/lib/mock/regions.data';
-import { MOCK_MARKETS } from '@/lib/mock/markets.data';
+import { getMarketsByRegion } from '@/lib/mock/markets.data';
 
 interface RegionContextValue {
   selectedRegion: Region;
@@ -50,8 +50,7 @@ export function RegionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const regionMarkets = useMemo(() => {
-    const list = MOCK_MARKETS.filter((m) => m.regionId === selectedRegion.id);
-    return list.length > 0 ? list : MOCK_MARKETS.filter((m) => m.regionId === 'reg_jabar');
+    return getMarketsByRegion(selectedRegion.id);
   }, [selectedRegion]);
 
   const calculateRegionalPrice = useCallback(

@@ -40,23 +40,25 @@ export function PriceFluctuationChartCard({ detail }: Props) {
   const hapTopPercent = Math.round(((maxVal - hapPrice) / range) * 100);
 
   return (
-    <div className="bg-white rounded-[18px] outline outline-1 outline-[#E5E3DE] p-5 sm:p-6 shadow-xs flex flex-col justify-between gap-5">
+    <div className="market-card p-5 sm:p-6 flex flex-col justify-between gap-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex flex-col gap-0.5">
-          <h3 className="text-[16px] font-bold text-[#1B1A18] tracking-tight">
+          <h3 className="text-[16px] font-bold text-[var(--text-primary)] tracking-tight">
             Tren Fluktuasi 30 Hari vs Batas HAP Acuan
           </h3>
-          <p className="text-[12px] text-[#6E6D67]">
+          <p className="text-[12px] text-[var(--text-secondary)]">
             Pergerakan harga harian dibanding batas toleransi resmi Bapanas
           </p>
         </div>
 
-        <div className="inline-flex items-center p-1 rounded-[8px] bg-[#FAF9F5] outline outline-1 outline-[#E5E3DE] text-[11px] font-medium w-fit">
+        <div className="inline-flex items-center p-1 rounded-[8px] bg-[var(--bg-muted)] border border-[var(--border-subtle)] text-[11px] font-bold w-fit">
           <button
             type="button"
             onClick={() => setActiveRange('7')}
-            className={`px-2.5 py-1 rounded-[6px] transition-all ${
-              activeRange === '7' ? 'bg-[#1B1A18] text-white shadow-xs' : 'text-[#6E6D67] hover:text-[#1B1A18]'
+            className={`px-2.5 py-1 rounded-[6px] transition-all cursor-pointer ${
+              activeRange === '7'
+                ? 'bg-[var(--accent-chili)] text-white shadow-xs'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
             7 Hari
@@ -64,8 +66,10 @@ export function PriceFluctuationChartCard({ detail }: Props) {
           <button
             type="button"
             onClick={() => setActiveRange('30')}
-            className={`px-2.5 py-1 rounded-[6px] transition-all ${
-              activeRange === '30' ? 'bg-[#1B1A18] text-white shadow-xs' : 'text-[#6E6D67] hover:text-[#1B1A18]'
+            className={`px-2.5 py-1 rounded-[6px] transition-all cursor-pointer ${
+              activeRange === '30'
+                ? 'bg-[var(--accent-chili)] text-white shadow-xs'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
             30 Hari
@@ -73,8 +77,10 @@ export function PriceFluctuationChartCard({ detail }: Props) {
           <button
             type="button"
             onClick={() => setActiveRange('90')}
-            className={`px-2.5 py-1 rounded-[6px] transition-all ${
-              activeRange === '90' ? 'bg-[#1B1A18] text-white shadow-xs' : 'text-[#6E6D67] hover:text-[#1B1A18]'
+            className={`px-2.5 py-1 rounded-[6px] transition-all cursor-pointer ${
+              activeRange === '90'
+                ? 'bg-[var(--accent-chili)] text-white shadow-xs'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
             90 Hari
@@ -82,19 +88,19 @@ export function PriceFluctuationChartCard({ detail }: Props) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-[11px] text-[#8C8B85] border-b border-[#E5E3DE] pb-2">
+      <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] border-b border-[var(--border-subtle)] pb-2">
         <span>Maks 30 Hari: Rp {maxVal.toLocaleString('id-ID')}</span>
-        <span className="font-semibold text-[#1B1A18]">
+        <span className="font-bold text-[var(--text-primary)]">
           Garis Acuan: Batas HAP Rp {hapPrice.toLocaleString('id-ID')}
         </span>
       </div>
 
       <div className="relative h-44 w-full flex flex-col justify-end">
         <div
-          className="absolute left-0 right-0 border-b border-dashed border-[#1B1A18] pointer-events-none z-10 flex items-center justify-end"
+          className="absolute left-0 right-0 border-b border-dashed border-[var(--border-ink)] pointer-events-none z-10 flex items-center justify-end"
           style={{ top: `${hapTopPercent}%` }}
         >
-          <span className="text-[10px] font-bold text-[#1B1A18] bg-[#FAF9F5] px-1.5 py-0.5 rounded-[4px] -translate-y-1/2">
+          <span className="text-[10px] font-bold text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-subtle)] px-1.5 py-0.5 rounded-[4px] -translate-y-1/2">
             HAP Rp {hapPrice.toLocaleString('id-ID')}
           </span>
         </div>
@@ -116,11 +122,11 @@ export function PriceFluctuationChartCard({ detail }: Props) {
                     height: `${Math.max(15, barHeight)}%`,
                     backgroundColor: isLast
                       ? isOverHap
-                        ? '#DC2626'
-                        : '#15803D'
+                        ? 'var(--accent-chili)'
+                        : 'var(--forest-ink)'
                       : isOverHap
                       ? '#F87171'
-                      : '#D6D4CE',
+                      : 'var(--border-subtle)',
                   }}
                   title={`${item.day}: Rp ${item.price.toLocaleString('id-ID')}`}
                 />
@@ -129,17 +135,17 @@ export function PriceFluctuationChartCard({ detail }: Props) {
           })}
         </div>
 
-        <div className="flex items-center justify-between text-[10px] text-[#8C8B85] pt-2 border-t border-[#E5E3DE]">
+        <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)] pt-2 border-t border-[var(--border-subtle)]">
           <span>22 Sep</span>
           <span>29 Sep</span>
           <span>06 Okt</span>
           <span>13 Okt</span>
-          <span className="font-bold text-[#1B1A18]">22 Okt (Hari Ini)</span>
+          <span className="font-bold text-[var(--text-primary)]">22 Okt (Hari Ini)</span>
         </div>
       </div>
 
-      <p className="text-[11px] text-[#6E6D67] leading-[16px] pt-1 border-t border-[#E5E3DE]">
-        Garis putus-putus = Batas HAP resmi (Rp {hapPrice.toLocaleString('id-ID')}/kg). Bar oranye menunjukkan pergerakan harga yang mulai melampaui batas toleransi resmi sejak pertengahan Oktober.
+      <p className="text-[11px] text-[var(--text-secondary)] leading-[16px] pt-2 border-t border-[var(--border-subtle)]">
+        Garis putus-putus = Batas HAP resmi (Rp {hapPrice.toLocaleString('id-ID')}/{detail.unit}). Bar merah menunjukkan pergerakan harga yang mulai melampaui batas toleransi resmi sejak pertengahan Oktober.
       </p>
     </div>
   );

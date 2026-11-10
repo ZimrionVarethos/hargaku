@@ -15,17 +15,17 @@ export function CommodityHeroHeader({ detail, changePercentage = 8.5 }: Props) {
   const isRising = changePercentage > 0;
   const isDropping = changePercentage < 0;
 
-  let statusBadgeStyle = 'bg-[#F4F3F0] text-[#1B1A18] outline-[#E5E3DE]';
+  let statusBadgeStyle = 'bg-[var(--bg-muted)] text-[var(--text-primary)] border-[var(--border-subtle)]';
   let statusLabel = 'Wajar';
 
   if (changePercentage > 10) {
-    statusBadgeStyle = 'bg-[#FEE2E2] text-[#991B1B] outline-[#FECACA]';
+    statusBadgeStyle = 'bg-[var(--accent-chili-soft)] text-[var(--accent-chili)] border-[var(--accent-chili)]';
     statusLabel = `Terlalu Mahal (+${changePercentage}%)`;
   } else if (changePercentage > 3) {
-    statusBadgeStyle = 'bg-[#FEF3C7] text-[#92400E] outline-[#FDE68A]';
+    statusBadgeStyle = 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]';
     statusLabel = `Agak Mahal (+${changePercentage}%)`;
   } else if (changePercentage < -2) {
-    statusBadgeStyle = 'bg-[#EEF773] text-[#1B1A18] outline-[#1B1A18]';
+    statusBadgeStyle = 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border-[var(--forest-ink)]';
     statusLabel = `Murah (${changePercentage}%)`;
   }
 
@@ -33,20 +33,20 @@ export function CommodityHeroHeader({ detail, changePercentage = 8.5 }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-2 border-b border-[#E5E3DE]">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-4 border-b border-[var(--border-subtle)]">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-[32px] sm:text-[38px] font-medium text-[#1B1A18] leading-[1.12] tracking-tight">
+            <h1 className="text-[32px] sm:text-[38px] font-bold text-[var(--text-primary)] leading-[1.12] tracking-tight">
               {detail.name}
             </h1>
             <span
-              className={`text-[12px] font-bold px-3 py-1 rounded-[6px] outline outline-1 ${statusBadgeStyle}`}
+              className={`text-[12px] font-bold px-3 py-1 rounded-[6px] border ${statusBadgeStyle}`}
             >
               {statusLabel}
             </span>
           </div>
 
-          <p className="text-[13px] sm:text-[14px] text-[#6E6D67]">
+          <p className="text-[13px] sm:text-[14px] text-[var(--text-secondary)]">
             {selectedRegion.name} · Acuan {selectedRegion.islandName} (Bapanas) · Diperbarui: 22 Okt 2026, 06:00 WIB
           </p>
         </div>
@@ -54,7 +54,7 @@ export function CommodityHeroHeader({ detail, changePercentage = 8.5 }: Props) {
         <div className="flex items-center gap-3 flex-wrap">
           <Link
             href={`/cek-harga?commodity=${detail.slug}`}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[10px] bg-[#1B1A18] text-white text-[13px] font-semibold hover:bg-black active:translate-y-[1px] shadow-xs transition-all"
+            className="market-btn-primary inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-bold no-underline"
           >
             <Check size={14} weight="bold" />
             <span>Cek Harga yang Kamu Terima</span>
@@ -62,7 +62,7 @@ export function CommodityHeroHeader({ detail, changePercentage = 8.5 }: Props) {
 
           <Link
             href={`/lapor?commodity=${detail.slug}`}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[10px] bg-white text-[#1B1A18] outline outline-1 outline-[#E5E3DE] hover:bg-[#F4F3F0] text-[13px] font-medium transition-colors"
+            className="market-btn-secondary inline-flex items-center gap-2 px-4 py-2.5 text-[13px] font-bold no-underline"
           >
             <MegaphoneSimple size={14} weight="bold" />
             <span>Lapor Harga Lapak</span>
@@ -71,11 +71,11 @@ export function CommodityHeroHeader({ detail, changePercentage = 8.5 }: Props) {
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
-        <span className="text-[38px] sm:text-[44px] font-bold text-[#1B1A18] tracking-tight tabular-nums">
+        <span className="text-[38px] sm:text-[44px] font-extrabold text-[var(--text-primary)] tracking-tight tabular-nums font-mono-num">
           Rp {detail.currentPriceStats.cityAverage.toLocaleString('id-ID')}
         </span>
 
-        <span className="text-[15px] font-medium text-[#78716C]">
+        <span className="text-[15px] font-medium text-[var(--text-muted)]">
           / {detail.unit} (Rp {pricePerOns.toLocaleString('id-ID')}/ons)
         </span>
 
@@ -85,13 +85,13 @@ export function CommodityHeroHeader({ detail, changePercentage = 8.5 }: Props) {
               isRising
                 ? 'bg-[#FEF3C7] text-[#92400E]'
                 : isDropping
-                ? 'bg-[#EEF773] text-[#1B1A18]'
-                : 'bg-[#F4F3F0] text-[#1B1A18]'
+                ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border border-[var(--forest-ink)]'
+                : 'bg-[var(--bg-muted)] text-[var(--text-primary)]'
             }`}
           >
             {isRising ? `▲ +${changePercentage}%` : isDropping ? `▼ ${changePercentage}%` : '~ 0.0% Stabil'}
           </span>
-          <span className="text-[#78716C]">dibanding 7 hari lalu di {selectedRegion.name}</span>
+          <span className="text-[var(--text-secondary)]">dibanding 7 hari lalu di {selectedRegion.name}</span>
         </div>
       </div>
     </div>

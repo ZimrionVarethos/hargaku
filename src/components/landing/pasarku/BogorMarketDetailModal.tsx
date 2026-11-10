@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import {
   ArrowLeft,
   ArrowRight,
@@ -8,11 +9,16 @@ import {
   ChatCircleDots,
   CubeFocus,
   MapPin,
+  MegaphoneSimple,
   Storefront,
+  Train,
   X,
 } from '@phosphor-icons/react';
 import type { BogorMarket, MarketTier } from '@/lib/data/bogor-markets';
+import { computeMarketInsights } from '@/lib/market-insights';
 import { useAssistant } from '@/lib/store/assistant-store';
+import { useLiveCatalog } from '@/lib/store/use-live-catalog';
+import { MarketInsightsPanel } from './MarketInsightsPanel';
 
 interface Props {
   market: BogorMarket | null;
@@ -36,6 +42,7 @@ export function BogorMarketDetailModal({
   onFocus3D,
 }: Props) {
   const { openAssistant } = useAssistant();
+  const { rawCommodities, rawMarkets, dailyPrices, reports } = useLiveCatalog();
 
   const currentIdx = market ? markets.findIndex((m) => m.id === market.id) : -1;
   const hasMultiple = markets.length > 1 && currentIdx !== -1;
@@ -60,7 +67,19 @@ export function BogorMarketDetailModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [market, hasMultiple, currentIdx, markets, onClose, onSelectMarket]);
 
-  if (!market) return null;
+  const insights = useMemo(() => {
+    if (!market) return null;
+    return computeMarketInsights({
+      marketId: market.id,
+      marketName: market.name,
+      commodities: rawCommodities,
+      markets: rawMarkets,
+      dailyPrices,
+      reports,
+    });
+  }, [market, rawCommodities, rawMarkets, dailyPrices, reports]);
+
+  if (!market || !insights) return null;
 
   const tierInfo = TIER_META[market.tier];
 
@@ -71,7 +90,7 @@ export function BogorMarketDetailModal({
   };
 
   const handleAskPunten = () => {
-    const prompt = `Bandingkan harga komoditas pokok serta kondisi acuan di ${market.name} (${market.area}, Kota Bogor) dari Bapanas, PIHPS BI, Perumda PPJ, dan laporan warga.`;
+    const prompt = `Saya mau belanja di ${market.name} (${market.area}). Menurut laporan warga dan pedagang, komoditas apa yang sedang mahal atau stoknya langka, dan bagaimana perbandingannya dengan Bapanas serta PIHPS?`;
     onClose();
     openAssistant(prompt);
   };
@@ -83,11 +102,7 @@ export function BogorMarketDetailModal({
       aria-labelledby="bogorMarketModalTitle"
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
     >
-      <div
-        className="fixed inset-0 bg-[#0A120E]/65 transition-opacity"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 bg-[#0A120E]/65 transition-opacity" onClick={onClose} aria-hidden="true" />
 
       <div className="relative w-full max-w-xl market-card p-5 sm:p-6 z-10 max-h-[90vh] overflow-y-auto space-y-4">
         <div className="flex items-start justify-between gap-3 pb-4 border-b-2 border-[var(--border-ink)]">
@@ -100,16 +115,19 @@ export function BogorMarketDetailModal({
                 <span className={`w-2 h-2 rounded-xs ${tierInfo.dotClass}`} aria-hidden="true" />
                 <span>{tierInfo.label}</span>
               </span>
+              {insights.nearStation && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[var(--accent-chili-soft)] text-[var(--accent-chili)] border border-[var(--accent-chili)] text-[11px] font-bold">
+                  <Train size={12} weight="bold" />
+                  <span>{insights.landmarkNote || 'Dekat Stasiun Bogor'}</span>
+                </span>
+              )}
             </div>
 
             <div className="text-xs font-bold uppercase tracking-wider text-[var(--accent-chili)]">
               {market.highlight}
             </div>
 
-            <h3
-              id="bogorMarketModalTitle"
-              className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] leading-snug"
-            >
+            <h3 id="bogorMarketModalTitle" className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] leading-snug">
               {market.name}
             </h3>
           </div>
@@ -125,7 +143,7 @@ export function BogorMarketDetailModal({
           </button>
         </div>
 
-        <div className="rounded-[14px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] p-4 sm:p-5 space-y-4">
+        <div className="rounded-[14px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] p-4 space-y-3">
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-lg bg-[var(--forest-surface)] border border-[var(--border-ink)] flex items-center justify-center shrink-0 mt-0.5 text-[var(--forest-ink)]">
               <MapPin size={16} weight="bold" aria-hidden="true" />
@@ -134,13 +152,13 @@ export function BogorMarketDetailModal({
               <div className="text-[11px] font-bold uppercase tracking-wide text-[var(--text-muted)]">
                 Lokasi Unit Pasar
               </div>
-              <p className="text-sm font-medium text-[var(--text-primary)] leading-relaxed mt-0.5">
+              <p className="text-xs sm:text-sm font-medium text-[var(--text-primary)] leading-relaxed mt-0.5">
                 {market.address}
               </p>
             </div>
           </div>
 
-          <div className="border-t border-[var(--border-subtle)] pt-3.5 flex items-start gap-3">
+          <div className="border-t border-[var(--border-subtle)] pt-3 flex items-start gap-3">
             <div className="w-8 h-8 rounded-lg bg-[var(--ochre-surface)] border border-[var(--border-ink)] flex items-center justify-center shrink-0 mt-0.5 text-[var(--earth-ochre)]">
               <Storefront size={16} weight="bold" aria-hidden="true" />
             </div>
@@ -148,46 +166,50 @@ export function BogorMarketDetailModal({
               <div className="text-[11px] font-bold uppercase tracking-wide text-[var(--text-muted)]">
                 Profil &amp; Kapasitas Pasar
               </div>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed mt-0.5">
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed mt-0.5">
                 {market.details}
               </p>
             </div>
           </div>
-
-          <div className="border-t border-[var(--border-subtle)] pt-3.5 space-y-2 text-xs">
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="text-[var(--text-muted)] font-medium shrink-0">Pengelola Resmi</span>
-              <span className="ledger-leader" />
-              <span className="font-bold text-[var(--text-primary)] text-right">
-                Perumda Pasar Pakuan Jaya
-              </span>
-            </div>
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="text-[var(--text-muted)] font-medium shrink-0">Koordinat Peta 3D</span>
-              <span className="ledger-leader" />
-              <span className="font-mono-num font-bold text-[var(--forest-ink)] text-right">
-                {market.lat.toFixed(5)}, {market.lng.toFixed(5)}
-              </span>
-            </div>
-          </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
+        <MarketInsightsPanel insight={insights} />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+          <Link
+            href={`/cek-harga?market=${insights.marketId}`}
+            onClick={onClose}
+            className="market-btn-primary min-h-[42px] px-4 py-2 text-xs font-bold inline-flex items-center justify-center gap-2 no-underline"
+          >
+            <span>Cek Harga di Pasar Ini</span>
+          </Link>
+
+          <Link
+            href={`/lapor?market=${insights.marketId}`}
+            onClick={onClose}
+            className="market-btn-secondary min-h-[42px] px-4 py-2 text-xs font-bold inline-flex items-center justify-center gap-2 no-underline"
+          >
+            <MegaphoneSimple size={15} weight="bold" />
+            <span>Lapor Harga / Kelangkaan</span>
+          </Link>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={handleAskPunten}
-            className="market-btn-primary flex-1 min-h-[44px] px-4 py-2.5 text-xs sm:text-sm inline-flex items-center justify-center gap-2"
+            className="market-btn-secondary flex-1 min-h-[38px] px-3 py-1.5 text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            <ChatCircleDots size={16} weight="bold" aria-hidden="true" />
+            <ChatCircleDots size={15} weight="bold" />
             <span>Tanya PUNTEN</span>
           </button>
 
           <button
             type="button"
             onClick={() => onFocus3D(market.id)}
-            className="market-btn-secondary min-h-[44px] px-3.5 py-2.5 text-xs font-bold inline-flex items-center justify-center gap-1.5"
+            className="market-btn-secondary min-h-[38px] px-3 py-1.5 text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            <CubeFocus size={15} weight="bold" aria-hidden="true" />
+            <CubeFocus size={15} weight="bold" />
             <span>Fokus 3D</span>
           </button>
 
@@ -195,10 +217,10 @@ export function BogorMarketDetailModal({
             href={market.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="market-btn-secondary min-h-[44px] px-3.5 py-2.5 text-xs font-bold text-[var(--accent-chili)] inline-flex items-center justify-center gap-1.5 no-underline"
+            className="market-btn-secondary min-h-[38px] px-3 py-1.5 text-xs font-bold text-[var(--accent-chili)] inline-flex items-center justify-center gap-1 no-underline"
           >
-            <span>Info Resmi PPJ</span>
-            <ArrowSquareOut size={14} weight="bold" aria-hidden="true" />
+            <span>Info PPJ</span>
+            <ArrowSquareOut size={13} weight="bold" />
           </a>
         </div>
 
@@ -207,9 +229,9 @@ export function BogorMarketDetailModal({
             <button
               type="button"
               onClick={() => handleStep(-1)}
-              className="market-btn-secondary min-h-[38px] px-3 py-1.5 text-xs font-bold inline-flex items-center gap-1.5"
+              className="market-btn-secondary min-h-[36px] px-3 py-1.5 text-xs font-bold inline-flex items-center gap-1.5"
             >
-              <ArrowLeft size={13} weight="bold" aria-hidden="true" />
+              <ArrowLeft size={13} weight="bold" />
               <span>Unit Sebelumnya</span>
             </button>
 
@@ -220,10 +242,10 @@ export function BogorMarketDetailModal({
             <button
               type="button"
               onClick={() => handleStep(1)}
-              className="market-btn-secondary min-h-[38px] px-3 py-1.5 text-xs font-bold inline-flex items-center gap-1.5"
+              className="market-btn-secondary min-h-[36px] px-3 py-1.5 text-xs font-bold inline-flex items-center gap-1.5"
             >
               <span>Unit Berikutnya</span>
-              <ArrowRight size={13} weight="bold" aria-hidden="true" />
+              <ArrowRight size={13} weight="bold" />
             </button>
           </div>
         )}

@@ -2,16 +2,24 @@ import { AssistantPromptPreset } from '@/types/assistant';
 
 export const DEFAULT_PROMPT_PRESETS: AssistantPromptPreset[] = [
   {
-    id: 'p1',
-    label: 'Bandingkan Cabai Rawit 4 Sumber',
+    id: 'p0',
+    label: 'Apa yang Mahal Dekat Stasiun Bogor?',
     prompt:
-      'Bandingkan harga Cabai Rawit Merah di Panel Bapanas, PIHPS BI, pasar rakyat, dan laporan warga. Sumber mana yang paling tepat jadi patokan?',
+      'Saya mau ke pasar dekat Stasiun Bogor hari ini. Menurut laporan warga dan pedagang, komoditas apa yang sedang mahal atau stoknya terbatas?',
+    category: 'compare',
+  },
+  {
+    id: 'p1',
+    label: 'Bandingkan Cabai Rawit Nasional vs Bogor',
+    prompt:
+      'Bandingkan harga Cabai Rawit Merah di Acuan Nasional Bapanas, PIHPS daerah Bogor, pasar rakyat, dan laporan warga.',
     category: 'compare',
   },
   {
     id: 'p2',
     label: 'Cabai Rawit 25rb / 250g Wajar?',
-    prompt: 'Tadi pedagang nawarin cabai rawit merah 25 ribu seperempat kilo, wajar gak dibanding acuan resmi?',
+    prompt:
+      'Tadi pedagang nawarin cabai rawit merah 25 ribu seperempat kilo, wajar gak dibanding acuan nasional dan lokal?',
     category: 'price-check',
   },
   {
@@ -22,8 +30,9 @@ export const DEFAULT_PROMPT_PRESETS: AssistantPromptPreset[] = [
   },
   {
     id: 'p4',
-    label: 'Bapanas vs PIHPS vs Laporan Warga',
-    prompt: 'Apa bedanya acuan HAP Bapanas, survei PIHPS BI, data Perumda PPJ, dan laporan warga untuk cek harga wajar?',
+    label: 'Peran PasarKu vs PIHPS BI',
+    prompt:
+      'Bagaimana peran PasarKu melengkapi PIHPS BI dan Panel Harga Bapanas saat saya belanja di lapak?',
     category: 'general',
   },
 ];

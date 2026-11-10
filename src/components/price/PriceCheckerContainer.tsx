@@ -3,6 +3,8 @@
 import { useState, useMemo, useEffect, useCallback, type FormEvent } from 'react';
 import { CommoditySummary, Market, PriceCheckResult } from '@/types';
 import { submitPriceCheck } from '@/lib/api/price-check.api';
+import { filterMarketsForRegion } from '@/lib/mock/markets.data';
+import { resolveCanonicalMarket } from '@/lib/market-insights';
 import { useRegion } from '@/lib/store/region-store';
 import { useLiveCatalog } from '@/lib/store/use-live-catalog';
 import { PriceCheckForm, TAKARAN_UNITS } from './PriceCheckForm';
@@ -29,21 +31,21 @@ export function PriceCheckerContainer({
   const currentCommodities =
     liveCommodities.length > 0 ? liveCommodities : initialCommodities;
 
-  const [selectedCommodityId, setSelectedCommodityId] = useState<string>(
-    () => {
-      if (initialCommoditySlug) {
-        const found = initialCommodities.find((c) => c.slug === initialCommoditySlug);
-        if (found) return found.id;
-      }
-      const cabaiRawit = initialCommodities.find((c) => c.slug === 'cabai-rawit-merah');
-      return cabaiRawit ? cabaiRawit.id : initialCommodities[0]?.id || '';
+  const [selectedCommodityId, setSelectedCommodityId] = useState<string>(() => {
+    if (initialCommoditySlug) {
+      const found = initialCommodities.find(
+        (c) => c.slug === initialCommoditySlug || c.id === initialCommoditySlug
+      );
+      if (found) return found.id;
     }
-  );
+    const cabaiRawit = initialCommodities.find((c) => c.slug === 'cabai-rawit-merah');
+    return cabaiRawit ? cabaiRawit.id : initialCommodities[0]?.id || '';
+  });
 
   const liveRegionMarkets = useMemo(() => {
-    const filtered = liveMarkets.filter((m) => m.regionId === selectedRegion.id);
-    return filtered.length > 0 ? filtered : liveMarkets;
-  }, [liveMarkets, selectedRegion.id]);
+    const source = liveMarkets.length > 0 ? liveMarkets : initialMarkets;
+    return filterMarketsForRegion(source, selectedRegion.id);
+  }, [liveMarkets, initialMarkets, selectedRegion.id]);
 
   const activeMarkets =
     liveRegionMarkets.length > 0
@@ -54,15 +56,23 @@ export function PriceCheckerContainer({
 
   const [takaranAmount, setTakaranAmount] = useState<number>(2);
   const [selectedUnitId, setSelectedUnitId] = useState<string>('ons');
-  const [selectedMarketId, setSelectedMarketId] = useState<string>(
-    () => initialMarketId || activeMarkets[0]?.id || ''
-  );
+  const [selectedMarketId, setSelectedMarketId] = useState<string>(() => {
+    const resolved = resolveCanonicalMarket(activeMarkets, initialMarketId);
+    return resolved?.id || activeMarkets[0]?.id || '';
+  });
 
   useEffect(() => {
+    if (initialMarketId) {
+      const resolved = resolveCanonicalMarket(activeMarkets, initialMarketId);
+      if (resolved) {
+        setSelectedMarketId(resolved.id);
+        return;
+      }
+    }
     if (activeMarkets.length > 0 && !activeMarkets.some((m) => m.id === selectedMarketId)) {
       setSelectedMarketId(activeMarkets[0].id);
     }
-  }, [activeMarkets, selectedMarketId]);
+  }, [activeMarkets, selectedMarketId, initialMarketId]);
 
   const [rawPriceInput, setRawPriceInput] = useState<string>('Rp 15.000');
   const [loading, setLoading] = useState<boolean>(false);
@@ -89,7 +99,10 @@ export function PriceCheckerContainer({
   }, [currentCommodities, selectedCommodityId]);
 
   const selectedMarket = useMemo(() => {
-    return activeMarkets.find((m) => m.id === selectedMarketId) || initialMarkets.find((m) => m.id === selectedMarketId);
+    return (
+      activeMarkets.find((m) => m.id === selectedMarketId) ||
+      initialMarkets.find((m) => m.id === selectedMarketId)
+    );
   }, [activeMarkets, initialMarkets, selectedMarketId]);
 
   const handlePriceChange = (val: string) => {
@@ -110,13 +123,24 @@ export function PriceCheckerContainer({
         marketId: selectedMarketId,
         regionSlug: selectedRegion.slug,
         offeredPrice: normalizedPricePerKg,
+        quantity: takaranAmount,
+        unitId: selectedUnitId,
+        offeredTotalPrice: numericRawPrice,
       });
       setResult(res);
     } catch {
     } finally {
       setLoading(false);
     }
-  }, [selectedCommodityId, normalizedPricePerKg, selectedMarketId, selectedRegion.slug]);
+  }, [
+    selectedCommodityId,
+    normalizedPricePerKg,
+    selectedMarketId,
+    selectedRegion.slug,
+    takaranAmount,
+    selectedUnitId,
+    numericRawPrice,
+  ]);
 
   useEffect(() => {
     void executeEvaluation();
@@ -132,7 +156,7 @@ export function PriceCheckerContainer({
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         <PriceCheckForm
           commodities={currentCommodities}
           markets={activeMarkets}
@@ -147,6 +171,7 @@ export function PriceCheckerContainer({
           rawPriceInput={rawPriceInput}
           onPriceInputChange={handlePriceChange}
           normalizedPricePerKg={normalizedPricePerKg}
+          standardUnit={selectedCommodity?.unit || 'kg'}
           onSubmit={handleSubmit}
           loading={loading}
         />
@@ -161,7 +186,7 @@ export function PriceCheckerContainer({
             rawPriceInput={rawPriceInput}
           />
         ) : loading ? (
-          <div className="bg-white rounded-[18px] outline outline-1 outline-[#E5E3DE] p-6 sm:p-7 shadow-xs flex items-center justify-center text-[#8C8B85] text-[13px]">
+          <div className="market-card bg-[var(--bg-card)] p-6 sm:p-7 flex items-center justify-center text-[var(--text-muted)] text-[13px] min-h-[260px]">
             Memuat hasil evaluasi kewajaran...
           </div>
         ) : (

@@ -24,16 +24,16 @@ export default async function CommodityDetailPage({ params }: Props) {
       <div className="max-w-[1240px] mx-auto space-y-8">
         <CommodityBreadcrumb commodityName={commodity.name} />
 
-        <CommodityHeroHeader detail={commodity} changePercentage={8.5} />
+        <CommodityHeroHeader detail={commodity} changePercentage={2.8} />
 
         <ThreeLayerPriceCards detail={commodity} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           <PriceFluctuationChartCard detail={commodity} />
-          <MarketComparisonCard />
+          <MarketComparisonCard detail={commodity} />
         </div>
 
-        <RecentCitizenReportsTable />
+        <RecentCitizenReportsTable detail={commodity} />
       </div>
     </div>
   );

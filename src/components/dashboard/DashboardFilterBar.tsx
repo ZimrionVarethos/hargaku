@@ -36,8 +36,8 @@ interface Props {
   markets?: Array<{ id: string; name: string }>;
 }
 
-const CATEGORIES: Array<{ id: DashboardCategoryFilter; label: string }> = [
-  { id: 'ALL', label: 'Semua (12)' },
+const CATEGORY_OPTIONS: Array<{ id: DashboardCategoryFilter; label: string }> = [
+  { id: 'ALL', label: 'Semua' },
   { id: 'BERAS', label: 'Beras' },
   { id: 'DAGING_TELUR', label: 'Protein & Daging' },
   { id: 'CABAI_BAWANG', label: 'Bumbu & Cabai' },
@@ -56,8 +56,12 @@ export function DashboardFilterBar({
   onToggleLightMode,
   selectedCategory,
   onCategoryChange,
+  totalCount,
   markets = [],
 }: Props) {
+  const categories = CATEGORY_OPTIONS.map((c) =>
+    c.id === 'ALL' ? { ...c, label: `Semua (${totalCount})` } : c
+  );
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
@@ -149,7 +153,7 @@ export function DashboardFilterBar({
       </div>
 
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-        {CATEGORIES.map((cat) => {
+        {categories.map((cat) => {
           const isActive = selectedCategory === cat.id;
           return (
             <button

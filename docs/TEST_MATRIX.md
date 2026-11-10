@@ -30,6 +30,8 @@ Fungsi kalkulator kewajaran harga (`/api/v1/price-check`) wajib lulus skenario u
 | **TC-LR-03** | Upload file bukan gambar (misal `.pdf` atau `.exe`) | Pilih file ekstensi dilarang | Form menolak sebelum upload, HTTP 422 jika bypass. |
 | **TC-LR-04** | Spam laporan beruntun dari IP yang sama | Mengirim > 10 laporan dalam 1 menit | Terkena rate limit: HTTP 429 Too Many Requests. |
 | **TC-LR-05** | Harga tidak masuk akal (Outlier ekstrem) | Melaporkan beras Rp 1 / kg atau Rp 10.000.000 | Validasi form memblokir: *"Harga di luar rentang wajar"*. |
+| **TC-LR-06** | Pedagang lapor kelangkaan komoditas | Memilih mode Pedagang, pasar & komoditas, status `LANGKA` / `TERBATAS` | Tersimpan dengan `reportType = 'SHORTAGE'`, `reporterRole = 'PEDAGANG'`, siap dimoderasi & tampil anonim di info pasar setelah `APPROVED`. |
+| **TC-MI-01** | Agregasi laporan pasar dekat Stasiun Bogor | Memilih/klik Pasar Kebon Kembang (Pasar Anyar) / Devries / Merdeka | Info pasar menampilkan komoditas yang sedang mahal menurut laporan warga terverifikasi & peringatan kelangkaan pedagang di pasar tersebut. |
 
 ---
 

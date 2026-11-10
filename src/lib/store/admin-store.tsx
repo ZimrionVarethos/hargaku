@@ -50,7 +50,7 @@ interface AdminStoreContextType {
   resetToDefaultData: () => void;
 }
 
-const STORAGE_KEY = 'hargaku_admin_store_v3';
+const STORAGE_KEY = 'hargaku_admin_store_v4';
 
 const AdminStoreContext = createContext<AdminStoreContextType | null>(null);
 
@@ -86,20 +86,23 @@ export function AdminStoreProvider({ children }: { children: ReactNode }) {
     try {
       const saved =
         localStorage.getItem(STORAGE_KEY) ||
+        localStorage.getItem('hargaku_admin_store_v3') ||
         localStorage.getItem('hargaku_admin_store_v2') ||
         localStorage.getItem('hargaku_admin_store_v1');
 
       if (saved) {
         const parsed = JSON.parse(saved) as AdminState;
         if (parsed && Array.isArray(parsed.commodities) && Array.isArray(parsed.markets)) {
-          const isOldBogorOnly = parsed.markets.length <= 5;
+          const isStaleCatalog =
+            parsed.markets.length <= 5 || !parsed.markets.some((m) => m.id === 'mkt_devries');
           dispatch({
             type: 'SET_STATE',
             payload: {
               ...INITIAL_ADMIN_STATE,
               ...parsed,
-              markets: isOldBogorOnly ? INITIAL_ADMIN_STATE.markets : parsed.markets,
-              dailyPrices: isOldBogorOnly
+              markets: isStaleCatalog ? INITIAL_ADMIN_STATE.markets : parsed.markets,
+              reports: isStaleCatalog ? INITIAL_ADMIN_STATE.reports : parsed.reports,
+              dailyPrices: isStaleCatalog
                 ? { ...INITIAL_ADMIN_STATE.dailyPrices, ...parsed.dailyPrices }
                 : parsed.dailyPrices,
             },
@@ -108,6 +111,7 @@ export function AdminStoreProvider({ children }: { children: ReactNode }) {
       }
       localStorage.removeItem('hargaku_admin_store_v1');
       localStorage.removeItem('hargaku_admin_store_v2');
+      localStorage.removeItem('hargaku_admin_store_v3');
     } catch {
     }
 

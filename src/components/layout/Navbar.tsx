@@ -7,11 +7,12 @@ import { usePathname } from 'next/navigation';
 import { ChatCircleDots, Moon, Sun } from '@phosphor-icons/react';
 import { useAssistant } from '@/lib/store/assistant-store';
 import { useTheme } from '@/lib/store/theme-store';
+import { RegionPhaseSwitcher } from './RegionPhaseSwitcher';
 
 const NAV_LINKS = [
   { href: '/#heroSection', label: 'Lorong Pasar' },
   { href: '/#sorotanSection', label: 'Papan Pokok' },
-  { href: '/#unitPasarSection', label: '13 Unit Pasar' },
+  { href: '/#unitPasarSection', label: 'Unit Pasar' },
   { href: '/cek-harga', label: 'Cek Harga' },
   { href: '/peta', label: 'Peta' },
   { href: '/lapor', label: 'Lapor' },
@@ -35,23 +36,24 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 bg-[var(--bg-paper)]/95 backdrop-blur-xs border-b-2 border-[var(--border-ink)] transition-colors">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-[60px] sm:h-[64px] flex items-center justify-between gap-2 sm:gap-3">
-
-        <Link href="/" className="flex items-center gap-2 sm:gap-2.5 no-underline shrink-0">
-          <span className="pasarku-logo-plaque">
-            <Image
-              src="/images/pasarku/logo-nav.webp"
-              alt="Logo PasarKu"
-              width={400}
-              height={173}
-              unoptimized
-              priority
-              className="h-7 sm:h-8 w-auto object-contain"
-            />
-          </span>
-          <span className="hidden sm:inline-block text-xs font-bold px-2 py-0.5 rounded bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-ink)]">
-            Kota Bogor
-          </span>
-        </Link>
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          <Link href="/" className="flex items-center no-underline shrink-0">
+            <span className="pasarku-logo-plaque">
+              <Image
+                src="/images/pasarku/logo-nav.webp"
+                alt="Logo PasarKu"
+                width={400}
+                height={173}
+                unoptimized
+                priority
+                className="h-7 sm:h-8 w-auto object-contain"
+              />
+            </span>
+          </Link>
+          <div className="hidden sm:block">
+            <RegionPhaseSwitcher />
+          </div>
+        </div>
 
         <nav aria-label="Navigasi Utama" className="hidden xl:flex items-center gap-1">
           {NAV_LINKS.map((link) => {
@@ -60,10 +62,11 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${isActive
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                  isActive
                     ? 'text-[var(--accent-chili)] hover:bg-[var(--bg-muted)]'
                     : 'text-[var(--text-primary)] hover:bg-[var(--bg-muted)]'
-                  }`}
+                }`}
               >
                 {link.label}
               </Link>
@@ -123,21 +126,25 @@ export function Navbar() {
             </svg>
           </button>
         </div>
-
       </div>
 
       {mobileOpen && (
-        <div className="xl:hidden border-t-2 border-[var(--border-ink)] bg-[var(--bg-paper)] px-4 py-3 space-y-1">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="block px-3 py-2 rounded-lg text-sm font-bold text-[var(--text-primary)] hover:bg-[var(--bg-muted)]"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="xl:hidden border-t-2 border-[var(--border-ink)] bg-[var(--bg-paper)] px-4 py-3 space-y-2">
+          <div className="sm:hidden pb-2 border-b border-[var(--border-subtle)]">
+            <RegionPhaseSwitcher compact />
+          </div>
+          <div className="space-y-1">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className="block px-3 py-2 rounded-lg text-sm font-bold text-[var(--text-primary)] hover:bg-[var(--bg-muted)]"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </header>

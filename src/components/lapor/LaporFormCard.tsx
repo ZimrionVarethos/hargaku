@@ -1,35 +1,35 @@
 'use client';
 
-import { useState, useId } from 'react';
-import { CaretDown, Check } from '@phosphor-icons/react';
-import { CommoditySummary, Market } from '@/types';
-import { formatRupiah } from '@/lib/utils';
+import { useState, useId, useEffect } from 'react';
+import { CaretDown, Check, Package, Tag } from '@phosphor-icons/react';
+import { CommoditySummary, Market, ReportType, ReporterRole, StockStatus } from '@/types';
+import { resolveCanonicalMarket } from '@/lib/market-insights';
 import { LaporPhotoUpload } from './LaporPhotoUpload';
-
-export interface TakaranUnitOption {
-  label: string;
-  ratioToKg: number;
-}
-
-export const TAKARAN_UNITS: TakaranUnitOption[] = [
-  { label: '1 kg', ratioToKg: 1.0 },
-  { label: '1/2 kg', ratioToKg: 0.5 },
-  { label: '1/4 kg (2.5 ons)', ratioToKg: 0.25 },
-  { label: '1 ons (100g)', ratioToKg: 0.1 },
-  { label: '1 liter', ratioToKg: 1.0 },
-  { label: '1 ikat / butir', ratioToKg: 1.0 },
-];
+import {
+  LaporPriceInputGroup,
+  LaporShortageSelector,
+  TAKARAN_UNITS,
+  type TakaranUnitOption,
+} from './LaporModeFields';
 
 interface Props {
   commodities: CommoditySummary[];
   markets: Market[];
   isSubmitting: boolean;
+  initialCommoditySlug?: string;
+  initialMarketId?: string;
+  initialPrice?: string;
+  initialMode?: ReportType;
   onSubmit: (data: {
     commodityId: string;
     marketId: string;
     price: number;
+    quantity: number;
     unit: string;
     normalizedPrice: number;
+    reportType: ReportType;
+    reporterRole: ReporterRole;
+    stockStatus?: StockStatus;
     purchaseDate: string;
     photoFile: File | null;
     notes: string;
@@ -40,55 +40,111 @@ export function LaporFormCard({
   commodities,
   markets,
   isSubmitting,
+  initialCommoditySlug,
+  initialMarketId,
+  initialPrice,
+  initialMode = 'PRICE',
   onSubmit,
 }: Props) {
-  const [selectedCommodityId, setSelectedCommodityId] = useState(
-    commodities[0]?.id || 'cabai-rawit-merah'
+  const [reportType, setReportType] = useState<ReportType>(initialMode);
+  const [selectedCommodityId, setSelectedCommodityId] = useState<string>(() => {
+    if (initialCommoditySlug) {
+      const found = commodities.find(
+        (c) => c.slug === initialCommoditySlug || c.id === initialCommoditySlug
+      );
+      if (found) return found.id;
+    }
+    return commodities[0]?.id || 'cabai-rawit-merah';
+  });
+  const [selectedMarketId, setSelectedMarketId] = useState<string>(() => {
+    const found = resolveCanonicalMarket(markets, initialMarketId);
+    return found?.id || markets[0]?.id || 'mkt_kebon_kembang';
+  });
+  const [quantity, setQuantity] = useState<number>(1);
+  const [priceInput, setPriceInput] = useState<string>(initialPrice || '15000');
+  const [selectedUnit, setSelectedUnit] = useState<TakaranUnitOption>(
+    initialPrice ? TAKARAN_UNITS[0] : TAKARAN_UNITS[2]
   );
-  const [selectedMarketId, setSelectedMarketId] = useState(
-    markets[0]?.id || 'mkt_pasar_anyar'
-  );
-  const [priceInput, setPriceInput] = useState<string>('15000');
-  const [selectedUnit, setSelectedUnit] = useState<TakaranUnitOption>(TAKARAN_UNITS[2]);
-  const [purchaseDate] = useState<'today' | 'yesterday'>('today');
+  const [stockStatus, setStockStatus] = useState<StockStatus>('TERBATAS');
   const [notes, setNotes] = useState<string>('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
+  useEffect(() => {
+    if (markets.length > 0 && !markets.some((m) => m.id === selectedMarketId)) {
+      const resolved = resolveCanonicalMarket(markets, initialMarketId);
+      setSelectedMarketId(resolved?.id || markets[0].id);
+    }
+  }, [markets, selectedMarketId, initialMarketId]);
+
   const fileInputId = useId();
   const rawPrice = parseInt(priceInput.replace(/\D/g, ''), 10) || 0;
-  const normalizedPrice = Math.round(rawPrice / selectedUnit.ratioToKg);
+  const totalUnitRatio = Math.max(0.05, quantity * selectedUnit.ratioToKg);
+  const normalizedPrice = Math.round(rawPrice / totalUnitRatio);
+  const isShortage = reportType === 'SHORTAGE';
+  const canSubmit = isShortage
+    ? !isSubmitting && (notes.trim().length >= 5 || rawPrice >= 0)
+    : !isSubmitting && rawPrice > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (rawPrice <= 0) return;
-    const now = new Date();
-    if (purchaseDate === 'yesterday') {
-      now.setDate(now.getDate() - 1);
-    }
+    if (!canSubmit) return;
     onSubmit({
       commodityId: selectedCommodityId,
       marketId: selectedMarketId,
-      price: rawPrice,
-      unit: selectedUnit.label,
-      normalizedPrice,
-      purchaseDate: now.toISOString(),
+      price: isShortage ? Math.max(0, rawPrice) : rawPrice,
+      quantity,
+      unit: quantity > 1 ? `${quantity} x ${selectedUnit.label}` : selectedUnit.label,
+      normalizedPrice: isShortage ? 0 : normalizedPrice,
+      reportType,
+      reporterRole: isShortage ? 'PEDAGANG' : 'WARGA',
+      stockStatus: isShortage ? stockStatus : undefined,
+      purchaseDate: new Date().toISOString(),
       photoFile,
       notes,
     });
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="market-card p-6 sm:p-8 flex flex-col gap-6"
-    >
-      <div>
-        <h2 className="text-[18px] sm:text-[20px] font-bold text-[var(--text-primary)] tracking-tight">
-          Formulir Laporan Harga Lapak
-        </h2>
-        <p className="text-[12px] sm:text-[13px] text-[var(--text-secondary)] mt-1">
-          Laporan Anda akan divalidasi dengan acuan resmi sebelum dipublikasikan ke peta transparansi.
-        </p>
+    <form onSubmit={handleSubmit} className="market-card p-6 sm:p-8 flex flex-col gap-5">
+      <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-ink)]">
+          <button
+            type="button"
+            onClick={() => setReportType('PRICE')}
+            className={`py-2 px-3 rounded-lg text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+              !isShortage
+                ? 'bg-[var(--bg-card)] text-[var(--text-primary)] border border-[var(--border-ink)] shadow-xs'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            <Tag size={14} weight="bold" className="text-[var(--accent-chili)]" />
+            <span>Warga &bull; Lapor Harga</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setReportType('SHORTAGE')}
+            className={`py-2 px-3 rounded-lg text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+              isShortage
+                ? 'bg-[var(--bg-card)] text-[var(--text-primary)] border border-[var(--border-ink)] shadow-xs'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            <Package size={14} weight="bold" className="text-[var(--earth-ochre)]" />
+            <span>Pedagang &bull; Kelangkaan</span>
+          </button>
+        </div>
+
+        <div>
+          <h2 className="text-[18px] sm:text-[20px] font-bold text-[var(--text-primary)] tracking-tight">
+            {isShortage ? 'Laporan Kelangkaan Pasokan (Pedagang)' : 'Laporan Harga Tidak Wajar (Warga)'}
+          </h2>
+          <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">
+            {isShortage
+              ? 'Identitas lapak dan nama pedagang tidak pernah disimpan. Informasi hanya muncul sebagai status pasokan pasar.'
+              : 'Bantu pembeli lain mengetahui harga wajar di pasar tujuan lewat catatan lapak Anda.'}
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -98,7 +154,7 @@ export function LaporFormCard({
             <select
               value={selectedCommodityId}
               onChange={(e) => setSelectedCommodityId(e.target.value)}
-              className="w-full appearance-none py-2.5 px-3.5 pr-9 rounded-lg bg-[var(--bg-card)] border border-[var(--border-ink)] text-[13px] font-semibold text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-chili)]"
+              className="w-full appearance-none py-2.5 px-3.5 pr-9 rounded-lg bg-[var(--bg-card)] border border-[var(--border-ink)] text-[13px] font-semibold text-[var(--text-primary)]"
             >
               {commodities.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -116,11 +172,11 @@ export function LaporFormCard({
             <select
               value={selectedMarketId}
               onChange={(e) => setSelectedMarketId(e.target.value)}
-              className="w-full appearance-none py-2.5 px-3.5 pr-9 rounded-lg bg-[var(--bg-card)] border border-[var(--border-ink)] text-[13px] font-semibold text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-chili)]"
+              className="w-full appearance-none py-2.5 px-3.5 pr-9 rounded-lg bg-[var(--bg-card)] border border-[var(--border-ink)] text-[13px] font-semibold text-[var(--text-primary)]"
             >
               {markets.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.name} ({m.district})
+                  {m.name} ({m.district}){m.nearStation ? ' [Dekat Stasiun]' : ''}
                 </option>
               ))}
             </select>
@@ -129,81 +185,55 @@ export function LaporFormCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-        <div className="sm:col-span-7 flex flex-col gap-2">
-          <label className="text-[12px] font-bold text-[var(--text-primary)]">Nominal yang Dibayar &amp; Takaran</label>
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] font-bold text-[var(--text-muted)]">Rp</span>
-              <input
-                type="text"
-                value={priceInput}
-                onChange={(e) => setPriceInput(e.target.value)}
-                placeholder="15.000"
-                className="w-full py-2.5 pl-10 pr-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-ink)] text-[15px] font-extrabold text-[var(--forest-ink)] tabular-nums font-mono-num focus:ring-2 focus:ring-[var(--accent-chili)]"
-              />
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {TAKARAN_UNITS.map((u) => {
-              const isSelected = selectedUnit.label === u.label;
-              return (
-                <button
-                  key={u.label}
-                  type="button"
-                  onClick={() => setSelectedUnit(u)}
-                  className={`py-1 px-2.5 rounded-lg text-[11px] font-bold transition-colors ${
-                    isSelected
-                      ? 'market-btn-primary'
-                      : 'market-btn-secondary'
-                  }`}
-                >
-                  {u.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+      {isShortage ? (
+        <LaporShortageSelector stockStatus={stockStatus} onChange={setStockStatus} />
+      ) : (
+        <LaporPriceInputGroup
+          quantity={quantity}
+          onQuantityChange={setQuantity}
+          priceInput={priceInput}
+          onPriceChange={setPriceInput}
+          selectedUnit={selectedUnit}
+          onUnitChange={setSelectedUnit}
+          normalizedPrice={normalizedPrice}
+        />
+      )}
 
-        <div className="sm:col-span-5 p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-subtle)] flex flex-col justify-center">
-          <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
-            Konversi Standar Pangan
-          </span>
-          <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="text-[16px] font-extrabold text-[var(--forest-ink)] tabular-nums font-mono-num">
-              {formatRupiah(normalizedPrice)}
-            </span>
-            <span className="text-[11px] text-[var(--text-muted)]">/ kg</span>
-          </div>
-        </div>
-      </div>
-
-      <LaporPhotoUpload
-        photoFile={photoFile}
-        setPhotoFile={setPhotoFile}
-        fileInputId={fileInputId}
-      />
+      <LaporPhotoUpload photoFile={photoFile} setPhotoFile={setPhotoFile} fileInputId={fileInputId} />
 
       <div className="flex flex-col gap-1.5">
         <label className="text-[12px] font-bold text-[var(--text-primary)]">
-          Catatan Tambahan <span className="font-normal text-[var(--text-muted)]">(Opsional)</span>
+          {isShortage ? 'Keterangan Kendala Pasokan' : 'Catatan Kondisi Lapak'}{' '}
+          <span className="font-normal text-[var(--text-muted)]">
+            ({isShortage ? 'Tanpa menyebut nama kios' : 'Opsional'})
+          </span>
         </label>
         <textarea
           rows={2}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Contoh: Kios Bu Siti dekat pintu timur, kualitas bagus dan segar."
-          className="w-full p-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-ink)] text-[12px] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:ring-2 focus:ring-[var(--accent-chili)]"
+          placeholder={
+            isShortage
+              ? 'Contoh: Kiriman distributor dari sentra produksi terlambat karena cuaca, stok tinggal sedikit.'
+              : 'Contoh: Kualitas barang segar atau kenaikan terasa di blok sayuran sejak pagi.'
+          }
+          className="w-full p-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-ink)] text-[12px] text-[var(--text-primary)] placeholder-[var(--text-muted)]"
         />
       </div>
 
       <button
         type="submit"
-        disabled={isSubmitting || rawPrice <= 0}
-        className="market-btn-primary w-full py-3 text-[13px] font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+        disabled={!canSubmit}
+        className="market-btn-primary w-full py-3 text-[13px] font-bold flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
       >
         <Check size={16} weight="bold" />
-        <span>{isSubmitting ? 'Mengirim Laporan...' : 'Kirim Laporan Harga Lapak'}</span>
+        <span>
+          {isSubmitting
+            ? 'Mengirim Laporan...'
+            : isShortage
+            ? 'Kirim Laporan Kelangkaan Anonim'
+            : 'Kirim Laporan Harga Warga'}
+        </span>
       </button>
     </form>
   );

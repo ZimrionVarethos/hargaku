@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useMemo, useRef } from 'react';
-import { MapPin } from '@phosphor-icons/react';
+import { MapPin, Train } from '@phosphor-icons/react';
 import { BOGOR_MARKETS } from '@/lib/data/bogor-markets';
+import { computeMarketInsights } from '@/lib/market-insights';
+import { useLiveCatalog } from '@/lib/store/use-live-catalog';
 import { Bogor3DMapCanvas } from './Bogor3DMapCanvas';
 import { BogorMarketDetailModal } from './BogorMarketDetailModal';
 
@@ -22,6 +24,23 @@ export function PasarKuUnitPasarSection() {
   const [modalMarketId, setModalMarketId] = useState<string | null>(null);
   const [flyRequestSeq, setFlyRequestSeq] = useState<number>(0);
   const mapWrapperRef = useRef<HTMLDivElement>(null);
+  const { rawCommodities, rawMarkets, dailyPrices, reports } = useLiveCatalog();
+
+  const alertCountsByMarket = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const m of BOGOR_MARKETS) {
+      const ins = computeMarketInsights({
+        marketId: m.id,
+        marketName: m.name,
+        commodities: rawCommodities,
+        markets: rawMarkets,
+        dailyPrices,
+        reports,
+      });
+      counts.set(m.id, ins.expensiveItems.length + ins.shortageAlerts.length);
+    }
+    return counts;
+  }, [rawCommodities, rawMarkets, dailyPrices, reports]);
 
   const visibleMarkets = useMemo(() => {
     if (selectedArea === 'SEMUA') return BOGOR_MARKETS;
@@ -67,13 +86,13 @@ export function PasarKuUnitPasarSection() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <div className="inline-block px-3 py-1 rounded-full text-xs font-bold border border-[var(--border-ink)] bg-[var(--bg-muted)] text-[var(--accent-chili)] mb-2">
-              PETA 3D &amp; JARINGAN DISTRIBUSI RESMI
+              PETA 3D &amp; LAPORAN PER PASAR
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
               Peta 3D 13 Unit Pasar Rakyat
             </h2>
             <p className="text-sm text-[var(--text-secondary)] mt-1">
-              Klik langsung pin unit atau bangunan pasar 3D pada peta untuk menerbangkan kamera sekaligus membuka popup rincian lengkap tiap pasar Perumda PPJ Kota Bogor.
+              Klik unit pasar di peta atau daftar cepat untuk melihat laporan barang yang sedang mahal, kelangkaan stok pedagang, dan posisi pasar dekat Stasiun Bogor.
             </p>
           </div>
 
@@ -114,19 +133,20 @@ export function PasarKuUnitPasarSection() {
           <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
             <span className="inline-flex items-center gap-1.5 font-medium">
               <MapPin size={14} weight="bold" className="text-[var(--accent-chili)]" aria-hidden="true" />
-              <span>Indeks Cepat ({visibleMarkets.length} Unit): klik untuk buka popup detail pasar</span>
+              <span>Indeks Cepat ({visibleMarkets.length} Unit): klik untuk melihat temuan harga &amp; stok tiap pasar</span>
             </span>
           </div>
 
           <div className="flex items-center gap-2 overflow-x-auto md:overflow-visible md:flex-wrap pb-1.5">
             {visibleMarkets.map((market) => {
               const isSelected = market.id === activeMarketId;
+              const alertsCount = alertCountsByMarket.get(market.id) || 0;
               return (
                 <button
                   key={market.id}
                   type="button"
                   onClick={() => handleOpenMarketPopup(market.id)}
-                  className={`min-h-[40px] px-3 py-1.5 rounded-xl border-2 border-[var(--border-ink)] text-xs font-bold whitespace-nowrap shrink-0 inline-flex items-center gap-2 transition-all ${
+                  className={`min-h-[40px] px-3 py-1.5 rounded-xl border-2 border-[var(--border-ink)] text-xs font-bold whitespace-nowrap shrink-0 inline-flex items-center gap-2 transition-all cursor-pointer ${
                     isSelected
                       ? 'bg-[#EEF773] text-[#132E20] shadow-[var(--shadow-hard-sm)]'
                       : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-[var(--bg-muted)]'
@@ -142,6 +162,16 @@ export function PasarKuUnitPasarSection() {
                     {market.code.replace('UNIT ', '#')}
                   </span>
                   <span>{market.shortName.replace('Pasar ', '')}</span>
+                  {market.nearStation && (
+                    <span title="Dekat Stasiun Bogor" className="text-[var(--accent-chili)] inline-flex items-center">
+                      <Train size={12} weight="bold" />
+                    </span>
+                  )}
+                  {alertsCount > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full bg-[var(--accent-chili)] text-white text-[10px] font-extrabold">
+                      {alertsCount}
+                    </span>
+                  )}
                 </button>
               );
             })}

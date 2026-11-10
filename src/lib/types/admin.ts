@@ -29,6 +29,8 @@ export interface AdminMarket {
   longitude: number;
   operatingHours: string;
   specialty: string;
+  nearStation?: boolean;
+  landmarkNote?: string;
   isActive: boolean;
 }
 
@@ -42,14 +44,20 @@ export interface DailyPriceRecord {
 
 export interface AdminReport {
   id: string;
+  commodityId?: string;
   commodityName: string;
+  marketId?: string;
   marketName: string;
+  reportType?: 'PRICE' | 'SHORTAGE';
+  reporterRole?: 'WARGA' | 'PEDAGANG';
+  quantity?: number;
   reportedPrice: number;
   unit: string;
   normalizedPricePerKg: number;
   officialHapPrice: number;
   cityAvgPrice: number;
   diffPercent: number;
+  stockStatus?: 'TERBATAS' | 'LANGKA' | 'PULIH';
   submittedAt: string;
   hasPhoto: boolean;
   photoUrl?: string;

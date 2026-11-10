@@ -8,7 +8,7 @@ export function PriceMethodologyCard() {
       <div className="flex items-center gap-2">
         <Question size={18} weight="bold" className="text-[var(--accent-chili)]" />
         <h3 className="text-[16px] font-bold text-[var(--text-primary)] tracking-tight">
-          Bagaimana Status Kewajaran Dihitung?
+          Bagaimana Keputusan Harga Dihitung &amp; Posisinya terhadap PIHPS?
         </h3>
       </div>
 
@@ -18,7 +18,7 @@ export function PriceMethodologyCard() {
             Wajar
           </span>
           <span className="text-[var(--text-muted)] leading-[18px]">
-            Dalam rentang ±10% dari harga pembanding pasar saat ini.
+            Dalam rentang ±10% dari acuan pasar setempat saat ini.
           </span>
         </div>
 
@@ -27,7 +27,7 @@ export function PriceMethodologyCard() {
             Agak Mahal
           </span>
           <span className="text-[var(--text-muted)] leading-[18px]">
-            +10% sampai +25% di atas rata-rata pembanding pasar.
+            +10% sampai +25% di atas acuan pasar; disarankan menawar.
           </span>
         </div>
 
@@ -36,7 +36,7 @@ export function PriceMethodologyCard() {
             Terlalu Mahal
           </span>
           <span className="text-[var(--text-muted)] leading-[18px]">
-            Di atas +25% dari acuan rata-rata harga pasar saat ini.
+            Melampaui +25% dari acuan pasar dan berisiko markup tinggi.
           </span>
         </div>
 
@@ -45,13 +45,13 @@ export function PriceMethodologyCard() {
             Jauh Lebih Murah
           </span>
           <span className="text-[var(--text-muted)] leading-[18px]">
-            Di bawah -15% (cek kualitas bahan, kesegaran, &amp; anak timbangan).
+            Di bawah -15% (periksa kesegaran produk dan anak timbangan).
           </span>
         </div>
       </div>
 
       <p className="text-[11px] text-[var(--text-muted)] leading-[16px] pt-2 border-t border-[var(--border-subtle)]">
-        <strong className="text-[var(--text-primary)] font-semibold">Hirarki sumber pembanding:</strong> Laporan Warga Lapak (≥3 laporan, 7 hari) → Rerata Survei Pasar Resmi Daerah (PIHPS) → Standarisasi Nasional HAP/HET Bapanas (Zonasi Wilayah).
+        <strong className="text-[var(--text-primary)] font-semibold">Melengkapi PIHPS, bukan menggantikan:</strong> PIHPS Bank Indonesia &amp; Panel Bapanas menyajikan data monitoring makro resmi; PasarKu menghubungkan acuan nasional dan lokal dengan jumlah serta satuan belanja di depan lapak, ditambah konteks harga &amp; kelangkaan pasar setempat.
       </p>
     </div>
   );

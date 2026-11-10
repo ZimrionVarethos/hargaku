@@ -8,16 +8,16 @@ interface Props {
 
 export function CommodityBreadcrumb({ commodityName }: Props) {
   return (
-    <nav className="flex items-center gap-2 text-[13px] text-[#6E6D67]">
-      <Link href="/dashboard" className="hover:text-[#1B1A18] transition-colors">
+    <nav className="flex items-center gap-2 text-[13px] text-[var(--text-muted)]">
+      <Link href="/dashboard" className="hover:text-[var(--text-primary)] transition-colors">
         Harga
       </Link>
-      <span className="text-[#A8A29E] font-bold">›</span>
-      <Link href="/dashboard" className="hover:text-[#1B1A18] transition-colors">
+      <span className="text-[var(--text-muted)] font-bold">›</span>
+      <Link href="/dashboard" className="hover:text-[var(--text-primary)] transition-colors">
         Detail Komoditas
       </Link>
-      <span className="text-[#A8A29E] font-bold">›</span>
-      <span className="font-semibold text-[#1B1A18]">{commodityName}</span>
+      <span className="text-[var(--text-muted)] font-bold">›</span>
+      <span className="font-semibold text-[var(--text-primary)]">{commodityName}</span>
     </nav>
   );
 }

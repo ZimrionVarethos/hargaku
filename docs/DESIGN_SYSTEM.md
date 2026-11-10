@@ -100,3 +100,11 @@ Seluruh halaman dan modal konsol pengawas (`/admin`, `/admin/login`) wajib mengi
   2. Kepala kartu berisi judul, subjudul keterangan, dan kapsul ringkasan jumlah data (`bg-[var(--bg-muted)] border border-[var(--border-subtle)]`) dengan garis pembatas bawah tegas **`border-b-2 border-[var(--border-ink)]`**.
   3. Header kolom `<thead>` transparan bertepi bawah `border-b border-[var(--border-subtle)]` (`text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]`).
   4. Baris `<tbody>` berpemisah `divide-y divide-[var(--border-subtle)]`, bulatan nomor indeks (`1, 2, 3...`), nominal harga `.font-mono-num` tebal berwarna `var(--forest-ink)`, lencana status kapsul semantik (`--forest-surface`, `--ochre-surface`/`--warning-ink`, `--accent-chili-soft`/`--accent-chili`), dan pasangan aksi `.market-btn-secondary` + tombol ikon `border border-[var(--border-ink)]`.
+
+---
+
+## 8. Pengalih Fase Wilayah, Intelijen Stasiun, & Halaman Sekunder Dual-Theme
+
+* **Pengalih Fase & Wilayah (`RegionPhaseSwitcher.tsx`)**: Pil kapsul Navbar menampilkan nama wilayah aktif + lencana fase singkat (`F1`–`F4`), serta membuka popover pemilih 4 fase (`Kota Bogor`, `Jabodetabek`, `Jawa Barat`, `Nasional`) dengan status aktif memakai `bg-[var(--forest-surface)] text-[var(--forest-ink)] border-[var(--forest-ink)]` agar tetap terbaca optimal di Mode Subuh.
+* **Penanda Kedekatan Stasiun & Sinyal Kelangkaan (`MarketInsightsPanel.tsx`, `PriceMarketContextBox.tsx`)**: Lencana stasiun memakai palet `--accent-chili-soft` / `--accent-chili` dengan ikon kereta, sedangkan agregat sinyal kelangkaan (`TERBATAS`, `LANGKA`, `PULIH`) dan komoditas mahal per pasar dikelompokkan bersih tanpa menyebut nama kios atau pedagang individu.
+* **Konsistensi Dual-Theme Halaman Sekunder (`/komoditas/[slug]`, `/dashboard`, `/cek-harga`, `/lapor`, `/peta`, `/rekomendasi-ai`)**: Seluruh wadah kartu, grafik fluktuasi 30 hari (`PriceFluctuationChartCard`), header detail komoditas (`CommodityHeroHeader`), breadcrumb, dan tabel riwayat memakai variabel `--bg-card`, `--bg-muted`, `--text-primary`, `--text-secondary`, `--border-subtle`, dan `--forest-ink`.

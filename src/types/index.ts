@@ -15,6 +15,8 @@ export type IslandCorridor =
   | 'BALI_NUSRA'
   | 'MALUKU_PAPUA';
 
+export type RolloutPhase = 1 | 2 | 3 | 4;
+
 export interface Region {
   id: string;
   name: string;
@@ -25,6 +27,8 @@ export interface Region {
   zone: BapanasZone;
   logisticsCostPct: number;
   disparityIndex: number;
+  phase?: RolloutPhase;
+  phaseLabel?: string;
   description?: string;
   latitude?: number;
   longitude?: number;
@@ -86,8 +90,16 @@ export interface Market {
   district: string;
   latitude: number;
   longitude: number;
+  nearStation?: boolean;
+  landmarkNote?: string;
   isActive: boolean;
 }
+
+export type ReportType = 'PRICE' | 'SHORTAGE';
+
+export type ReporterRole = 'WARGA' | 'PEDAGANG';
+
+export type StockStatus = 'TERBATAS' | 'LANGKA' | 'PULIH';
 
 export type PriceCheckStatus =
   | 'FAIR'
@@ -102,6 +114,58 @@ export interface PriceCheckRequest {
   marketId: string;
   regionSlug?: string;
   offeredPrice: number;
+  quantity?: number;
+  unitId?: string;
+  offeredTotalPrice?: number;
+}
+
+export interface MarketExpensiveItem {
+  commodityId: string;
+  commodityName: string;
+  reportedMedianPrice: number;
+  officialPrice: number;
+  hapPrice: number;
+  diffPercent: number;
+  reportCount: number;
+  unit: string;
+}
+
+export interface MarketShortageAlert {
+  commodityId: string;
+  commodityName: string;
+  stockStatus: StockStatus;
+  reportCount: number;
+  note?: string;
+  submittedAt: string;
+}
+
+export interface MarketReportSummary {
+  id: string;
+  reportType: ReportType;
+  reporterRole: ReporterRole;
+  commodityName: string;
+  marketName: string;
+  reportedPrice: number;
+  unit: string;
+  normalizedPricePerKg: number;
+  diffPercent: number;
+  stockStatus?: StockStatus;
+  submittedAt: string;
+  hasPhoto: boolean;
+  citizenNotes?: string;
+  status: string;
+}
+
+export interface MarketInsightsSummary {
+  marketId: string;
+  marketName: string;
+  nearStation: boolean;
+  landmarkNote?: string;
+  expensiveItems: MarketExpensiveItem[];
+  shortageAlerts: MarketShortageAlert[];
+  approvedPriceReportCount: number;
+  approvedShortageReportCount: number;
+  recentReports: MarketReportSummary[];
 }
 
 export interface PriceCheckResult {
@@ -121,8 +185,20 @@ export interface PriceCheckResult {
     lapis1NationalHap?: number;
     lapis1RegionalHap?: number;
     lapis2OfficialAvg: number;
+    lapis2PihpsCityAvg?: number;
     lapis3CitizenMedian: number;
+    nationalVsLocalDiffPct?: number;
   };
+  marketContext?: {
+    marketId: string;
+    marketName: string;
+    nearStation?: boolean;
+    landmarkNote?: string;
+    marketReportCount: number;
+    expensiveItems: MarketExpensiveItem[];
+    shortageAlerts: MarketShortageAlert[];
+  };
+  positioningNote?: string;
   regionName?: string;
 }
 

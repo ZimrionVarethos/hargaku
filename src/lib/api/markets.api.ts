@@ -1,16 +1,24 @@
 import { Market, ApiResponse } from '@/types';
 import { apiClient, IS_MOCK } from './client';
-import { MOCK_MARKETS } from '../mock/markets.data';
+import { filterMarketsForRegion, MOCK_MARKETS } from '../mock/markets.data';
+import { MOCK_REGIONS } from '../mock/regions.data';
 
 function getFallbackMarkets(regionSlugOrId?: string): Market[] {
   if (!regionSlugOrId) {
     return MOCK_MARKETS;
   }
+  const matchedRegion = MOCK_REGIONS.find(
+    (r) => r.id.toLowerCase() === regionSlugOrId.toLowerCase() || r.slug.toLowerCase() === regionSlugOrId.toLowerCase()
+  );
+  if (matchedRegion) {
+    return filterMarketsForRegion(MOCK_MARKETS, matchedRegion.id);
+  }
+  const q = regionSlugOrId.toLowerCase();
   const filtered = MOCK_MARKETS.filter(
     (m) =>
       m.regionId === regionSlugOrId ||
-      m.city.toLowerCase().includes(regionSlugOrId.replace('-', ' ').toLowerCase()) ||
-      m.city.toLowerCase().replace(/\s+/g, '-') === regionSlugOrId.toLowerCase()
+      m.city.toLowerCase().includes(q.replace(/-/g, ' ')) ||
+      m.city.toLowerCase().replace(/\s+/g, '-') === q
   );
   return filtered.length > 0 ? filtered : MOCK_MARKETS;
 }

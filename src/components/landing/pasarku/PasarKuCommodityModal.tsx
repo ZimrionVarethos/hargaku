@@ -1,11 +1,14 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { BogorCommodity } from '@/lib/data/bogor-commodities';
 import { useLiveBogorCommodities } from '@/lib/data/live-bogor-sync';
 import { CommoditySvg } from '@/lib/data/market-svgs';
 import { useAssistant } from '@/lib/store/assistant-store';
 import { useRegion } from '@/lib/store/region-store';
+import { useLiveCatalog } from '@/lib/store/use-live-catalog';
+import { findMatchingCommodity } from '@/lib/market-insights';
 
 interface Props {
   item: BogorCommodity | null;
@@ -15,7 +18,8 @@ interface Props {
 
 export function PasarKuCommodityModal({ item, onClose, categoryAvg = 0 }: Props) {
   const { openAssistant } = useAssistant();
-  const { selectedRegion } = useRegion();
+  const { selectedRegion, calculateRegionalPrice } = useRegion();
+  const { commodities: catalogCommodities } = useLiveCatalog();
   const liveList = useLiveBogorCommodities();
 
   useEffect(() => {
@@ -31,6 +35,14 @@ export function PasarKuCommodityModal({ item, onClose, categoryAvg = 0 }: Props)
     return liveList.find((c) => c.id === item.id) || item;
   }, [item, liveList]);
 
+  const matchedCatalog = useMemo(() => {
+    if (!resolvedItem) return undefined;
+    return findMatchingCommodity(catalogCommodities, {
+      commodityId: String(resolvedItem.id),
+      commodityName: resolvedItem.name,
+    });
+  }, [resolvedItem, catalogCommodities]);
+
   const computedCatAvg = useMemo(() => {
     if (categoryAvg > 0) return categoryAvg;
     if (!resolvedItem) return 0;
@@ -41,12 +53,15 @@ export function PasarKuCommodityModal({ item, onClose, categoryAvg = 0 }: Props)
 
   if (!resolvedItem) return null;
 
-  const avg = computedCatAvg || resolvedItem.price;
-  const diffPct = avg > 0 ? Math.round(((resolvedItem.price - avg) / avg) * 100) : 0;
+  const regionalPrice = calculateRegionalPrice(resolvedItem.price);
+  const nationalHap = matchedCatalog?.hapHetPrice || Math.round(resolvedItem.price * 0.94);
+  const avg = calculateRegionalPrice(computedCatAvg || resolvedItem.price);
+  const diffPct = avg > 0 ? Math.round(((regionalPrice - avg) / avg) * 100) : 0;
   const isHigher = diffPct > 0;
+  const targetSlug = matchedCatalog?.slug || 'cabai-rawit-merah';
 
   const handleAskAi = () => {
-    const prompt = `Bandingkan harga ${resolvedItem.name} (Rp ${resolvedItem.price.toLocaleString('id-ID')}/${resolvedItem.unit}) dari Panel Bapanas, PIHPS BI, Pasar Rakyat ${selectedRegion.name}, dan Laporan Warga. Berikan rekomendasi acuan terbaik.`;
+    const prompt = `Bandingkan harga ${resolvedItem.name} (Nasional HAP Rp ${nationalHap.toLocaleString('id-ID')}/${resolvedItem.unit} vs Lokal ${selectedRegion.name} Rp ${regionalPrice.toLocaleString('id-ID')}/${resolvedItem.unit}) dari Bapanas, PIHPS BI, pasar setempat, dan laporan warga.`;
     onClose();
     openAssistant(prompt);
   };
@@ -86,14 +101,23 @@ export function PasarKuCommodityModal({ item, onClose, categoryAvg = 0 }: Props)
 
         <div className="market-card p-4 space-y-3 bg-[var(--bg-paper)]">
           <div className="flex justify-between items-baseline">
-            <span className="text-xs text-[var(--text-muted)] font-medium">Harga Lapak Terkini (DB):</span>
+            <span className="text-xs text-[var(--text-muted)] font-medium">
+              Acuan Lokal ({selectedRegion.name}):
+            </span>
             <span className="text-2xl font-bold text-[var(--forest-ink)] font-mono-num">
-              Rp {resolvedItem.price.toLocaleString('id-ID')}
+              Rp {regionalPrice.toLocaleString('id-ID')}
               <span className="text-xs font-normal text-[var(--text-muted)] ml-1">/{resolvedItem.unit}</span>
             </span>
           </div>
 
           <div className="flex justify-between items-center text-xs pt-2 border-t border-[var(--border-subtle)]">
+            <span className="text-[var(--text-secondary)]">Acuan Nasional Bapanas (HAP/HET):</span>
+            <span className="font-bold text-[var(--text-primary)] font-mono-num">
+              Rp {nationalHap.toLocaleString('id-ID')}/{resolvedItem.unit}
+            </span>
+          </div>
+
+          <div className="flex justify-between items-center text-xs">
             <span className="text-[var(--text-secondary)]">Rerata Kategori {resolvedItem.category}:</span>
             <span className="font-bold text-[var(--text-primary)] font-mono-num">
               Rp {avg.toLocaleString('id-ID')}
@@ -102,29 +126,43 @@ export function PasarKuCommodityModal({ item, onClose, categoryAvg = 0 }: Props)
 
           <div className="flex justify-between items-center text-xs">
             <span className="text-[var(--text-secondary)]">Posisi Terhadap Rerata:</span>
-            <span className={`font-bold ${isHigher ? 'text-[var(--accent-chili)]' : 'text-[#245034]'}`}>
+            <span className={`font-bold ${isHigher ? 'text-[var(--accent-chili)]' : 'text-[var(--forest-ink)]'}`}>
               {diffPct === 0 ? 'Sama dengan Rerata' : isHigher ? `+${diffPct}% Di Atas` : `${diffPct}% Di Bawah`}
             </span>
           </div>
         </div>
 
         <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
-          <span>Data tersinkron Perumda PPJ &amp; Supabase</span>
+          <span>Melengkapi PIHPS &amp; Bapanas untuk keputusan pembeli</span>
           <a
             href={resolvedItem.url}
             target="_blank"
             rel="noopener noreferrer"
             className="font-bold text-[var(--accent-chili)] hover:underline"
           >
-            Arsip Resmi PPJ &rarr;
+            Arsip PPJ &rarr;
           </a>
         </div>
 
-        <div className="pt-2 flex gap-2">
+        <div className="pt-1 flex flex-col sm:flex-row gap-2">
+          <Link
+            href={`/cek-harga?commodity=${targetSlug}`}
+            onClick={onClose}
+            className="market-btn-secondary flex-1 py-2.5 text-xs font-bold text-center no-underline"
+          >
+            Cek Harga di Lapak
+          </Link>
+          <Link
+            href={`/lapor?commodity=${targetSlug}`}
+            onClick={onClose}
+            className="market-btn-secondary flex-1 py-2.5 text-xs font-bold text-center no-underline"
+          >
+            Lapor Harga / Stok
+          </Link>
           <button
             type="button"
             onClick={handleAskAi}
-            className="market-btn-primary flex-1 py-3 text-sm font-bold cursor-pointer"
+            className="market-btn-primary flex-1 py-2.5 text-xs font-bold cursor-pointer"
           >
             Tanya PUNTEN
           </button>

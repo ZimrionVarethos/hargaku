@@ -15,6 +15,7 @@ export const TAKARAN_UNITS: TakaranUnit[] = [
   { id: 'half', label: '1/2 kg (500 gram)', gramMultiplier: 500 },
   { id: 'kg', label: '1 kg (Standar)', gramMultiplier: 1000 },
   { id: 'liter', label: 'Liter', gramMultiplier: 1000 },
+  { id: 'ikat', label: 'Ikat / Satuan', gramMultiplier: 1000 },
 ];
 
 interface Props {
@@ -31,6 +32,7 @@ interface Props {
   rawPriceInput: string;
   onPriceInputChange: (price: string) => void;
   normalizedPricePerKg: number;
+  standardUnit?: string;
   onSubmit: (e: React.FormEvent) => void;
   loading: boolean;
 }
@@ -49,13 +51,14 @@ export function PriceCheckForm({
   rawPriceInput,
   onPriceInputChange,
   normalizedPricePerKg,
+  standardUnit = 'kg',
   onSubmit,
   loading,
 }: Props) {
   return (
     <div className="market-card p-6 sm:p-7 flex flex-col gap-6 bg-[var(--bg-card)]">
       <h2 className="text-[18px] font-bold text-[var(--text-primary)] tracking-tight">
-        Data Belanja Lapak
+        Input Penawaran di Lapak
       </h2>
 
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
@@ -86,7 +89,7 @@ export function PriceCheckForm({
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
           <div className="sm:col-span-4 flex flex-col gap-1.5">
             <label className="text-[13px] font-semibold text-[var(--text-primary)]">
-              Jumlah Takaran
+              Jumlah
             </label>
             <input
               type="number"
@@ -100,9 +103,9 @@ export function PriceCheckForm({
 
           <div className="sm:col-span-8 flex flex-col gap-1.5">
             <label className="text-[13px] font-semibold text-[var(--text-primary)]">
-              Satuan Takaran
+              Satuan
             </label>
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+            <div className="grid grid-cols-3 gap-1.5">
               {TAKARAN_UNITS.map((unit) => {
                 const isSelected = selectedUnitId === unit.id;
                 return (
@@ -110,7 +113,7 @@ export function PriceCheckForm({
                     key={unit.id}
                     type="button"
                     onClick={() => onUnitChange(unit.id)}
-                    className={`py-2 px-1 text-[11px] font-bold rounded-lg border-2 border-[var(--border-ink)] transition-colors ${
+                    className={`py-2 px-1.5 text-[11px] font-bold rounded-lg border-2 border-[var(--border-ink)] transition-colors cursor-pointer ${
                       isSelected
                         ? 'bg-[var(--accent-chili)] text-white shadow-xs'
                         : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-[var(--bg-muted)]'
@@ -126,7 +129,7 @@ export function PriceCheckForm({
 
         <div className="flex flex-col gap-1.5">
           <label className="text-[13px] font-semibold text-[var(--text-primary)]">
-            Lokasi Pasar Tradisional
+            Lokasi Pasar Tujuan
           </label>
           <div className="relative">
             <select
@@ -136,7 +139,7 @@ export function PriceCheckForm({
             >
               {markets.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.name} ({m.district})
+                  {m.name} ({m.district}){m.nearStation ? ' [Dekat Stasiun]' : ''}
                 </option>
               ))}
             </select>
@@ -149,13 +152,13 @@ export function PriceCheckForm({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <label className="text-[13px] font-semibold text-[var(--text-primary)]">
               Harga yang Ditawarkan Pedagang (Rp)
             </label>
             {normalizedPricePerKg > 0 && (
               <span className="text-[12px] font-bold text-[var(--forest-ink)] tabular-nums">
-                ≈ Rp {normalizedPricePerKg.toLocaleString('id-ID')}/kg
+                = Rp {normalizedPricePerKg.toLocaleString('id-ID')}/{standardUnit}
               </span>
             )}
           </div>
@@ -171,13 +174,13 @@ export function PriceCheckForm({
         <button
           type="submit"
           disabled={loading}
-          className="market-btn-primary mt-2 w-full py-3.5 px-5 text-sm font-bold flex items-center justify-center gap-2"
+          className="market-btn-primary mt-2 w-full py-3.5 px-5 text-sm font-bold flex items-center justify-center gap-2 cursor-pointer"
         >
-          {loading ? 'Menghitung Validasi...' : 'Cek Kewajaran Harga Sekarang'}
+          {loading ? 'Menghitung Perbandingan...' : 'Bandingkan dengan Acuan Sekarang'}
         </button>
 
         <p className="text-[11px] text-[var(--text-muted)] text-center leading-[16px] pt-1">
-          Tanpa daftar akun. Seluruh takaran otomatis dinormalisasi ke satuan acuan standar (Rp/kg, Rp/liter).
+          Tanpa login. Harga otomatis disetarakan ke satuan acuan nasional &amp; pasar setempat (Rp/kg atau Rp/liter).
         </p>
       </form>
     </div>

@@ -1,7 +1,9 @@
 'use client';
 
 import { CommodityDetail } from '@/types';
+import { computeCommodityCitizenStats, matchesCommodityRecord } from '@/lib/market-insights';
 import { useRegion } from '@/lib/store/region-store';
+import { useLiveCatalog } from '@/lib/store/use-live-catalog';
 
 interface Props {
   detail: CommodityDetail;
@@ -9,11 +11,24 @@ interface Props {
 
 export function ThreeLayerPriceCards({ detail }: Props) {
   const { selectedRegion, calculateRegionalPrice } = useRegion();
+  const { reports } = useLiveCatalog();
+
   const nationalHap = detail.reference.nationalHapHet ?? detail.reference.priceHapHet;
   const regionalHap = calculateRegionalPrice(nationalHap);
-  const tolerancePrice = Math.round(regionalHap * 1.05);
+  const tolerancePrice = Math.round(regionalHap * 1.1);
   const cityAvg = calculateRegionalPrice(detail.currentPriceStats.cityAverage);
-  const deviationPercent = Number((((cityAvg - regionalHap) / regionalHap) * 100).toFixed(1));
+  const deviationPercent =
+    regionalHap > 0 ? Number((((cityAvg - regionalHap) / regionalHap) * 100).toFixed(1)) : 0;
+
+  const citizenStats = computeCommodityCitizenStats(detail, reports);
+  const shortageReports = reports.filter(
+    (r) =>
+      r.status === 'APPROVED' &&
+      r.reportType === 'SHORTAGE' &&
+      matchesCommodityRecord(r, detail)
+  );
+  const citizenMedian =
+    citizenStats.cityCount > 0 ? calculateRegionalPrice(citizenStats.cityMedian) : cityAvg;
 
   const lowest = Math.round(detail.currentPriceStats.lowestMarket.price * selectedRegion.disparityIndex);
   const highest = Math.round(detail.currentPriceStats.highestMarket.price * selectedRegion.disparityIndex);
@@ -23,26 +38,24 @@ export function ThreeLayerPriceCards({ detail }: Props) {
       <div className="market-card p-5 sm:p-6 flex flex-col justify-between gap-4">
         <div className="flex flex-col gap-3">
           <span className="text-[11px] font-bold text-[var(--accent-chili)] uppercase tracking-wider">
-            LAPIS 1 &middot; ACUAN {selectedRegion.islandName.toUpperCase()} ({detail.reference.type})
+            LAPIS 1 &middot; ACUAN NASIONAL ({detail.reference.type})
           </span>
 
           <div className="flex items-baseline gap-1.5">
             <span className="text-[24px] font-extrabold text-[var(--forest-ink)] tabular-nums font-mono-num tracking-tight">
-              Rp {regionalHap.toLocaleString('id-ID')}
+              Rp {nationalHap.toLocaleString('id-ID')}
             </span>
-            <span className="text-[13px] font-medium text-[var(--text-muted)]">
-              /{detail.unit}
-            </span>
+            <span className="text-[13px] font-medium text-[var(--text-muted)]">/{detail.unit}</span>
           </div>
 
           <p className="text-[12px] text-[var(--text-secondary)] leading-[18px]">
-            HAP Bapanas RI &middot; Koridor logistik {selectedRegion.islandName} (+{selectedRegion.logisticsCostPct}% kargo laut) &middot; {detail.reference.legalDoc || 'Perbadan No 17/2023'}
+            Panel Bapanas RI ({detail.reference.legalDoc || 'Peraturan Bapanas'}) &middot; Penyesuaian {selectedRegion.name} (+{selectedRegion.logisticsCostPct}%): Rp {regionalHap.toLocaleString('id-ID')}
           </p>
         </div>
 
         <div className="pt-3 border-t border-[var(--border-subtle)]">
           <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)]">
-            Batas Toleransi: Rp {tolerancePrice.toLocaleString('id-ID')}/{detail.unit}
+            Batas Toleransi (+10%): Rp {tolerancePrice.toLocaleString('id-ID')}/{detail.unit}
           </span>
         </div>
       </div>
@@ -50,26 +63,24 @@ export function ThreeLayerPriceCards({ detail }: Props) {
       <div className="market-card p-5 sm:p-6 flex flex-col justify-between gap-4">
         <div className="flex flex-col gap-3">
           <span className="text-[11px] font-bold text-[var(--accent-chili)] uppercase tracking-wider">
-            LAPIS 2 &middot; RATA-RATA {selectedRegion.name.toUpperCase()} (PIHPS)
+            LAPIS 2 &middot; ACUAN DAERAH ({selectedRegion.name.toUpperCase()})
           </span>
 
           <div className="flex items-baseline gap-1.5">
             <span className="text-[24px] font-extrabold text-[var(--forest-ink)] tabular-nums font-mono-num tracking-tight">
               Rp {cityAvg.toLocaleString('id-ID')}
             </span>
-            <span className="text-[13px] font-medium text-[var(--text-muted)]">
-              /{detail.unit}
-            </span>
+            <span className="text-[13px] font-medium text-[var(--text-muted)]">/{detail.unit}</span>
           </div>
 
           <p className="text-[12px] text-[var(--text-secondary)] leading-[18px]">
-            Bank Indonesia &middot; Agregat Pasar Kebon Kembang &amp; Pasar Sukasari (06:00 WIB)
+            Melengkapi pemantauan PIHPS Bank Indonesia &amp; survei pasar harian di {selectedRegion.name}.
           </p>
         </div>
 
         <div className="pt-3 border-t border-[var(--border-subtle)]">
           <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
-            Deviasi: {deviationPercent > 0 ? `+${deviationPercent}%` : `${deviationPercent}%`} di atas acuan
+            Selisih vs Acuan: {deviationPercent > 0 ? `+${deviationPercent}%` : `${deviationPercent}%`}
           </span>
         </div>
       </div>
@@ -77,25 +88,26 @@ export function ThreeLayerPriceCards({ detail }: Props) {
       <div className="market-card p-5 sm:p-6 flex flex-col justify-between gap-4">
         <div className="flex flex-col gap-3">
           <span className="text-[11px] font-bold text-[var(--accent-chili)] uppercase tracking-wider">
-            LAPIS 3 &middot; DATA LAPAK WARGA (7 HARI)
+            LAPIS 3 &middot; LAPORAN WARGA &amp; STOK
           </span>
 
           <div className="flex items-baseline gap-1.5">
             <span className="text-[24px] font-extrabold text-[var(--forest-ink)] tabular-nums font-mono-num tracking-tight">
-              Rp {cityAvg.toLocaleString('id-ID')}
+              Rp {citizenMedian.toLocaleString('id-ID')}
             </span>
-            <span className="text-[13px] font-medium text-[var(--text-muted)]">
-              /{detail.unit}
-            </span>
+            <span className="text-[13px] font-medium text-[var(--text-muted)]">/{detail.unit}</span>
           </div>
 
           <p className="text-[12px] text-[var(--text-secondary)] leading-[18px]">
-            {detail.currentPriceStats.citizenReportsCount || 24} Laporan warga terverifikasi &middot; Kepercayaan Tinggi (Dilengkapi foto timbangan)
+            {citizenStats.cityCount > 0
+              ? `${citizenStats.cityCount} laporan harga warga terverifikasi`
+              : `${detail.currentPriceStats.citizenReportsCount || 3} laporan konsensus awal`}{' '}
+            &middot; {shortageReports.length > 0 ? `${shortageReports.length} info stok pedagang aktif` : 'Pasokan stabil'}
           </p>
         </div>
 
         <div className="pt-3 border-t border-[var(--border-subtle)]">
-          <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded bg-[#E2EFE6] text-[#245034] border border-[#245034]">
+          <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded bg-[var(--forest-surface)] text-[var(--forest-ink)] border border-[var(--forest-ink)]">
             Rentang lapak: Rp {lowest.toLocaleString('id-ID')} s.d. Rp {highest.toLocaleString('id-ID')}
           </span>
         </div>

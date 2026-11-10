@@ -12,26 +12,33 @@ Dokumen ini mendefinisikan visi produk, persona pengguna, arsitektur modul fitur
 * **Format Data Pemerintah Sulit Dipahami**: Informasi harga pangan resmi dari pemerintah (PIHPS Bank Indonesia dan Panel Harga Bapanas) tersedia di internet, namun disajikan dalam format tabel agregat makro/analis ekonomi yang kaku dan membingungkan orang awam.
 * **Keterbatasan Cakupan Survei**: PIHPS hanya menyurvei 2 pasar utama per kota/kabupaten dengan 2 pedagang per komoditas, tanpa melibatkan partisipasi warga lokal secara langsung.
 
-### 1.2. Solusi: Standarisasi Nasional Terkalibrasi Provinsi per Pulau & Tiga Lapis Harga
-HargaKu hadir sebagai **pendamping belanja pangan cerdas** yang memberikan acuan harga terstandarisasi nasional dan disesuaikan dengan realitas supply-demand tingkat **Provinsi (dikelompokkan dalam 6 Koridor Pulau)**:
-1. **Lapis 1 — Standarisasi Acuan Nasional Berbasis Provinsi & Koridor Pulau (HAP & HET Bapanas)**: Batas patokan harga dasar resmi dari Badan Pangan Nasional yang dikalibrasi berdasarkan provinsi dan koridor logistik pulau:
-   - **Pulau Jawa**: Jawa Barat, DKI Jakarta, Jawa Tengah, Jawa Timur, Banten, DI Yogyakarta (Baseline sentra pangan `1.00x` / +0%).
-   - **Pulau Sumatera**: Sumatera Utara, Sumatera Barat, Sumatera Selatan, Riau, Lampung (Logistik lintas selat `1.04x` – `1.06x`).
-   - **Pulau Kalimantan**: Kalimantan Timur, Kalimantan Barat, Kalimantan Selatan (Logistik kargo laut `1.10x` – `1.12x`).
-   - **Pulau Sulawesi**: Sulawesi Selatan, Sulawesi Utara (Lumbung beras & jagung KTI `1.08x`).
-   - **Kepulauan Bali & Nusa Tenggara**: Bali, Nusa Tenggara Barat, Nusa Tenggara Timur (`1.06x` – `1.12x`).
-   - **Kepulauan Maluku & Papua**: Maluku, Papua (Ketergantungan tol laut `1.20x` – `1.25x`).
-   *Keuntungan Utama*: Warga di seluruh pelosok provinsi terwakili dengan adil tanpa dibatasi hanya segelintir kota, serta mencegah pedagang nakal mengkambinghitamkan "ongkos kapal" untuk mematok harga spekulatif.
-2. **Lapis 2 — Rata-Rata Pasar Daerah (PIHPS BI & Bapanas)**: Survei harian resmi di pasar-pasar tradisional sentra pada provinsi yang dipilih pengguna.
-3. **Lapis 3 — Laporan Partisipatif Warga (Crowdsourcing)**: Harga riil di level lapak pasar lokal yang dilaporkan langsung oleh warga dengan bukti foto nota/timbangan terverifikasi.
+### 1.2. Positioning & Solusi: Alat Bantu Keputusan Belanja (Melengkapi PIHPS) + Tiga Lapis Harga
+HargaKu / **PasarKu** diposisikan sebagai **alat bantu keputusan saat berbelanja**: pengguna memasukkan **jumlah**, **satuan**, dan **harga yang ditawarkan**, lalu melihat perbandingannya dengan **acuan nasional**, **acuan daerah setempat (Kota Bogor)**, dan **informasi pasar setempat**. Direktori pasar, laporan warga (harga tidak wajar), laporan pedagang (kelangkaan komoditas), dan **Tanya PUNTEN** saling terintegrasi melengkapi alur keputusan pembeli. **PasarKu melengkapi PIHPS Bank Indonesia dan Panel Harga Bapanas** dengan alur yang lebih dekat ke keputusan pembeli, **bukan menggantikan data atau fungsi pemantauan PIHPS**.
+
+Tiga lapis pembanding harga yang digunakan:
+1. **Lapis 1 — Acuan Nasional & Kalibrasi Wilayah (HAP & HET Bapanas)**: Batas patokan harga dasar nasional dari Badan Pangan Nasional beserta penyesuaian logistik wilayah:
+   - **Pulau Jawa**: Kota Bogor (Fase 1 Pilot `1.00x`), Jabodetabek (Fase 2), Jawa Barat (Fase 3), DKI Jakarta, Jawa Tengah, Jawa Timur, Banten, DI Yogyakarta (`1.00x` – `1.02x`).
+   - **Pulau Sumatera**: Sumatera Utara, Sumatera Barat, Sumatera Selatan, Riau, Lampung (Logistik lintas selat `1.04x` – `1.07x`).
+   - **Pulau Kalimantan**: Kalimantan Timur, Kalimantan Barat, Kalimantan Selatan (Logistik kargo laut `1.09x` – `1.12x`).
+   - **Pulau Sulawesi**: Sulawesi Selatan, Sulawesi Utara, Sulawesi Tengah (`1.07x` – `1.11x`).
+   - **Kepulauan Bali & Nusa Tenggara**: Bali, Nusa Tenggara Barat (`1.06x` – `1.08x`).
+   - **Kepulauan Maluku & Papua**: Maluku, Papua (Ketergantungan tol laut `1.22x` – `1.28x`).
+2. **Lapis 2 — Rata-Rata Pasar Daerah & Survei Harian (PIHPS BI, Bapanas, & Perumda PPJ)**: Survei harian resmi di pasar tradisional aktif (termasuk 13 unit pasar Perumda PPJ Kota Bogor).
+3. **Lapis 3 — Laporan Partisipatif Dua Sisi (Warga & Pedagang)**:
+   - **Laporan Warga (Harga Lapak)**: Harga riil dan laporan harga mahal tidak wajar per unit pasar yang diagregasi menjadi sinyal komoditas apa yang sedang mahal di pasar tertentu (misal pasar dekat Stasiun Bogor: Pasar Kebon Kembang/Anyar, Pasar Devries, Pasar Merdeka).
+   - **Laporan Pedagang (Kelangkaan Komoditas)**: Sinyal pasokan terbatas atau langka di lapak/pasar (tetap anonim per pasar tanpa menyebut nama pedagang) agar pembeli memahami penyebab lonjakan harga di lapangan.
 
 #### Dua Momen Kunci Penggunaan (*The Two Critical Moments*)
 * **Momen 1: Dari Rumah (Pra-Belanja)**: Sebelum berangkat ke pasar, warga mengecek apakah komoditas tertentu sedang naik atau turun hari ini di provinsinya, meminta rekomendasi multi-sumber kepada **AI HargaKu**, dan memilih pasar tradisional yang paling wajar.
 * **Momen 2: Di Depan Lapak (Saat Belanja)**: Saat pedagang menawarkan harga ("Cabai Rp 80.000/kg"), warga langsung memasukkan nominal tersebut ke fitur **Cek Harga Wajar** di HP -> dalam hitungan detik sistem mendeteksi apakah harga tersebut wajar atau melampaui acuan provinsi, dan warga bisa langsung berkonsultasi ke **AI HargaKu** untuk saran tawar dan perbandingan sumber.
 
-### 1.3. Cakupan Wilayah & Penempatan UI Selector
-* **Cakupan Wilayah**: **Standarisasi Tingkat Provinsi Berbasis 6 Koridor Pulau**. Pengguna dapat memilih provinsi dengan acuan resmi Bapanas.
-* **Prinsip Bebas Redundansi UI (Top Navbar Only)**: Pemilih wilayah (Region Selector) diletakkan secara terpusat **eksklusif di Top Navbar (Desktop & Mobile)**. Header section halaman internal tidak lagi menampilkan duplikat tombol selector agar antarmuka bersih dan tidak menampilkan dua informasi ganda secara bersamaan.
+### 1.3. Cakupan Wilayah 4 Fase & Penempatan UI Selector
+* **Skala Cakupan Berjenjang (4 Fase)**:
+  1. **Fase 1 — Kota Bogor (Pilot Aktif)**: 13 unit pasar rakyat Perumda Pasar Pakuan Jaya (`reg_bogor`, termasuk koridor pasar dekat Stasiun Bogor: Kebon Kembang/Anyar, Devries, Merdeka).
+  2. **Fase 2 — Jabodetabek (Penyangga)**: DKI Jakarta, Bodetabek (`reg_bodebek`, `reg_jakarta`, `reg_banten`).
+  3. **Fase 3 — Jawa Barat**: Cakupan penuh Jawa Barat (`reg_jabar`: Bogor, Bandung, sentra pasok Jabar).
+  4. **Fase 4 — Nasional**: 21 provinsi dalam 6 koridor pulau dengan kalibrasi logistik resmi Bapanas RI.
+* **Prinsip Bebas Redundansi UI (Top Navbar Only)**: Pemilih wilayah & fase (4-Phase Region Selector) diletakkan secara terpusat di **Top Navbar**. Halaman internal mengikuti wilayah aktif secara otomatis tanpa tombol duplikat.
 * **12–15 Komoditas Strategis**:
   1. Beras Medium
   2. Beras Premium
@@ -93,40 +100,37 @@ HargaKu hadir sebagai **pendamping belanja pangan cerdas** yang memberikan acuan
 * Grafik tren pergerakan harga 7–30 hari terakhir untuk memantau siklus inflasi pangan.
 * Filter berdasarkan kategori pangan (Beras, Cabai/Bawang, Daging/Telur, Minyak/Gula).
 
-### Modul 3: Cek Harga Wajar & Evaluasi Disparitas (Fase A — Fitur Inti)
-* Form input sederhana: Pilih Komoditas ➔ Pilih Wilayah/Pasar ➔ Masukkan Harga Penawaran di Lapak.
-* **Logika Kalkulasi & Indikator Status Kewajaran**:
-  1. **Harga Pembanding**:
-     * Prioritas 1: Median laporan warga terverifikasi di pasar tersebut (7 hari terakhir, min. 3 laporan) ➔ Tingkat Kepercayaan: **Tinggi**.
-     * Prioritas 2: Rata-rata survei resmi pasar harian (PIHPS/Bapanas daerah) ➔ Tingkat Kepercayaan: **Sedang**.
-     * Prioritas 3: Standarisasi Nasional HAP/HET Bapanas terkalibrasi Zonasi Wilayah ➔ Tingkat Kepercayaan: **Dasar/Regulasi**.
-  2. **Klasifikasi Status**:
-     * Deviasi dalam rentang `[-10% s.d. +10%]`: **Wajar** (Badge Hijau/Lime — Harga sesuai standar pasar).
-     * Deviasi `[+10% s.d. +25%]`: **Agak Mahal** (Badge Oranye/Amber — Terindikasi di atas harga rata-rata).
-     * Deviasi `> +25%`: **Terlalu Mahal** (Badge Merah — Peringatan harga terlalu tinggi).
-     * Deviasi `< -15%`: **Jauh Lebih Murah** (Badge Biru — Peringatan cek kesegaran atau akurasi timbangan pedagang).
-  3. **Konsultasi AI Multi-Sumber**: Tombol instan `[Tanya Rekomendasi AI Multi-Sumber]` untuk meminta Gemini AI membandingkan acuan PIHPS, Bapanas, Perumda PPJ, dan laporan warga.
+### Modul 3: Cek Harga Wajar & Keputusan Belanja (Fitur Inti — Pelengkap PIHPS)
+* Form input belanja di depan lapak: Pilih Komoditas ➔ Masukkan **Jumlah & Satuan** (`ons`, `1/4 kg`, `1/2 kg`, `kg`, `liter`, `ikat`, `butir`) ➔ Pilih **Pasar Tradisional** ➔ Masukkan **Harga Penawaran Pedagang**.
+* **Pembanding Berbasis Konteks Lokal & Nasional**:
+  * **Acuan Nasional (HAP/HET Bapanas)** & **Acuan Daerah Setempat (Kota Bogor / Wilayah Aktif)** ditampilkan berdampingan agar pembeli melihat perbandingan skala nasional dan lokal sekaligus.
+  * Prioritas 1: **Median laporan warga terverifikasi** di pasar terpilih (`>= 2` laporan harga `APPROVED`), atau fallback median wilayah ➔ Tingkat Kepercayaan: **Tinggi**.
+  * Prioritas 2: **Survei harian pasar terpilih** / rerata resmi PIHPS & Perumda PPJ ➔ Tingkat Kepercayaan: **Sedang**.
+  * Prioritas 3: **Standarisasi Nasional HAP/HET Bapanas** terkalibrasi zonasi logistik ➔ Tingkat Kepercayaan: **Dasar/Regulasi**.
+* **Kartu Intelijen Pasar Setempat (`marketContext`)**: Menampilkan komoditas apa saja yang sedang dilaporkan mahal oleh warga (`> +10%`) dan peringatan kelangkaan komoditas dari pedagang pada pasar terpilih (misal pasar dekat Stasiun Bogor).
+* **Klasifikasi Status**:
+  * Deviasi dalam rentang `[-10% s.d. +10%]`: **Wajar** (Hijau/Forest — sesuai acuan).
+  * Deviasi `[+10% s.d. +25%]`: **Agak Mahal** (Amber — di atas acuan wajar).
+  * Deviasi `> +25%`: **Terlalu Mahal** (Merah Chili — melampaui toleransi wajar).
+  * Deviasi `< -15%`: **Jauh Lebih Murah** (Lime/Biru — cek kesegaran mutu & timbangan).
+* **Konsultasi AI Multi-Sumber**: Tombol **`Tanya PUNTEN`** dan tautan langsung **`Lapor Harga / Kelangkaan di Pasar Ini`**.
 
 ### Modul 4: Halaman Tentang & Sumber Data (Fase A)
-* Pernyataan transparansi metodologi data.
-* Sumber resmi yang dirujuk (tautan ke PIHPS BI dan Badan Pangan Nasional).
-* Label penegasan data simulasi demo bila diperlukan.
+* Pernyataan transparansi metodologi data dan penegasan posisi bahwa **PasarKu melengkapi PIHPS BI dan Panel Harga Bapanas**, bukan menggantikan fungsi pemantauannya.
+* Tautan ke PIHPS BI, Bapanas, serta label penegasan data simulasi demo bila digunakan.
 
-### Modul 5: Lapor Harga Warga / Crowdsourcing (Fase B)
-* Form pelaporan harga warga di kios pasar tertentu.
-* Unggah foto bukti (nota/kios/papan harga).
-* **Keamanan & Privasi**: Penghapusan metadata EXIF dan lokasi presisi perangkat secara otomatis di browser sebelum upload; enkripsi hash IP untuk pencegahan spam (*rate limiting*).
-* Status moderasi: `PENDING`, `APPROVED`, `REJECTED`.
+### Modul 5: Lapor Warga & Pedagang (Crowdsourcing Dua Sisi)
+* **Jalur Warga (`WARGA · PRICE`)**: Melaporkan harga riil maupun harga tidak wajar di pasar tertentu beserta jumlah, satuan, konversi standar `/kg`, dan foto bukti (nota/papan harga) dengan penghapusan metadata EXIF otomatis di browser.
+* **Jalur Pedagang (`PEDAGANG · SHORTAGE`)**: Pedagang dapat melaporkan kelangkaan atau keterbatasan pasokan komoditas (`TERBATAS`, `LANGKA`, `PULIH`) di pasar tertentu **secara anonim** (tanpa mengekspos nama kios atau pedagang perorangan) beserta catatan penyebab pasokan agar pembeli memahami dinamika stok.
+* Deteksi anomali MAD (`> 25%`) dan moderasi status `PENDING` / `ANOMALY` / `APPROVED` / `REJECTED` di `/admin`.
 
-### Modul 6: Peta Harga Antar-Pasar & Peta 3D 13 Unit Pasar (Fase B & Fase C)
-* Halaman `/peta` menggunakan Leaflet untuk titik-titik pasar nasional (64 sentra) dan tabel peringkat harga lapak vs rerata wilayah.
-* Halaman utama (`#unitPasarSection`) menghadirkan **Peta 3D Interaktif 13 Unit Pasar Kota Bogor** berbasis **Mapbox GL JS v3** + **Three.js 3D Building Custom Layer** (token Mapbox dibaca dinamis dari Supabase `system_settings`) lengkap dengan jalur koridor pasar, bangunan paviliun 3D pada koordinat asli Perumda PPJ, navigasi kamera `flyTo`, serta penyaring kecamatan.
+### Modul 6: Peta Harga Antar-Pasar, Peta 3D 13 Unit Pasar, & Intelijen Lokasi
+* Halaman `/peta` menggunakan Leaflet untuk titik pasar sesuai fase & wilayah aktif (`Bogor` -> `Jabodetabek` -> `Jabar` -> `Nasional`), menampakkan jumlah laporan warga terverifikasi riil dan sinyal kelangkaan pedagang per pasar, beserta tautan cepat ke `/cek-harga?market=...` dan `Tanya PUNTEN`.
+* Halaman utama (`#unitPasarSection`) menghadirkan **Peta 3D 13 Unit Pasar Kota Bogor** berbasis **Mapbox GL JS v3** + **Three.js 3D Building Custom Layer**. Modal rincian pasar menampilkan penanda **Dekat Stasiun Bogor** (Kebon Kembang/Anyar, Devries, Merdeka), ringkasan **"Sedang Mahal Menurut Laporan Warga"**, dan **"Info Kelangkaan Pedagang"** lengkap dengan tombol **`Cek Harga di Pasar Ini`** dan **`Lapor Harga/Kelangkaan`**.
 
-### Modul 7: PUNTEN, Asisten AI Multi-Sumber & Tanya Jawab Harga (Menggantikan Keranjang)
-* Karena HargaKu berfokus penuh pada transparansi & pengecekan harga (bukan e-commerce), fitur keranjang belanja dihapus dan digantikan oleh **PUNTEN** (`/rekomendasi-ai` & Drawer **Tanya PUNTEN**).
+### Modul 7: PUNTEN, Asisten AI Multi-Sumber & Tanya Jawab Harga
 * Seluruh tombol pemicu konsultasi AI di aplikasi memakai label seragam **`Tanya PUNTEN`**.
-* **PUNTEN** (didukung Google Gemini API dengan kunci dinamis dari Supabase `system_settings`) membandingkan harga dari **beberapa sumber resmi dan warga** (`PIHPS Bank Indonesia`, `Panel Harga Bapanas`, `Perumda Pasar Pakuan Jaya / Pasar Rakyat`, dan `Laporan Warga Terverifikasi`) sesuai wilayah aktif (`selectedRegion`), serta merender jawaban berformat **Markdown (`md`)** lengkap (tabel komparasi, heading, daftar poin, dan penekanan nominal).
-* Pengguna dapat langsung **bertanya secara bebas** kepada PUNTEN (contoh: *"Lebih hemat beli Cabai Rawit berdasarkan acuan mana?"*, *"Ayam 45rb/kg di pasar wajar gak?"*, atau *"Bandingkan sumber harga beras & minyak minggu ini"*).
+* **PUNTEN** membandingkan **Acuan Nasional (HAP/HET Bapanas)**, **Acuan Daerah / Kota Bogor**, **Survei PIHPS / PPJ**, serta **Laporan Warga & Sinyal Kelangkaan Pedagang per pasar** (termasuk menjawab pertanyaan seperti *"Di pasar dekat Stasiun Bogor lagi mahal apa?"*), serta merender jawaban berformat **Markdown (`md`)** lengkap tanpa menggantikan fungsi pemantauan PIHPS.
 
 ### Modul 8: Portal Admin Moderasi, Supabase CRUD, & Pengaturan AI + Peta Dinamis
 * **Integrasi Supabase PostgreSQL**: Seluruh CRUD komoditas, pasar tradisional, entri harga harian (`daily_prices`), moderasi laporan warga (`citizen_reports`), dan konfigurasi API tersimpan langsung di database Supabase.

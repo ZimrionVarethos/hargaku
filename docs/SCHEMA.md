@@ -12,10 +12,10 @@ Dokumen ini adalah **Single Source of Truth (SSOT)** untuk seluruh struktur data
 | Aspek | Standar yang Digunakan | Keterangan |
 | :--- | :--- | :--- |
 | **Engine** | PostgreSQL 17 (Supabase) | Diakses melalui Supavisor Session Pooler (`pg` Pool) dengan parameterized SQL |
-| **Penamaan Tabel** | `snake_case`, plural | `commodities`, `markets`, `official_prices`, `citizen_reports` |
-| **Penamaan Kolom** | `snake_case` | `commodity_id`, `reported_price`, `recorded_date` |
-| **Primary Key** | CUID / UUIDv7 string (`VARCHAR(36)`) | `id String @id @default(cuid())` |
-| **Mata Uang & Nominal**| `INTEGER` / `BIGINT` | Disimpan dalam satuan Rupiah bulat (misal: `15000` untuk Rp 15.000) |
+| **Penamaan Tabel** | `snake_case`, plural | `regions`, `commodities`, `markets`, `daily_prices`, `citizen_reports`, `system_settings` |
+| **Penamaan Kolom** | `snake_case` | `commodity_id`, `market_id`, `reported_price`, `report_type`, `stock_status`, `recorded_date` |
+| **Primary Key** | String slug/ID terstandarisasi (`TEXT`) | misal `reg_bogor`, `cabai-rawit-merah`, `mkt_kebon_kembang` |
+| **Mata Uang & Nominal**| `INTEGER` | Disimpan dalam satuan Rupiah bulat (misal: `15000` untuk Rp 15.000) |
 | **Timestamps** | Wajib ada di setiap tabel | `created_at TIMESTAMPTZ`, `updated_at TIMESTAMPTZ` |
 | **Zona Waktu** | UTC di database, konversi ke `Asia/Jakarta (WIB)` di presentation layer |
 
@@ -43,6 +43,8 @@ erDiagram
         string zone
         int logistics_cost_pct
         decimal disparity_index
+        int phase
+        string phase_label
         boolean is_active
         timestamp created_at
         timestamp updated_at
@@ -64,51 +66,54 @@ erDiagram
         string id PK
         string region_id FK
         string name
-        string slug UK
+        string slug
         string city
         string district
+        string address
         decimal latitude
         decimal longitude
+        string operating_hours
+        string specialty
+        boolean near_station
+        string landmark_note
         boolean is_active
-        timestamp created_at
         timestamp updated_at
     }
 
-    REFERENCE_PRICES {
-        string id PK
-        string commodity_id FK
-        string zone
-        integer price_hap_het
-        decimal disparity_multiplier
-        string reference_type
-        string legal_doc_no
-        date valid_from
-        date valid_to
-        timestamp created_at
-    }
-
-    OFFICIAL_PRICES {
-        string id PK
-        string commodity_id FK
+    DAILY_PRICES {
         string market_id FK
+        string commodity_id FK
         integer price
+        integer previous_price
+        string recorded_date
         string source_type
-        date recorded_date
-        timestamp created_at
+        timestamp updated_at
     }
 
     CITIZEN_REPORTS {
         string id PK
-        string commodity_id FK
-        string market_id FK
+        string commodity_id
+        string commodity_name
+        string market_id
+        string market_name
+        string report_type
+        string reporter_role
+        decimal quantity
         integer reported_price
+        string unit
+        integer normalized_price_per_kg
+        integer official_hap_price
+        integer city_avg_price
+        double diff_percent
+        string stock_status
+        string submitted_at
+        boolean has_photo
         string photo_url
-        string notes
-        string reporter_ip_hash
+        string citizen_notes
         string status
-        string moderator_id FK
+        string anomaly_reason
+        boolean exif_sanitized
         timestamp created_at
-        timestamp updated_at
     }
 
     USERS {
@@ -135,16 +140,20 @@ erDiagram
 ## 3. Data Dictionary & Kamus Kolom
 
 ### 3.1. Tabel `regions`
-Menyimpan daftar wilayah acuan tingkat **Provinsi** yang dikelompokkan berdasarkan koridor pulau, zonasi Bapanas, dan persentase toleransi biaya logistik penyeberangan kargo laut.
-* `id` (VARCHAR/CUID, PK): ID unik wilayah provinsi.
-* `name` (VARCHAR(100), NOT NULL): Nama provinsi (misal: "Jawa Barat", "DKI Jakarta", "Jawa Timur", "Kalimantan Timur", "Sulawesi Selatan").
-* `slug` (VARCHAR(120), UNIQUE): URL slug wilayah (misal: `jawa-barat`).
-* `island` (VARCHAR(50), NOT NULL): Koridor pulau logistik (`JAWA`, `SUMATERA`, `KALIMANTAN`, `SULAWESI`, `BALI_NUSRA`, `MALUKU_PAPUA`).
-* `zone` (VARCHAR(20), NOT NULL, DEFAULT 'ZONA_1'): Zonasi pangan Bapanas (`ZONA_1`, `ZONA_2`, `ZONA_3`).
-* `logistics_cost_pct` (INTEGER, DEFAULT 0): Estimasi toleransi biaya logistik kargo laut resmi Bapanas (misal: 0% untuk Jawa, 6% Sumatera, 12% Kalimantan, 25% Papua).
-* `disparity_index` (DECIMAL(5, 3), DEFAULT 1.000): Koefisien pengali harga acuan dasar nasional (`1 + logistics_cost_pct / 100`).
+Menyimpan daftar wilayah acuan 4 fase (`Kota Bogor`, `Jabodetabek`, `Jawa Barat`, dan 21 provinsi `Nasional`) berdasarkan koridor pulau, zonasi Bapanas, dan persentase toleransi biaya logistik kargo laut.
+* `id` (TEXT, PK): ID unik wilayah (misal `reg_bogor`, `reg_bodebek`, `reg_jabar`, `reg_jakarta`, `reg_kaltim`).
+* `name` (TEXT, NOT NULL): Nama wilayah/provinsi.
+* `slug` (TEXT, UNIQUE): URL slug wilayah (`kota-bogor`, `jabodetabek`, `jawa-barat`, dll.).
+* `province` (TEXT, NULL): Provinsi induk (misal: `Jawa Barat` untuk `reg_bogor`).
+* `island` (TEXT, NOT NULL): Koridor pulau logistik (`JAWA`, `SUMATERA`, `KALIMANTAN`, `SULAWESI`, `BALI_NUSRA`, `MALUKU_PAPUA`).
+* `island_name` (TEXT, NOT NULL): Nama koridor tampil UI.
+* `zone` (TEXT, NOT NULL, DEFAULT 'ZONA_1'): Zonasi pangan Bapanas (`ZONA_1`, `ZONA_2`, `ZONA_3`).
+* `logistics_cost_pct` (INTEGER, DEFAULT 0): Toleransi biaya logistik kargo laut resmi Bapanas.
+* `disparity_index` (DOUBLE PRECISION, DEFAULT 1.0): Koefisien pengali harga acuan nasional (`1 + logistics_cost_pct / 100`).
+* `phase` (INTEGER, NOT NULL, DEFAULT 4): Urutan fase rollout (`1` Bogor -> `2` Jabodetabek -> `3` Jawa Barat -> `4` Nasional).
+* `phase_label` (TEXT, NOT NULL): Label fase tampil UI (`Fase 1 · Kota Bogor`, `Fase 2 · Jabodetabek`, `Fase 3 · Jawa Barat`, `Fase 4 · Nasional`).
 * `is_active` (BOOLEAN, DEFAULT true): Status keaktifan wilayah.
-* `created_at` / `updated_at` (TIMESTAMPTZ).
+* `updated_at` (TIMESTAMPTZ).
 
 ### 3.2. Tabel `commodities`
 Menyimpan daftar bahan pokok strategis yang dipantau (12–15 komoditas).
@@ -158,17 +167,21 @@ Menyimpan daftar bahan pokok strategis yang dipantau (12–15 komoditas).
 * `created_at` / `updated_at` (TIMESTAMPTZ).
 
 ### 3.3. Tabel `markets`
-Menyimpan daftar pasar tradisional yang berada di dalam wilayah cakupan.
-* `id` (VARCHAR/CUID, PK): ID unik pasar.
-* `region_id` (VARCHAR, FK ➔ `regions.id`, NOT NULL): Relasi ke wilayah kabupaten/kota.
-* `name` (VARCHAR(100), NOT NULL): Nama pasar (misal: "Pasar Anyar", "Pasar Kramat Jati").
-* `slug` (VARCHAR(120), UNIQUE): URL-friendly slug (`pasar-anyar`).
-* `city` (VARCHAR(50), NOT NULL): Nama kota/kabupaten.
-* `district` (VARCHAR(100), NULL): Nama kecamatan.
-* `latitude` (DECIMAL(10, 7), NOT NULL): Koordinat lintang untuk peta Leaflet.
-* `longitude` (DECIMAL(10, 7), NOT NULL): Koordinat bujur untuk peta Leaflet.
+Menyimpan daftar pasar tradisional (13 unit Perumda PPJ Kota Bogor dan sentra daerah/nasional).
+* `id` (TEXT, PK): ID unik pasar.
+* `region_id` (TEXT, NOT NULL): Relasi ke `regions.id`.
+* `name` (TEXT, NOT NULL): Nama pasar (misal: "Pasar Kebon Kembang (Pasar Anyar)", "Pasar Devries").
+* `slug` (TEXT, NOT NULL): URL slug pasar (`kebon-kembang`, `devries`).
+* `city` (TEXT, NOT NULL): Nama kota/kabupaten.
+* `district` (TEXT, NOT NULL): Nama kecamatan.
+* `address` (TEXT, NOT NULL): Alamat lengkap pasar.
+* `latitude` / `longitude` (DOUBLE PRECISION, NOT NULL): Koordinat geospasial.
+* `operating_hours` (TEXT): Jam operasional pasar.
+* `specialty` (TEXT): Karakteristik/profil pasar.
+* `near_station` (BOOLEAN, DEFAULT false): Penanda pasar dekat Stasiun Bogor (`Kebon Kembang/Anyar`, `Devries`, `Merdeka`).
+* `landmark_note` (TEXT, NULL): Keterangan kedekatan simpul transportasi (misal: `"±350m dari Stasiun Bogor"`).
 * `is_active` (BOOLEAN, DEFAULT true): Status aktif pasar dalam sistem.
-* `created_at` / `updated_at` (TIMESTAMPTZ).
+* `updated_at` (TIMESTAMPTZ).
 
 ### 3.4. Tabel `reference_prices` (Lapis 1 — Standarisasi Nasional HAP / HET Terkalibrasi)
 Menyimpan ketetapan harga acuan resmi dari Badan Pangan Nasional berdasarkan zonasi wilayah.
@@ -182,28 +195,41 @@ Menyimpan ketetapan harga acuan resmi dari Badan Pangan Nasional berdasarkan zon
 * `valid_from` (DATE, NOT NULL): Tanggal mulai berlaku regulasi.
 * `valid_to` (DATE, NULL): Tanggal berakhir (NULL bila masih aktif).
 
-### 3.5. Tabel `official_prices` (Lapis 2 — Rata-rata Pasar Harian)
-Menyimpan harga survei harian resmi dari PIHPS BI atau Panel Bapanas di pasar daerah.
-* `id` (VARCHAR/CUID, PK): ID unik pencatatan harga.
-* `commodity_id` (VARCHAR, FK ➔ `commodities.id`): Relasi komoditas.
-* `market_id` (VARCHAR, FK ➔ `markets.id`): Relasi pasar tempat survei.
-* `price` (INTEGER, NOT NULL): Nominal harga harian dalam Rupiah.
-* `source_type` (VARCHAR(30), NOT NULL): Sumber data (`PIHPS_BI`, `PANEL_BAPANAS`, `SIMULASI_DEMO`).
-* `recorded_date` (DATE, NOT NULL): Tanggal pencatatan harga (harian).
-* `created_at` (TIMESTAMPTZ, DEFAULT NOW()).
+### 3.5. Tabel `daily_prices` (Lapis 2 — Survei Pasar Harian PIHPS / PPJ / Admin)
+Menyimpan harga survei harian per komoditas dan pasar (`PRIMARY KEY (market_id, commodity_id)`).
+* `market_id` (TEXT, FK ➔ `markets.id`).
+* `commodity_id` (TEXT, FK ➔ `commodities.id`).
+* `price` (INTEGER, NOT NULL): Nominal harga harian dalam Rupiah (`/kg` atau satuan dasar).
+* `previous_price` (INTEGER, NULL): Harga pencatatan sebelumnya untuk menghitung persentase perubahan harian.
+* `recorded_date` (TEXT, NOT NULL): Tanggal pencatatan (`YYYY-MM-DD`).
+* `source_type` (TEXT, DEFAULT 'PIHPS_BI'): Sumber pencatatan (`PIHPS_BI`, `PANEL_BAPANAS`, `ADMIN_CHECKUP`).
+* `updated_at` (TIMESTAMPTZ, DEFAULT NOW()).
 
-### 3.6. Tabel `citizen_reports` (Lapis 3 — Crowdsourcing Warga)
-Menyimpan laporan langsung dari warga di lapangan.
-* `id` (VARCHAR/CUID, PK): ID unik laporan warga.
-* `commodity_id` (VARCHAR, FK ➔ `commodities.id`): Relasi komoditas yang dilaporkan.
-* `market_id` (VARCHAR, FK ➔ `markets.id`): Relasi pasar tempat pembelian.
-* `reported_price` (INTEGER, NOT NULL): Nominal harga yang dibeli/ditemukan warga.
-* `photo_url` (VARCHAR(255), NULL): URL foto bukti nota/papan harga (sudah distrip metadata EXIF).
-* `notes` (TEXT, NULL): Catatan kualitas/kondisi barang.
-* `reporter_ip_hash` (VARCHAR(64), NOT NULL): SHA-256 hash dari IP pelapor (pencegahan spam/rate limit tanpa menyimpan IP mentah).
-* `status` (VARCHAR(20), DEFAULT 'PENDING'): Status moderasi (`PENDING`, `APPROVED`, `REJECTED`).
-* `moderator_id` (VARCHAR, NULL, FK ➔ `users.id`): ID admin yang memoderasi.
-* `created_at` / `updated_at` (TIMESTAMPTZ).
+### 3.6. Tabel `citizen_reports` (Lapis 3 — Laporan Partisipatif Dua Sisi: Warga & Pedagang)
+Menyimpan laporan warga (harga riil / tidak wajar) dan laporan pedagang (kelangkaan / keterbatasan pasokan) secara anonim per pasar.
+* `id` (TEXT, PK): ID unik laporan (`REP-...`).
+* `commodity_id` (TEXT, NULL): ID/slug komoditas terstruktur untuk agregasi cepat.
+* `commodity_name` (TEXT, NOT NULL): Nama komoditas tampil UI.
+* `market_id` (TEXT, NULL): ID pasar terstruktur untuk agregasi intelijen per pasar.
+* `market_name` (TEXT, NOT NULL): Nama pasar tampil UI.
+* `report_type` (TEXT, NOT NULL, DEFAULT 'PRICE'): Jenis laporan (`PRICE` | `SHORTAGE`).
+* `reporter_role` (TEXT, NOT NULL, DEFAULT 'WARGA'): Peran pelapor (`WARGA` | `PEDAGANG`).
+* `quantity` (DOUBLE PRECISION, DEFAULT 1): Jumlah takaran pembelian (`2`, `1`, `0.25`, dll.).
+* `reported_price` (INTEGER, NOT NULL): Harga transaksi total saat laporan warga (`0` bila murni laporan kelangkaan pedagang).
+* `unit` (TEXT, NOT NULL): Satuan (`ons`, `1/4 kg`, `1/2 kg`, `1 kg`, `liter`, `ikat`, `butir`).
+* `normalized_price_per_kg` (INTEGER, NOT NULL): Harga terstandarisasi per satuan acuan (`kg`/`liter`).
+* `official_hap_price` (INTEGER, NOT NULL): Snapshot acuan HAP/HET saat melapor.
+* `city_avg_price` (INTEGER, NOT NULL): Snapshot rata-rata daerah saat melapor.
+* `diff_percent` (DOUBLE PRECISION, NOT NULL): Persentase deviasi terhadap rata-rata daerah.
+* `stock_status` (TEXT, NULL): Status pasokan untuk laporan kelangkaan pedagang (`TERBATAS` | `LANGKA` | `PULIH`).
+* `submitted_at` (TEXT, NOT NULL): Label waktu tampil UI.
+* `has_photo` (BOOLEAN, DEFAULT false): Penanda keberadaan foto bukti.
+* `photo_url` (TEXT, NULL): Path/URL foto setelah sanitasi EXIF.
+* `citizen_notes` (TEXT, NULL): Catatan kondisi lapak / pasokan.
+* `status` (TEXT, DEFAULT 'PENDING'): Status moderasi (`PENDING`, `ANOMALY`, `APPROVED`, `REJECTED`).
+* `anomaly_reason` (TEXT, NULL): Penjelasan sistem deteksi MAD bila deviasi > 25%.
+* `exif_sanitized` (BOOLEAN, DEFAULT true): Penanda metadata GPS telah dihapus.
+* `created_at` (TIMESTAMPTZ, DEFAULT NOW()).
 
 ### 3.7. Tabel `users`
 Akun internal tim moderator / admin HargaKu.
@@ -226,9 +252,11 @@ Menyimpan kredensial API eksternal, token peta Mapbox, dan konfigurasi layanan A
 ## 4. Indeks & Strategi Performa Query
 
 Untuk menjamin query cepat tanpa butuh caching layer kompleks:
-1. `CREATE INDEX idx_official_prices_lookup ON official_prices(commodity_id, market_id, recorded_date DESC);`
-   ➔ Mempercepat query Cek Harga Wajar dan Dashboard tren harian.
-2. `CREATE INDEX idx_citizen_reports_valid ON citizen_reports(commodity_id, market_id, status, created_at DESC);`
-   ➔ Mempercepat agregasi perhitungan median laporan warga dalam 7 hari terakhir.
-3. `CREATE INDEX idx_markets_coords ON markets(latitude, longitude);`
-   ➔ Mempercepat rendering marker peta harga.
+1. `CREATE INDEX IF NOT EXISTS idx_daily_prices_commodity ON daily_prices(commodity_id);`
+   ➔ Mempercepat agregasi harga harian per komoditas.
+2. `CREATE INDEX IF NOT EXISTS idx_daily_prices_market ON daily_prices(market_id);`
+   ➔ Mempercepat pembacaan harga lapak per pasar.
+3. `CREATE INDEX IF NOT EXISTS idx_markets_region ON markets(region_id);`
+   ➔ Mempercepat filter pasar per wilayah/fase.
+4. `CREATE INDEX IF NOT EXISTS idx_citizen_reports_market_status ON citizen_reports(market_id, status, report_type);`
+   ➔ Mempercepat agregasi komoditas mahal dan sinyal kelangkaan per pasar.

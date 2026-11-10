@@ -78,11 +78,11 @@ export function CommodityDashboardView({ initialCommodities }: Props) {
       />
 
       {processedCommodities.length === 0 ? (
-        <div className="w-full py-16 text-center bg-white rounded-[16px] outline outline-1 outline-[#E5E3DE] flex flex-col items-center justify-center gap-2">
-          <p className="text-[15px] font-semibold text-[#1B1A18]">
+        <div className="w-full py-16 text-center market-card flex flex-col items-center justify-center gap-2">
+          <p className="text-[15px] font-bold text-[var(--text-primary)]">
             Tidak ada komoditas yang cocok dengan pencarian &quot;{searchQuery}&quot;
           </p>
-          <p className="text-[13px] text-[#6E6D67]">
+          <p className="text-[13px] text-[var(--text-secondary)]">
             Coba gunakan kata kunci umum seperti beras, telur, atau cabai.
           </p>
           <button
@@ -91,7 +91,7 @@ export function CommodityDashboardView({ initialCommodities }: Props) {
               setSearchQuery('');
               setSelectedCategory('ALL');
             }}
-            className="mt-3 px-4 py-2 rounded-[8px] bg-[#1B1A18] text-white text-[12px] font-medium hover:bg-black transition-colors"
+            className="market-btn-primary mt-3 px-4 py-2 text-[12px] font-bold"
           >
             Reset Filter
           </button>
