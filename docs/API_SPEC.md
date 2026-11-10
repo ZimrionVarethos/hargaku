@@ -75,6 +75,6 @@ Endpoint mutasi terpadu (menerima header sesi admin) untuk menyinkronkan aksi CR
 
 ### 3.3. `GET /api/v1/admin/settings` & `PUT /api/v1/admin/settings`
 Mengelola kredensial AI & sumber pembanding di tabel `system_settings` Supabase secara dinamis:
-* **`GET`**: Mengembalikan status kunci API tersamar (`maskedApiKey`: `AQ.Ab...CeQ`), `hasApiKey`, `geminiModel`, `systemInstruction`, `enabledSources`, `dbConnected`, dan `updatedAt`. Kunci mentah tidak pernah dikirim ke browser.
+* **`GET`**: Mengembalikan status kunci API tersamar (`maskedApiKey`: `AIzaSy......abcd`), `hasApiKey`, `geminiModel`, `systemInstruction`, `enabledSources`, `dbConnected`, dan `updatedAt`. Kunci mentah tidak pernah dikirim ke browser.
 * **`PUT`**: Menyimpan pembaruan `geminiApiKey` (opsional, diisi hanya saat ingin ganti kunci), `geminiModel`, `systemInstruction`, atau `enabledSources` ke Supabase.
 * **`POST /api/v1/admin/settings` (`{ action: "test", geminiApiKey?: string, geminiModel?: string }`)**: Menguji koneksi langsung ke endpoint Google Gemini dan mengembalikan status & latensi respons.
