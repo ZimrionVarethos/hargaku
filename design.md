@@ -69,3 +69,11 @@ Untuk menjaga tema **PasarKu** tetap hidup tanpa melanggar aturan dekorasi [miqd
    - Kanvas transparan di latar depan Hero Section menggambar 24 butir cahaya keemasan kecil (`r: 1.8px` s.d. `4.6px`) yang melayang perlahan ke atas untuk menghadirkan suasana udara pagi di pasar tradisional Bogor.
 5. **Pola Garis Titik-Titik Buku Besar (`.ledger-leader`)**:
    - Pada komponen daftar harga ringkas, nama komoditas di sisi kiri dan nominal harga di sisi kanan dihubungkan oleh garis bawah bertitik (`border-bottom: 1.5px dotted var(--border-subtle)`) untuk memudahkan mata memindai baris harga secara horizontal.
+6. **Pita Ornamen Kawung Renda Modular (`src/components/ornament/KawungBand.tsx`)**:
+   - Mengulang pola Kawung SVG (`36x30` pada varian `scallop` atau `36x20` pada `flat`, latar `--ochre-surface`, elips `--earth-ochre` + sapuan `0.22`, belah ketupat `--accent-chili`, bingkai garis atas + renda bawah bergelombang bertitik chili) dengan React `useId()` dan penskalaan responsif (`scale(0.8)` ponsel, `1:1` desktop) agar motif utuh di ponsel maupun desktop.
+   - Dibatasi **maksimal 2 pita per halaman landing** (Hero ke Sorotan dan puncak Footer panorama); pita di atas Peta 3D dihapus.
+7. **Pembatas Gelombang Kontur Cacing (`src/components/ornament/CacingWaveDivider.tsx`)**:
+   - Garis kontur 2 lapis bergaya gelombang Hero (`--wave-line-gold` dan `--border-ink`, `viewBox="0 0 1440 46"`, `non-scaling-stroke`) yang mengapit `#analitikSection` secara simetris (atas `--bg-paper -> --bg-muted`, bawah `--bg-muted -> --bg-paper`) dan menutup bagian bawah panorama Footer menyatu ke langit backdrop Tugu Kujang.
+8. **Tekstur Tegel Batik Berseling (`src/components/ornament/BatikMeshBackground.tsx`)**:
+   - Lapisan SVG `48x48` (`64x64` di `<640px` lewat `patternTransform`) dengan fade mask 15% atas/bawah dan opasitas adaptif (`0.16` ponsel siang, `0.22` desktop siang, `0.14` Mode Subuh; `0.35` tanpa fade di panorama Footer).
+   - Hanya dipasang bergantian di section berlatar `--bg-paper` (`#sorotanSection` dan `#unitPasarSection`), sedangkan `#heroSection` dan `#analitikSection` (`--bg-muted`) tetap polos. Semua `.market-card` tetap solid `--bg-card`.
