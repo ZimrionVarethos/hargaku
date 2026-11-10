@@ -77,11 +77,6 @@ export function PasarKuSorotanSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-5 space-y-5">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border border-[var(--border-ink)] bg-[var(--bg-muted)] text-[var(--accent-chili)] mb-3">
-                <span>ALAT BANTU KEPUTUSAN PEMBELI</span>
-                <span className="text-[var(--text-muted)]">&bull;</span>
-                <span>{selectedRegion.phaseLabel || 'Fase 1 · Kota Bogor'}</span>
-              </div>
               <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
                 Acuan Nasional vs {selectedRegion.name}
               </h2>
@@ -138,7 +133,7 @@ export function PasarKuSorotanSection() {
                   href="/cek-harga"
                   className="market-btn-secondary px-3 py-1.5 text-xs font-bold whitespace-nowrap no-underline"
                 >
-                  Cek Harga &rarr;
+                  Cek Harga 
                 </Link>
               </div>
             </div>

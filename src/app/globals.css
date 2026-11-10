@@ -195,11 +195,24 @@ html[data-theme="dark"] .pasarku-logo-plaque {
 @keyframes marketRightBreeze { 0%, 100% { transform: scale(1) translate(0px, 0px); } 50% { transform: scale(1.018) translate(-4px, -3px); } }
 @keyframes lampWarmPulse { 0%, 100% { opacity: 0.45; transform: scale(0.92); } 50% { opacity: 0.85; transform: scale(1.14); } }
 @keyframes logoGentleFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-5px); } }
+@keyframes scrollCueNudge {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  38% { transform: translateY(7px); opacity: 1; }
+  62% { transform: translateY(3px); opacity: 0.88; }
+  82% { transform: translateY(6px); opacity: 1; }
+}
 
 .animate-market-left { animation: marketLeftBreeze 7.5s ease-in-out infinite; transform-origin: bottom left; }
 .animate-market-right { animation: marketRightBreeze 8.2s ease-in-out infinite; transform-origin: bottom right; }
 .animate-lamp-glow { animation: lampWarmPulse 3.4s ease-in-out infinite; }
 .animate-logo-float { animation: logoGentleFloat 4.5s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-scroll-cue {
+    animation: scrollCueNudge 3.5s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -234,4 +247,35 @@ html[data-theme="dark"] .pasarku-logo-plaque {
 }
 html[data-theme="dark"] .footer-market-photo {
   filter: brightness(0.74) contrast(1.08) saturate(0.92);
+}
+.footer-market-mask {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+@media (min-width: 768px) {
+  .footer-market-mask {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%);
+  }
+}
+
+.footer-scenic-dark {
+  display: none;
+}
+html[data-theme="dark"] .footer-scenic-light {
+  display: none;
+}
+html[data-theme="dark"] .footer-scenic-dark {
+  display: block;
+}
+.footer-scenic-scrim {
+  background: transparent;
+}
+html[data-theme="dark"] .footer-scenic-scrim {
+  background: linear-gradient(
+    to bottom,
+    rgba(19, 42, 30, 0.35) 0%,
+    rgba(19, 42, 30, 0.15) 65%,
+    transparent 100%
+  );
 }

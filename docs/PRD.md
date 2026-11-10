@@ -88,11 +88,10 @@ Tiga lapis pembanding harga yang digunakan:
 
 ## 3. Scope & Modul Fitur
 
-### Modul 1: Landing Page & Edukasi Publik (Fase A)
-* Hero section dengan slogan *"Tahu harga, beli tenang, jual adil."*
-* Widget interaktif cuplikan komoditas teratas & status harga hari ini.
-* Penjelasan 3 lapis harga secara visual dan bersahabat.
-* Call-to-action cepat ke fitur Cek Harga Wajar.
+### Modul 1: Landing Page, Lorong Pasar 3D Interaktif, & Edukasi Publik (Fase A)
+* Hero section dengan tajuk *"Cek Harga Sebelum ke Pasar"*, tombol *Masuk Lorong*, dan petunjuk scroll menuju panggung **Lorong Pasar 3D Full-Viewport**.
+* **Navigasi 5 Kategori Berurutan & Pencarian Langsung**: Bilah HUD atas menyediakan tombol `Gerbang Depan`, indikator meter langkah, dan kolom `Cari komoditas di lorong...` ber-autocomplete yang melompatkan kamera ke koordinat Z lapak 3D atau membuka daftar terfilter (`53` komoditas); bilah bawah menyediakan navigasi 5 zona berurutan (`Sayuran`, `Cabai & Bawang`, `Beras & Sembako`, `Daging & Telur`, `Ikan & Buah`).
+* Penjelasan 3 lapis harga secara visual dan bersahabat beserta CTA cepat ke Cek Harga Wajar.
 
 ### Modul 2: Dashboard Harga & Tren Pasar (Fase A)
 * **Selector Daerah Dinamis**: Pilihan wilayah (kabupaten/kota) aktif di bagian header yang menyesuaikan data harga pasar lokal dengan acuan nasional.
@@ -124,8 +123,9 @@ Tiga lapis pembanding harga yang digunakan:
 * **Jalur Pedagang (`PEDAGANG · SHORTAGE`)**: Pedagang dapat melaporkan kelangkaan atau keterbatasan pasokan komoditas (`TERBATAS`, `LANGKA`, `PULIH`) di pasar tertentu **secara anonim** (tanpa mengekspos nama kios atau pedagang perorangan) beserta catatan penyebab pasokan agar pembeli memahami dinamika stok.
 * Deteksi anomali MAD (`> 25%`) dan moderasi status `PENDING` / `ANOMALY` / `APPROVED` / `REJECTED` di `/admin`.
 
-### Modul 6: Peta Harga Antar-Pasar, Peta 3D 13 Unit Pasar, & Intelijen Lokasi
+### Modul 6: Peta Harga Antar-Pasar, Peta 3D 13 Unit Pasar, Lorong Pasar 3D, & Intelijen Lokasi
 * Halaman `/peta` menggunakan Leaflet untuk titik pasar sesuai fase & wilayah aktif (`Bogor` -> `Jabodetabek` -> `Jabar` -> `Nasional`), menampakkan jumlah laporan warga terverifikasi riil dan sinyal kelangkaan pedagang per pasar, beserta tautan cepat ke `/cek-harga?market=...` dan `Tanya PUNTEN`.
+* Halaman utama (`#heroSection`) menampilkan **Lorong Pasar 3D** 20 lapak interaktif yang lengkap dengan figur pedagang 3D prosedural generik (anonim tanpa menyebut nama kios atau pedagang individu) serta sudut pandang orang pertama memegang keranjang bambu, beradaptasi penuh pada Mode Siang/Subuh dan preferensi `prefers-reduced-motion`.
 * Halaman utama (`#unitPasarSection`) menghadirkan **Peta 3D 13 Unit Pasar Kota Bogor** berbasis **Mapbox GL JS v3** + **Three.js 3D Building Custom Layer**. Modal rincian pasar menampilkan penanda **Dekat Stasiun Bogor** (Kebon Kembang/Anyar, Devries, Merdeka), ringkasan **"Sedang Mahal Menurut Laporan Warga"**, dan **"Info Kelangkaan Pedagang"** lengkap dengan tombol **`Cek Harga di Pasar Ini`** dan **`Lapor Harga/Kelangkaan`**.
 
 ### Modul 7: PUNTEN, Asisten AI Multi-Sumber & Tanya Jawab Harga

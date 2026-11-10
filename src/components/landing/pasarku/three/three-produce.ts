@@ -75,7 +75,7 @@ export function createInstancedMarketProduce(
   group.name = 'market-produce-instanced';
 
   const buckets: Record<string, InstanceItem[]> = {
-    tomato: [], orange: [], shallot: [], garlic: [], carrot: [],
+    tomato: [], orange: [], watermelon: [], shallot: [], garlic: [], carrot: [],
     chili: [], cabbage: [], greens: [], egg: [],
     fish: [], meat: [], oil: [], sack: [], crate: [], basin: [], mound: [],
   };
@@ -125,7 +125,7 @@ export function createInstancedMarketProduce(
       });
     }
 
-    if (!isL && (c.id === 11 || c.id === 12)) {
+    if (c.produceType === 'sayur') {
       pushInst(buckets.basin, cx + dir * 0.37, 0.67, cz, 0, 0, 0, 1.05, 1.05, 1.05, 0x2563eb);
     }
     if (c.produceType === 'wortel' || c.produceType === 'beras' || c.produceType === 'gula') {
@@ -143,6 +143,10 @@ export function createInstancedMarketProduce(
       } else if (c.produceType === 'jeruk') {
         pushInst(buckets.mound, t.tx, t.ty + 0.032, cz, 0, 0, 0, 0.96, 1.0, moundL, 0xd97706);
         scatterTop(buckets.orange, t.tx, t.ty + 0.068, cz, depth, seed, 32, [0xf59e0b, 0xf97316, 0xfbbf24], 1.0, 0.4);
+      } else if (c.produceType === 'semangka') {
+        for (let dz = -depth / 2 + 0.34; dz <= depth / 2 - 0.34; dz += 0.32) {
+          pushInst(buckets.watermelon, t.tx, t.ty + 0.1, cz + dz, 0.08, dz * 0.6, 0, 2.05, 1.75, 2.25, 0xffffff);
+        }
       } else if (c.produceType === 'bawang-merah') {
         pushInst(buckets.mound, t.tx, t.ty + 0.03, cz, 0, 0, 0, 0.96, 0.95, moundL, 0x6b1d35);
         scatterTop(buckets.shallot, t.tx, t.ty + 0.064, cz, depth, seed, 44, [0xffffff, 0xfce7f3, 0xfbcfe8], 1.0, 1.2);
@@ -227,6 +231,7 @@ export function createInstancedMarketProduce(
     ['mound', createMoundGeo, () => mat(0.85, pTex.moundTex, tex.organicNorm), false],
     ['tomato', createTomatoGeo, () => mat(0.18, pTex.tomatoTex, tex.organicNorm, 0.85), false],
     ['orange', createOrangeGeo, () => mat(0.34, undefined, tex.organicNorm, 0.3), false],
+    ['watermelon', createOrangeGeo, () => mat(0.28, pTex.watermelonTex, tex.organicNorm, 0.45), true],
     ['shallot', createOnionGeo, () => mat(0.4, pTex.shallotTex, tex.organicNorm, 0.35), false],
     ['garlic', createOnionGeo, () => mat(0.48, pTex.garlicTex, tex.organicNorm), false],
     ['carrot', createCarrotGeo, () => mat(0.4, pTex.carrotTex, tex.organicNorm), false],

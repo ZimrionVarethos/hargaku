@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ArrowRight, X } from '@phosphor-icons/react';
 import { MarketStallData } from '@/lib/data/market-stalls';
 import { BogorCommodity } from '@/lib/data/bogor-commodities';
 import { CommoditySvg } from '@/lib/data/market-svgs';
@@ -9,6 +10,9 @@ import { useAssistant } from '@/lib/store/assistant-store';
 interface Props {
   isOpen: boolean;
   stalls: MarketStallData[];
+  initialStallIdx?: number;
+  searchFilter?: string;
+  onClearSearchFilter?: () => void;
   onClose: () => void;
   onSelectCommodity: (item: BogorCommodity) => void;
 }
@@ -16,15 +20,36 @@ interface Props {
 export function LorongCommodityDrawer({
   isOpen,
   stalls,
+  initialStallIdx = 0,
+  searchFilter = '',
+  onClearSearchFilter,
   onClose,
   onSelectCommodity,
 }: Props) {
-  const [selectedStallIdx, setSelectedStallIdx] = useState(0);
+  const [selectedStallIdx, setSelectedStallIdx] = useState(initialStallIdx);
   const { openAssistant } = useAssistant();
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) setSelectedStallIdx(initialStallIdx);
+  }, [isOpen, initialStallIdx]);
 
+  const normalizedFilter = searchFilter.trim().toLowerCase();
   const currentStall = stalls[selectedStallIdx] || stalls[0];
+
+  const displayedItems = useMemo(() => {
+    if (normalizedFilter) {
+      return stalls
+        .flatMap((s) => s.items)
+        .filter(
+          (item) =>
+            item.name.toLowerCase().includes(normalizedFilter) ||
+            item.category.toLowerCase().includes(normalizedFilter)
+        );
+    }
+    return currentStall.items;
+  }, [normalizedFilter, stalls, currentStall]);
+
+  if (!isOpen) return null;
 
   const handleQuickAi = (e: React.MouseEvent, item: BogorCommodity) => {
     e.stopPropagation();
@@ -60,9 +85,10 @@ export function LorongCommodityDrawer({
             type="button"
             onClick={onClose}
             aria-label="Tutup daftar komoditas"
-            className="market-btn-secondary px-3 py-1 text-xs font-bold"
+            className="market-btn-secondary h-9 px-3 text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
           >
-            &times; Tutup
+            <X size={14} weight="bold" aria-hidden="true" />
+            <span>Tutup</span>
           </button>
         </div>
 
@@ -71,9 +97,12 @@ export function LorongCommodityDrawer({
             <button
               key={stall.id}
               type="button"
-              onClick={() => setSelectedStallIdx(idx)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap border shrink-0 transition-all ${
-                selectedStallIdx === idx
+              onClick={() => {
+                if (normalizedFilter && onClearSearchFilter) onClearSearchFilter();
+                setSelectedStallIdx(idx);
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap border shrink-0 transition-colors cursor-pointer ${
+                !normalizedFilter && selectedStallIdx === idx
                   ? 'bg-[#A92717] text-white border-[var(--border-ink)]'
                   : 'bg-[var(--bg-muted)] text-[var(--text-primary)] border-[var(--border-subtle)] hover:bg-[var(--bg-card)]'
               }`}
@@ -83,8 +112,25 @@ export function LorongCommodityDrawer({
           ))}
         </div>
 
+        {normalizedFilter && (
+          <div className="py-2 px-3 mt-2 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-subtle)] flex items-center justify-between text-xs shrink-0">
+            <span className="text-[var(--text-secondary)]">
+              Hasil pencarian <strong className="text-[var(--text-primary)]">&ldquo;{searchFilter}&rdquo;</strong> ({displayedItems.length} item)
+            </span>
+            {onClearSearchFilter && (
+              <button
+                type="button"
+                onClick={onClearSearchFilter}
+                className="font-bold text-[var(--accent-chili)] hover:underline cursor-pointer"
+              >
+                Tampilkan semua kategori
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="flex-1 overflow-y-auto py-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
-          {currentStall.items.map((item) => (
+          {displayedItems.map((item) => (
             <div
               key={item.id}
               onClick={() => {
@@ -113,7 +159,10 @@ export function LorongCommodityDrawer({
               </div>
 
               <div className="mt-2 pt-1 border-t border-[var(--border-subtle)] flex items-center justify-between text-[10px]">
-                <span className="font-semibold text-[var(--accent-chili)]">Rincian &rarr;</span>
+                <span className="font-semibold text-[var(--accent-chili)] inline-flex items-center gap-0.5">
+                  <span>Rincian</span>
+                  <ArrowRight size={11} weight="bold" aria-hidden="true" />
+                </span>
                 <button
                   type="button"
                   onClick={(e) => handleQuickAi(e, item)}
@@ -127,7 +176,11 @@ export function LorongCommodityDrawer({
         </div>
 
         <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-[11px] text-[var(--text-muted)] shrink-0">
-          <span>{currentStall.items.length} komoditas di {currentStall.title}</span>
+          <span>
+            {normalizedFilter
+              ? `${displayedItems.length} komoditas cocok`
+              : `${currentStall.items.length} komoditas di ${currentStall.title}`}
+          </span>
           <span className="font-semibold text-[var(--forest-ink)]">Sinkron DB</span>
         </div>
       </div>

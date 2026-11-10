@@ -22,7 +22,7 @@ export function LorongEntranceGate({
   scrollProgress,
   onEnterMarket,
 }: Props) {
-  const gateOpacity = scrollProgress > 0.08 ? Math.max(0, 1 - (scrollProgress - 0.08) * 8) : 1;
+  const gateOpacity = scrollProgress > 0.04 ? Math.max(0, 1 - (scrollProgress - 0.04) * 16) : 1;
 
   return (
     <div
@@ -126,7 +126,7 @@ export function LorongEntranceGate({
       </div>
 
       <div
-        className="relative z-20 max-w-xl mx-auto text-center flex flex-col items-center px-4 pt-4 sm:pt-6 pb-2 transition-all duration-200"
+        className="relative z-20 w-full max-w-3xl mx-auto text-center flex flex-col items-center px-4 pt-4 sm:pt-6 pb-2 transition-all duration-200"
         style={{
           opacity: heroTextOpacity,
           transform: `translateY(-${(1 - heroTextOpacity) * 70}px)`,
@@ -145,26 +145,45 @@ export function LorongEntranceGate({
           />
         </div>
 
-        <h1 className="font-bold text-3xl sm:text-5xl lg:text-[48px] tracking-tight text-[#132E20] leading-[1.14] mb-3">
-          Harga Pasar, Lebih Dekat
+        <h1 className="font-bold tracking-tight text-[#132E20] leading-[1.14] mb-3 text-[clamp(1.375rem,0.75rem+3.1vw,3rem)]">
+          Cek Harga Sebelum ke Pasar
         </h1>
 
-        <p className="text-sm sm:text-lg text-[#263E30] font-normal leading-relaxed max-w-md mb-6">
-          Jelajahi harga 53 komoditas pasar rakyat secara langsung di lorong pasar Kota Bogor.
+        <p className="text-sm sm:text-lg text-[#263E30] font-normal leading-relaxed max-w-md sm:max-w-xl mb-6">
+          Bandingkan harga tawaran lapak dengan acuan resmi pemerintah, pantauan pasar, dan laporan warga.
         </p>
 
         <button
           type="button"
           onClick={onEnterMarket}
-          className="pasarku-cta-btn inline-flex items-center justify-center gap-3 px-9 sm:px-11 py-3.5 text-base sm:text-lg font-bold"
+          className="pasarku-cta-btn inline-flex items-center justify-center px-9 sm:px-11 py-3.5 text-base sm:text-lg font-bold"
         >
-          <span>Mulai</span>
-          <span className="text-xl animate-bounce">&darr;</span>
+          <span>Masuk Lorong</span>
         </button>
 
-        <div className="mt-4 text-xs font-semibold text-[#566B5D]">
-          Scroll untuk melangkah masuk ke dalam pasar
-        </div>
+        <button
+          type="button"
+          onClick={onEnterMarket}
+          className="mt-4 flex flex-col items-center gap-1.5 text-xs font-semibold text-[#566B5D] hover:text-[#132E20] transition-colors cursor-pointer"
+        >
+          <span>Scroll untuk melangkah ke dalam pasar</span>
+          <svg
+            aria-hidden="true"
+            width="18"
+            height="18"
+            viewBox="0 0 16 16"
+            fill="none"
+            className="animate-scroll-cue text-[#245034]"
+          >
+            <path
+              d="M8 2.5V13M8 13L3.5 8.5M8 13L12.5 8.5"
+              stroke="currentColor"
+              strokeWidth="2.1"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
       </div>
     </div>
   );

@@ -43,7 +43,7 @@ export function FooterMarketPanorama() {
         </svg>
 
         <svg
-          className="hidden md:block absolute inset-0 w-full h-full pointer-events-none z-10"
+          className="hidden md:block absolute inset-0 w-full h-full pointer-events-none z-0"
           viewBox="0 0 1440 285"
           preserveAspectRatio="none"
         >
@@ -77,18 +77,18 @@ export function FooterMarketPanorama() {
           />
         </svg>
 
-        <div className="relative h-full w-full md:max-w-[940px] lg:max-w-[1040px] mx-auto overflow-hidden">
-          <Image
-            src="/images/pasarku/footer-market-real.jpg"
-            alt="Panorama Pasar Rakyat Kota Bogor"
-            fill
-            sizes="(max-width: 768px) 100vw, 1040px"
-            className="object-cover object-[50%_74%] footer-market-photo"
-          />
-          <div className="absolute inset-x-0 top-0 h-[44%] bg-gradient-to-b from-[var(--bg-muted)] via-[var(--bg-muted)]/60 to-transparent pointer-events-none" />
-          <div className="hidden md:block absolute inset-y-0 left-0 w-28 lg:w-44 bg-gradient-to-r from-[var(--bg-muted)] via-[var(--bg-muted)]/75 to-transparent pointer-events-none" />
-          <div className="hidden md:block absolute inset-y-0 right-0 w-28 lg:w-44 bg-gradient-to-l from-[var(--bg-muted)] via-[var(--bg-muted)]/75 to-transparent pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-5 bg-gradient-to-t from-[var(--border-ink)]/25 to-transparent pointer-events-none" />
+        <div className="relative z-10 h-full w-full md:max-w-[920px] lg:max-w-[1020px] mx-auto bg-[var(--bg-muted)]">
+          <div className="hidden md:block absolute inset-y-0 right-full w-24 lg:w-36 bg-gradient-to-l from-[var(--bg-muted)] via-[var(--bg-muted)]/75 to-transparent pointer-events-none" />
+          <div className="hidden md:block absolute inset-y-0 left-full w-24 lg:w-36 bg-gradient-to-r from-[var(--bg-muted)] via-[var(--bg-muted)]/75 to-transparent pointer-events-none" />
+          <div className="relative w-full h-full overflow-hidden footer-market-mask">
+            <Image
+              src="/images/pasarku/footer-market-real.jpg"
+              alt="Panorama Pasar Rakyat Kota Bogor"
+              fill
+              sizes="(max-width: 768px) 100vw, 1020px"
+              className="object-cover object-[50%_74%] footer-market-photo"
+            />
+          </div>
         </div>
       </div>
 
