@@ -10,9 +10,7 @@ import { useTheme } from '@/lib/store/theme-store';
 import { RegionPhaseSwitcher } from './RegionPhaseSwitcher';
 
 const NAV_LINKS = [
-  { href: '/#heroSection', label: 'Lorong Pasar' },
-  { href: '/#sorotanSection', label: 'Papan Pokok' },
-  { href: '/#unitPasarSection', label: 'Unit Pasar' },
+  { href: '/', label: 'Beranda' },
   { href: '/cek-harga', label: 'Cek Harga' },
   { href: '/peta', label: 'Peta' },
   { href: '/lapor', label: 'Lapor' },
@@ -55,14 +53,14 @@ export function Navbar() {
           </div>
         </div>
 
-        <nav aria-label="Navigasi Utama" className="hidden xl:flex items-center gap-1">
+        <nav aria-label="Navigasi Utama" className="hidden lg:flex items-center gap-1">
           {NAV_LINKS.map((link) => {
-            const isActive = pathname === link.href || (link.href.startsWith('/#') && pathname === '/');
+            const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
                   isActive
                     ? 'text-[var(--accent-chili)] hover:bg-[var(--bg-muted)]'
                     : 'text-[var(--text-primary)] hover:bg-[var(--bg-muted)]'
@@ -115,7 +113,7 @@ export function Navbar() {
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Buka navigasi seluler"
-            className="xl:hidden market-btn-secondary p-2 min-h-[38px] sm:min-h-[40px]"
+            className="lg:hidden market-btn-secondary p-2 min-h-[38px] sm:min-h-[40px]"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
               {mobileOpen ? (
@@ -129,21 +127,26 @@ export function Navbar() {
       </div>
 
       {mobileOpen && (
-        <div className="xl:hidden border-t-2 border-[var(--border-ink)] bg-[var(--bg-paper)] px-4 py-3 space-y-2">
+        <div className="lg:hidden border-t-2 border-[var(--border-ink)] bg-[var(--bg-paper)] px-4 py-3 space-y-2">
           <div className="sm:hidden pb-2 border-b border-[var(--border-subtle)]">
             <RegionPhaseSwitcher compact />
           </div>
           <div className="space-y-1">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm font-bold text-[var(--text-primary)] hover:bg-[var(--bg-muted)]"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`block px-3 py-2 rounded-lg text-sm font-bold hover:bg-[var(--bg-muted)] ${
+                    isActive ? 'text-[var(--accent-chili)]' : 'text-[var(--text-primary)]'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}

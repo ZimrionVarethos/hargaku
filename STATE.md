@@ -10,6 +10,7 @@
 * **Fokus Pengerjaan**: Mengimplementasikan visi lengkap PasarKu sebagai alat bantu keputusan belanja pembeli (komplementer terhadap PIHPS BI & Panel Harga Bapanas), skala ekspansi terstruktur 4 fase wilayah, inteligensi agregat per pasar (*"di pasar dekat stasiun, apa yang sedang mahal/langka"*), serta pelaporan dua arah anonim (Warga · Lapor Harga & Pedagang · Kelangkaan Pasokan) dari spesifikasi `docs/*.md`, skema PostgreSQL/API, antarmuka publik/admin, hingga verifikasi browser lintas tema.
 * **Fitur Utama Terkini**:
   - **Alat Bantu Keputusan Belanja Pelengkap PIHPS (`/cek-harga`, `src/lib/price-logic.ts`, `src/app/api/v1/price-check/route.ts`)**: Pengguna memasukkan jumlah, satuan (`kg`, `ons`, `1/4 kg`, `1/2 kg`, `liter`, `ikat`), lokasi pasar tujuan, dan harga penawaran lapak, lalu membandingkannya langsung dalam 3 lapis setara satuan terhadap **Acuan Nasional Bapanas (HAP/HET)**, **Acuan Daerah / PIHPS**, dan **Laporan Warga & Pasar Setempat**.
+  - **Penyederhanaan Navigasi Navbar (`Navbar.tsx`)**: Menggabungkan `Lorong Pasar`, `Papan Pokok`, dan `Unit Pasar` menjadi satu tautan ringkas **`Beranda`** (`/`) bersama `Cek Harga`, `Peta`, `Lapor`, dan `Komparasi AI`.
   - **Arsitektur Ekspansi 4 Fase (`RegionPhaseSwitcher.tsx`, `src/lib/mock/regions.data.ts`, `filterMarketsForRegion`)**:
     - `Fase 1 · Kota Bogor` (default): 13 unit pasar rakyat Perumda PPJ Kota Bogor.
     - `Fase 2 · Jabodetabek`: Aglomerasi Jakarta, Bogor, Depok, Tangerang, Bekasi.
