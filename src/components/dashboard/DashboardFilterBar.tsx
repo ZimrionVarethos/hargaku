@@ -60,9 +60,7 @@ export function DashboardFilterBar({
 }: Props) {
   return (
     <div className="flex flex-col gap-4">
-      {/* Top Controls Row */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-        {/* Search Input */}
         <div className="md:col-span-5 relative">
           <MagnifyingGlass
             size={16}
@@ -78,7 +76,6 @@ export function DashboardFilterBar({
           />
         </div>
 
-        {/* Market Selector */}
         <div className="md:col-span-3 relative">
           <select
             value={selectedMarket}
@@ -111,7 +108,6 @@ export function DashboardFilterBar({
           />
         </div>
 
-        {/* Sort Selector */}
         <div className="md:col-span-2 relative">
           <select
             value={selectedSort}
@@ -130,7 +126,6 @@ export function DashboardFilterBar({
           />
         </div>
 
-        {/* Light Mode / Table View Switch */}
         <div className="md:col-span-2 flex items-center justify-end">
           <button
             type="button"
@@ -153,7 +148,6 @@ export function DashboardFilterBar({
         </div>
       </div>
 
-      {/* Category Pills Row */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         {CATEGORIES.map((cat) => {
           const isActive = selectedCategory === cat.id;

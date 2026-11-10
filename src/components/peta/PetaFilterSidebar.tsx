@@ -25,7 +25,6 @@ export function PetaFilterSidebar({
           Filter Pantauan
         </h3>
 
-        {/* Komoditas Pilihan */}
         <div className="flex flex-col gap-1.5">
           <label className="text-[12px] font-bold text-[var(--text-primary)]">
             Komoditas Pilihan
@@ -50,14 +49,12 @@ export function PetaFilterSidebar({
           </div>
         </div>
 
-        {/* Kategori Indeks Relatif Legend */}
         <div className="flex flex-col gap-2 pt-2 border-t border-[var(--border-subtle)]">
           <span className="text-[12px] font-bold text-[var(--text-primary)]">
             Kategori Indeks Relatif
           </span>
 
           <div className="flex flex-col gap-2.5 text-[12px]">
-            {/* Murah */}
             <div className="flex items-start gap-2.5">
               <span className="w-3 h-3 rounded-full bg-[#E2EFE6] border border-[#245034] shrink-0 mt-0.5" />
               <div className="flex flex-col">
@@ -70,7 +67,6 @@ export function PetaFilterSidebar({
               </div>
             </div>
 
-            {/* Rerata */}
             <div className="flex items-start gap-2.5">
               <span className="w-3 h-3 rounded-full bg-[var(--bg-muted)] border border-[var(--border-ink)] shrink-0 mt-0.5" />
               <div className="flex flex-col">
@@ -83,7 +79,6 @@ export function PetaFilterSidebar({
               </div>
             </div>
 
-            {/* Mahal */}
             <div className="flex items-start gap-2.5">
               <span className="w-3 h-3 rounded-full bg-[#FBE9E6] border border-[#A92717] shrink-0 mt-0.5" />
               <div className="flex flex-col">
@@ -99,7 +94,6 @@ export function PetaFilterSidebar({
         </div>
       </div>
 
-      {/* Mode Ringan Toggle Button */}
       <button
         type="button"
         onClick={onToggleLightMode}

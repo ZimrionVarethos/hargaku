@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { MarketStallData } from '@/lib/data/market-stalls';
 
 interface Props {
@@ -25,8 +24,7 @@ export function LorongWalkHud({
   return (
     <div className="w-full bg-[var(--bg-paper)]/95 backdrop-blur-md border-b-2 border-[var(--border-ink)] py-2.5 px-3 sm:px-6 shrink-0 z-30 shadow-xs">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2.5">
-        
-        {/* Left: Exit to Gate & Distance Odometer */}
+
         <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
           <button
             type="button"
@@ -50,7 +48,6 @@ export function LorongWalkHud({
           </div>
         </div>
 
-        {/* Center: Stall Walk Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 md:pb-0 scrollbar-none">
           {stalls.map((stall, idx) => {
             const isActive = activeStallIndex === idx;
@@ -71,7 +68,6 @@ export function LorongWalkHud({
           })}
         </div>
 
-        {/* Right: In-Corridor Search Filter */}
         <div className="w-full md:w-64 relative shrink-0">
           <input
             type="text"
@@ -100,4 +96,3 @@ export function LorongWalkHud({
     </div>
   );
 }
-

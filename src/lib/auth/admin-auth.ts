@@ -113,7 +113,6 @@ function persistSession(session: AuthSession) {
       localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
     }
   } catch {
-    // Graceful fallback if localStorage is disabled
   }
 }
 
@@ -130,7 +129,6 @@ export function logoutAdmin(): void {
       fetch('/api/v1/admin/auth/login', { method: 'DELETE' }).catch(() => {});
     }
   } catch {
-    // Ignore errors
   }
 }
 
@@ -151,13 +149,11 @@ export function getAdminSession(): AuthSession | null {
     const parsed = JSON.parse(raw) as AuthSession;
     if (!parsed || !parsed.token || !parsed.expiresAt) return null;
 
-    // Check expiry
     if (Date.now() > parsed.expiresAt) {
       logoutAdmin();
       return null;
     }
 
-    // Sanitize legacy persona if user browser had stale storage
     const userName = parsed.user?.name || parsed.user?.fullName || '';
     const userEmail = parsed.user?.email || '';
     if (

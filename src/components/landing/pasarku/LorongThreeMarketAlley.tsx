@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react';
+import { useRef, useEffect, useMemo, useState, useCallback, type MouseEvent } from 'react';
 import { BogorCommodity } from '@/lib/data/bogor-commodities';
 import { useLiveBogorCommodities } from '@/lib/data/live-bogor-sync';
 import { ThreeMarketCorridorManager } from './three/three-scene-manager';
@@ -10,7 +10,6 @@ import { useTheme } from '@/lib/store/theme-store';
 interface Props {
   walkProgress: number;
   walkMeters: number;
-  searchQuery: string;
   onSelectCommodity: (item: BogorCommodity) => void;
 }
 
@@ -57,9 +56,14 @@ export function LorongThreeMarketAlley({
   const [hoveredName, setHoveredName] = useState<string | null>(null);
   const lastRaycastRef = useRef<number>(0);
 
+  const commodityById = useMemo(
+    () => new Map(liveCommodities.map((b) => [b.id, b])),
+    [liveCommodities]
+  );
+
   const compartments: ThreeStallCompartment[] = useMemo(() => {
     return COMPARTMENT_SLOTS.map((s) => {
-      const item = liveCommodities.find((b) => b.id === s.commodityId);
+      const item = commodityById.get(s.commodityId);
       const priceStr = item ? `Rp ${item.price.toLocaleString('id-ID')}` : 'Rp 0';
       return {
         ...s,
@@ -69,17 +73,26 @@ export function LorongThreeMarketAlley({
         category: item ? item.category : 'SAYURAN',
       };
     });
-  }, [liveCommodities]);
+  }, [commodityById]);
+
+  const compartmentById = useMemo(
+    () => new Map(compartments.map((c) => [c.id, c])),
+    [compartments]
+  );
 
   const compartmentsRef = useRef(compartments);
+  const lastTaggedRef = useRef<ThreeStallCompartment[] | null>(null);
   useEffect(() => {
     compartmentsRef.current = compartments;
+    if (lastTaggedRef.current === compartments) return;
+    lastTaggedRef.current = compartments;
     managerRef.current?.updatePriceTags(compartments);
   }, [compartments]);
 
   useEffect(() => {
     if (!canvasMountRef.current) return;
     const mgr = new ThreeMarketCorridorManager();
+    lastTaggedRef.current = compartmentsRef.current;
     mgr.init(canvasMountRef.current, isDark, compartmentsRef.current);
     managerRef.current = mgr;
 
@@ -104,20 +117,20 @@ export function LorongThreeMarketAlley({
   }, [walkProgress]);
 
   const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+    (e: MouseEvent<HTMLDivElement>) => {
       if (!wrapperRef.current || !managerRef.current) return;
       const rect = wrapperRef.current.getBoundingClientRect();
       const hit = managerRef.current.raycastHit(e.clientX, e.clientY, rect);
       if (hit) {
-        const item = liveCommodities.find((b) => b.id === hit.commodityId);
+        const item = commodityById.get(hit.commodityId);
         if (item) onSelectCommodity(item);
       }
     },
-    [liveCommodities, onSelectCommodity]
+    [commodityById, onSelectCommodity]
   );
 
   const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+    (e: MouseEvent<HTMLDivElement>) => {
       const now = performance.now();
       if (now - lastRaycastRef.current < 35) return;
       lastRaycastRef.current = now;
@@ -127,13 +140,13 @@ export function LorongThreeMarketAlley({
       const hit = managerRef.current.raycastHit(e.clientX, e.clientY, rect);
 
       if (hit) {
-        const comp = compartments.find((c) => c.id === hit.compartmentId);
+        const comp = compartmentById.get(hit.compartmentId);
         setHoveredName(comp ? `${comp.name} (${comp.priceText} ${comp.unitText})` : null);
       } else {
         setHoveredName(null);
       }
     },
-    [compartments]
+    [compartmentById]
   );
 
   return (

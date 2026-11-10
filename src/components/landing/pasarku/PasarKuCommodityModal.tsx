@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { BogorCommodity } from '@/lib/data/bogor-commodities';
 import { useLiveBogorCommodities } from '@/lib/data/live-bogor-sync';
 import { CommoditySvg } from '@/lib/data/market-svgs';

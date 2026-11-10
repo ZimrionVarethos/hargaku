@@ -23,7 +23,6 @@ export function AboutMethodologySection() {
         </div>
       </div>
 
-      {/* 3 Lapis Penentuan Harga Acuan */}
       <div className="market-card p-6 sm:p-8 space-y-6">
         <div>
           <h3 className="text-[18px] font-bold text-[var(--text-primary)]">
@@ -87,7 +86,6 @@ export function AboutMethodologySection() {
           </div>
         </div>
 
-        {/* Formula MAD Explainer */}
         <div className="p-5 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-subtle)] space-y-3">
           <div className="flex items-center gap-2">
             <ChartBar size={18} weight="bold" className="text-[var(--accent-chili)]" />
@@ -104,7 +102,6 @@ export function AboutMethodologySection() {
           </div>
         </div>
 
-        {/* 4 Status Bands */}
         <div className="space-y-3 pt-2">
           <h4 className="text-[14px] font-bold text-[var(--text-primary)]">
             3. Klasifikasi Status Kewajaran Harga

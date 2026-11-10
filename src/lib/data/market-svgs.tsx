@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function CommoditySvg({
   kind,
   className = 'w-full h-full',

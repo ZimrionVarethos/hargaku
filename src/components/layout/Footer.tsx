@@ -1,12 +1,11 @@
-import React from 'react';
+import { FooterMarketPanorama } from '@/components/layout/FooterMarketPanorama';
 
 export function Footer() {
   return (
-    <footer className="bg-[var(--bg-muted)] border-t-2 border-[var(--border-ink)] mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          
-          {/* Brand & Purpose */}
+    <footer className="bg-[var(--bg-muted)] border-t-2 border-[var(--border-ink)] mt-auto overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-4 sm:pt-7 sm:pb-5">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-7">
+
           <div className="md:col-span-5 space-y-2">
             <div className="font-bold text-2xl text-[var(--text-primary)]">
               Pasar<span className="text-[var(--accent-chili)]">Ku</span>{' '}
@@ -17,7 +16,6 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Perumda PPJ Office Information */}
           <div className="md:col-span-4 space-y-1.5 text-xs text-[var(--text-secondary)]">
             <h3 className="font-bold text-sm text-[var(--text-primary)]">
               Kantor Pusat Perumda Pasar Pakuan Jaya
@@ -28,7 +26,6 @@ export function Footer() {
             <p>Telepon: (0251) 8330313 | Email: info@pasarpakuanjaya.co.id</p>
           </div>
 
-          {/* Verified Data References */}
           <div className="md:col-span-3 space-y-1.5 text-xs">
             <h3 className="font-bold text-sm text-[var(--text-primary)]">
               Referensi Data Terverifikasi
@@ -68,12 +65,9 @@ export function Footer() {
           </div>
 
         </div>
-
-        <div className="mt-8 pt-6 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between text-[11px] text-[var(--text-muted)] gap-2">
-          <span>&copy; {new Date().getFullYear()} PasarKu Kota Bogor. Hak cipta dilindungi.</span>
-          <span>Inisiatif transparansi pangan publik: Tanpa bias komersial.</span>
-        </div>
       </div>
+
+      <FooterMarketPanorama />
     </footer>
   );
 }

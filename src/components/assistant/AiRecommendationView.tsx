@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, type FormEvent } from 'react';
 import { ChatCircleDots, PaperPlaneRight, ArrowsCounterClockwise, MapPin } from '@phosphor-icons/react';
 import { useAssistant } from '@/lib/store/assistant-store';
 import { useRegion } from '@/lib/store/region-store';
@@ -11,7 +11,7 @@ import { AiMessageBubble } from './AiMessageBubble';
 export function AiRecommendationView() {
   const { messages, isTyping, sendMessage, clearConversation } = useAssistant();
   const { selectedRegion, allRegions, setSelectedRegion } = useRegion();
-  const { commodities, rawMarkets, dailyPrices } = useLiveCatalog(selectedRegion.id);
+  const { commodities, rawMarkets, dailyPrices } = useLiveCatalog();
   const [selectedSlug, setSelectedSlug] = useState(commodities[0]?.slug || 'cabai-rawit-merah');
   const [inputText, setInputText] = useState('');
   const endRef = useRef<HTMLDivElement>(null);
@@ -66,7 +66,7 @@ export function AiRecommendationView() {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!inputText.trim() || isTyping) return;
     sendMessage(inputText);
@@ -105,7 +105,6 @@ export function AiRecommendationView() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left: Live 4-Source Comparison Analyzer */}
         <div className="lg:col-span-5 market-card p-5 space-y-4 bg-[var(--bg-card)]">
           <div className="space-y-1.5">
             <label htmlFor="aiComSelect" className="text-xs font-bold text-[var(--text-primary)]">
@@ -164,7 +163,6 @@ export function AiRecommendationView() {
           </button>
         </div>
 
-        {/* Right: Conversational PUNTEN Q&A Panel with Markdown Support */}
         <div className="lg:col-span-7 market-card bg-[var(--bg-card)] flex flex-col h-[560px] md:h-[620px] overflow-hidden">
           <div className="px-5 py-3.5 border-b-2 border-[var(--border-ink)] flex items-center justify-between bg-[var(--bg-muted)]">
             <div className="flex items-center gap-3">

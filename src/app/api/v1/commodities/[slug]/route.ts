@@ -1,16 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchBootstrapFromDb } from '@/lib/server/admin-db';
 import { MOCK_COMMODITY_DETAILS, MOCK_COMMODITY_SUMMARIES } from '@/lib/mock/commodities.data';
-import type { CommodityCategory, CommodityDetail } from '@/types';
-
-function mapCat(category: string): CommodityCategory {
-  if (category === 'BERAS') return 'BERAS';
-  if (category === 'CABAI_BAWANG') return 'CABAI_BAWANG';
-  if (category === 'DAGING') return 'DAGING_TELUR';
-  if (category === 'MINYAK') return 'MINYAK_GULA';
-  if (category === 'SAYUR') return 'SAYURAN';
-  return 'CABAI_BAWANG';
-}
+import { mapAdminCategoryToPublic } from '@/lib/utils';
+import type { CommodityDetail } from '@/types';
 
 export async function GET(
   _req: NextRequest,
@@ -24,26 +16,29 @@ export async function GET(
       return NextResponse.json({ success: false, message: 'Komoditas tidak ditemukan.' }, { status: 404 });
     }
 
-    const activeMarkets = markets.filter((m) => m.isActive);
-    const entries = activeMarkets
-      .map((m) => ({
-        marketName: m.name,
-        rec: dailyPrices[`${m.id}_${com.id}`],
-      }))
-      .filter((x): x is { marketName: string; rec: NonNullable<typeof x.rec> } => Boolean(x.rec && x.rec.price > 0));
+    let sumPrice = 0;
+    let sumPrev = 0;
+    let count = 0;
+    let highest: { name: string; price: number } | null = null;
+    let lowest: { name: string; price: number } | null = null;
 
-    const sorted = [...entries].sort((a, b) => a.rec.price - b.rec.price);
-    const cityAvg =
-      entries.length > 0
-        ? Math.round(entries.reduce((acc, e) => acc + e.rec.price, 0) / entries.length)
-        : com.hapHetPrice;
-    const prevAvg =
-      entries.length > 0
-        ? Math.round(entries.reduce((acc, e) => acc + (e.rec.previousPrice || e.rec.price), 0) / entries.length)
-        : com.hapHetPrice;
+    for (const m of markets) {
+      if (!m.isActive) continue;
+      const rec = dailyPrices[`${m.id}_${com.id}`];
+      if (!rec || rec.price <= 0) continue;
+      sumPrice += rec.price;
+      sumPrev += rec.previousPrice || rec.price;
+      count++;
+      if (!highest || rec.price > highest.price) highest = { name: m.name, price: rec.price };
+      if (!lowest || rec.price < lowest.price) lowest = { name: m.name, price: rec.price };
+    }
 
+    const cityAvg = count > 0 ? Math.round(sumPrice / count) : com.hapHetPrice;
+    const prevAvg = count > 0 ? Math.round(sumPrev / count) : com.hapHetPrice;
+
+    const firstWord = com.name.split(' ')[0].toLowerCase();
     const approvedCount = reports.filter(
-      (r) => r.status === 'APPROVED' && r.commodityName.toLowerCase().includes(com.name.split(' ')[0].toLowerCase())
+      (r) => r.status === 'APPROVED' && r.commodityName.toLowerCase().includes(firstWord)
     ).length;
 
     const detail: CommodityDetail = {
@@ -51,7 +46,7 @@ export async function GET(
       name: com.name,
       slug: com.slug,
       unit: com.unit,
-      category: mapCat(com.category),
+      category: mapAdminCategoryToPublic(com.category),
       reference: {
         priceHapHet: com.hapHetPrice,
         type: com.name.toLowerCase().includes('beras') || com.name.toLowerCase().includes('minyak') ? 'HET' : 'HAP',
@@ -59,12 +54,8 @@ export async function GET(
       },
       currentPriceStats: {
         cityAverage: cityAvg,
-        highestMarket: sorted.length > 0
-          ? { name: sorted[sorted.length - 1].marketName, price: sorted[sorted.length - 1].rec.price }
-          : { name: 'Pasar Rakyat', price: cityAvg },
-        lowestMarket: sorted.length > 0
-          ? { name: sorted[0].marketName, price: sorted[0].rec.price }
-          : { name: 'Pasar Rakyat', price: cityAvg },
+        highestMarket: highest || { name: 'Pasar Rakyat', price: cityAvg },
+        lowestMarket: lowest || { name: 'Pasar Rakyat', price: cityAvg },
         citizenReportsCount: Math.max(3, approvedCount),
       },
       priceHistory: [

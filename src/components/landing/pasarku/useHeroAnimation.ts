@@ -2,16 +2,21 @@
 
 import { useEffect, useRef } from 'react';
 
-export function useHeroAnimation() {
+export function useHeroAnimation(enabled = true) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number>(0);
   const waveTimeRef = useRef<number>(0);
 
   useEffect(() => {
+    if (!enabled) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    const trFill = document.getElementById('trWaveFill');
+    const trGold = document.getElementById('trWaveGold');
+    const trDark = document.getElementById('trWaveDark');
 
     let width = (canvas.width = canvas.parentElement?.clientWidth || 1440);
     let height = (canvas.height = canvas.parentElement?.clientHeight || 700);
@@ -23,7 +28,6 @@ export function useHeroAnimation() {
     };
     window.addEventListener('resize', onResize);
 
-    // 24 golden morning light motes
     const motes = Array.from({ length: 24 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
@@ -53,14 +57,9 @@ export function useHeroAnimation() {
         ctx.fill();
       }
 
-      // Animate SVG wave paths
       const w1 = Math.sin(t) * 12;
       const w2 = Math.cos(t * 0.85) * 14;
       const w3 = Math.sin(t * 1.15 + 1.2) * 10;
-
-      const trFill = document.getElementById('trWaveFill');
-      const trGold = document.getElementById('trWaveGold');
-      const trDark = document.getElementById('trWaveDark');
 
       if (trFill) {
         trFill.setAttribute(
@@ -89,7 +88,7 @@ export function useHeroAnimation() {
       cancelAnimationFrame(animFrameRef.current);
       window.removeEventListener('resize', onResize);
     };
-  }, []);
+  }, [enabled]);
 
   return { canvasRef };
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { Database, Key, MapPin, CheckCircle, WarningCircle } from '@phosphor-icons/react';
 
 export interface PublicAiSettingsDto {

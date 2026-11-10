@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAdminStore } from '@/lib/store/admin-store';
 import { AdminMetricCards } from './AdminMetricCards';
 import { AdminReportQueue } from './AdminReportQueue';

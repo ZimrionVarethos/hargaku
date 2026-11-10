@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PasarKuLorongHero } from '@/components/landing/pasarku/PasarKuLorongHero';
 import { PasarKuSorotanSection } from '@/components/landing/pasarku/PasarKuSorotanSection';
 import { PasarKuAnalitikSection } from '@/components/landing/pasarku/PasarKuAnalitikSection';
@@ -13,19 +13,14 @@ export default function HomePage() {
 
   return (
     <div className="w-full flex flex-col bg-[var(--bg-paper)] text-[var(--text-primary)]">
-      {/* Immersive Gate Zoom & Lorong Pasar Walkthrough */}
       <PasarKuLorongHero onSelectCommodity={setSelectedCommodity} />
 
-      {/* Papan Pokok & Sorotan Pangan */}
       <PasarKuSorotanSection />
 
-      {/* Grafik Kategori & Metrik Harga */}
       <PasarKuAnalitikSection />
 
-      {/* Direktori 13 Unit Pasar */}
       <PasarKuUnitPasarSection />
 
-      {/* Pop-up Detail Komoditas */}
       <PasarKuCommodityModal
         item={selectedCommodity}
         onClose={() => setSelectedCommodity(null)}

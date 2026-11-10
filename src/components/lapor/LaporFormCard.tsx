@@ -129,7 +129,6 @@ export function LaporFormCard({
         </div>
       </div>
 
-      {/* Takaran & Nominal */}
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
         <div className="sm:col-span-7 flex flex-col gap-2">
           <label className="text-[12px] font-bold text-[var(--text-primary)]">Nominal yang Dibayar &amp; Takaran</label>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useLiveBogorCommodities } from '@/lib/data/live-bogor-sync';
 import { useAssistant } from '@/lib/store/assistant-store';
 import { CommoditySvg } from '@/lib/data/market-svgs';
@@ -11,20 +11,36 @@ export function PasarKuSorotanSection() {
   const { openAssistant } = useAssistant();
   const liveCommodities = useLiveBogorCommodities();
 
-  const quickItems = useMemo(() => {
-    return QUICK_COMMODITY_IDS.map((id) =>
-      liveCommodities.find((c) => c.id === id)
-    ).filter((c): c is NonNullable<typeof c> => !!c);
-  }, [liveCommodities]);
+  const { quickItems, topPriceItem, berasRange } = useMemo(() => {
+    const byId = new Map<number, (typeof liveCommodities)[number]>();
+    let minBeras = Infinity;
+    let maxBeras = -Infinity;
 
-  const topPriceItem = useMemo(() => {
-    return [...quickItems].sort((a, b) => b.price - a.price)[0];
-  }, [quickItems]);
+    for (const c of liveCommodities) {
+      byId.set(c.id, c);
+      if (c.subCategory === 'BERAS') {
+        if (c.price < minBeras) minBeras = c.price;
+        if (c.price > maxBeras) maxBeras = c.price;
+      }
+    }
 
-  const berasRange = useMemo(() => {
-    const beras = liveCommodities.filter((c) => c.subCategory === 'BERAS').map((c) => c.price);
-    if (beras.length === 0) return { min: 12500, max: 16000 };
-    return { min: Math.min(...beras), max: Math.max(...beras) };
+    const items: (typeof liveCommodities)[number][] = [];
+    let top: (typeof liveCommodities)[number] | undefined;
+    for (const id of QUICK_COMMODITY_IDS) {
+      const found = byId.get(id);
+      if (!found) continue;
+      items.push(found);
+      if (!top || found.price > top.price) top = found;
+    }
+
+    return {
+      quickItems: items,
+      topPriceItem: top,
+      berasRange:
+        minBeras <= maxBeras
+          ? { min: minBeras, max: maxBeras }
+          : { min: 12500, max: 16000 },
+    };
   }, [liveCommodities]);
 
   const handleAskAi = (item: (typeof quickItems)[0]) => {
@@ -37,7 +53,6 @@ export function PasarKuSorotanSection() {
     <section id="sorotanSection" className="border-b-2 border-[var(--border-ink)] py-12 bg-[var(--bg-paper)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: 5 Cols Sorotan Pangan Utama */}
           <div className="lg:col-span-5 space-y-5">
             <div>
               <div className="inline-block px-3 py-1 rounded-full text-xs font-bold border border-[var(--border-ink)] bg-[var(--bg-muted)] text-[var(--accent-chili)] mb-3">
@@ -97,7 +112,6 @@ export function PasarKuSorotanSection() {
             </div>
           </div>
 
-          {/* Right Column: 7 Cols Papan Harga Cepat 10 Komoditas */}
           <div className="lg:col-span-7">
             <div className="market-card p-6">
               <div className="flex items-center justify-between border-b-2 border-[var(--border-ink)] pb-4 mb-4">

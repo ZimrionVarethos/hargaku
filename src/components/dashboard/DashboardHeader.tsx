@@ -24,7 +24,6 @@ export function DashboardHeader({
         </p>
       </div>
 
-      {/* Live Update Pill */}
       <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[var(--bg-card)] border border-[var(--border-ink)] text-[12px] font-bold text-[var(--text-primary)] shadow-xs w-fit shrink-0">
         <Clock size={14} weight="bold" className="text-[var(--text-muted)]" />
         <span>Pembaruan: {lastUpdatedText}</span>

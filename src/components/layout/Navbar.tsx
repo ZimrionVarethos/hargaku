@@ -34,10 +34,9 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--bg-paper)]/95 backdrop-blur-xs border-b-2 border-[var(--border-ink)] transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[64px] py-2 flex items-center justify-between gap-3">
-        
-        {/* Brand / Logo */}
-        <Link href="/" className="flex items-center gap-2.5 no-underline shrink-0">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-h-[60px] sm:min-h-[64px] py-2 flex items-center justify-between gap-2 sm:gap-3">
+
+        <Link href="/" className="flex items-center gap-2 sm:gap-2.5 no-underline shrink-0">
           <span className="pasarku-logo-plaque">
             <Image
               src="/images/pasarku/logo-nav.webp"
@@ -46,15 +45,14 @@ export function Navbar() {
               height={173}
               unoptimized
               priority
-              className="h-8 w-auto object-contain"
+              className="h-7 sm:h-8 w-auto object-contain"
             />
           </span>
-          <span className="text-xs font-bold px-2 py-0.5 rounded bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-ink)]">
+          <span className="hidden sm:inline-block text-xs font-bold px-2 py-0.5 rounded bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-ink)]">
             Kota Bogor
           </span>
         </Link>
 
-        {/* Desktop Navigation Links */}
         <nav aria-label="Navigasi Utama" className="hidden xl:flex items-center gap-1">
           {NAV_LINKS.map((link) => {
             const isActive = pathname === link.href || (link.href.startsWith('/#') && pathname === '/');
@@ -74,13 +72,12 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Right Actions: Cari, Mode Subuh/Siang, Tanya PUNTEN */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             type="button"
             onClick={handleQuickSearch}
             aria-label="Fokus ke pencarian komoditas"
-            className="market-btn-secondary px-3 py-1.5 text-xs min-h-[40px] inline-flex items-center gap-1.5"
+            className="market-btn-secondary px-2.5 sm:px-3 py-1.5 text-xs min-h-[38px] sm:min-h-[40px] inline-flex items-center gap-1.5"
           >
             <svg aria-hidden="true" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
               <circle cx="11" cy="11" r="7" />
@@ -94,7 +91,7 @@ export function Navbar() {
             onClick={toggleTheme}
             aria-label={theme === 'dark' ? 'Beralih ke Mode Siang' : 'Beralih ke Mode Subuh'}
             title={theme === 'dark' ? 'Beralih ke Mode Siang' : 'Beralih ke Mode Subuh'}
-            className="market-btn-secondary w-10 h-10 p-0 inline-flex items-center justify-center shrink-0"
+            className="market-btn-secondary w-9 h-9 sm:w-10 sm:h-10 p-0 inline-flex items-center justify-center shrink-0"
           >
             {theme === 'dark' ? (
               <Sun size={18} weight="bold" className="text-[#EEF773]" aria-hidden="true" />
@@ -106,18 +103,17 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => openAssistant()}
-            className="market-btn-primary px-3.5 py-1.5 text-xs min-h-[40px] inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+            className="market-btn-primary px-2.5 sm:px-3.5 py-1.5 text-xs min-h-[38px] sm:min-h-[40px] inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
           >
             <ChatCircleDots size={15} weight="bold" />
             <span>Tanya PUNTEN</span>
           </button>
 
-          {/* Mobile hamburger toggle */}
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Buka navigasi seluler"
-            className="xl:hidden market-btn-secondary p-2 min-h-[40px]"
+            className="xl:hidden market-btn-secondary p-2 min-h-[38px] sm:min-h-[40px]"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
               {mobileOpen ? (
@@ -131,7 +127,6 @@ export function Navbar() {
 
       </div>
 
-      {/* Mobile Drawer Menu */}
       {mobileOpen && (
         <div className="xl:hidden border-t-2 border-[var(--border-ink)] bg-[var(--bg-paper)] px-4 py-3 space-y-1">
           {NAV_LINKS.map((link) => (

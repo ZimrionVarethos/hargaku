@@ -7,9 +7,6 @@ export interface MarketEnvironmentRig {
   aheadLight: THREE.PointLight;
 }
 
-/**
- * Creates an authentic, GPU-optimized traditional market corridor with batched structures & pooled lights
- */
 export function createMarketEnvironment(
   scene: THREE.Scene,
   isDark: boolean,
@@ -19,12 +16,10 @@ export function createMarketEnvironment(
   const envGroup = new THREE.Group();
   envGroup.name = 'market-environment';
 
-  // 1. Atmosphere & Fog (warm golden end glow)
   const fogColor = isDark ? 0x120d09 : 0xf2e6d8;
   scene.background = new THREE.Color(fogColor);
   scene.fog = new THREE.FogExp2(fogColor, 0.02);
 
-  // 2. Efficient Lighting Rig (Hemisphere + Directional + 2 Pooled Camera-Tracking PointLights)
   const hemiLight = new THREE.HemisphereLight(
     isDark ? 0xffd29d : 0xfff5e4,
     isDark ? 0x211810 : 0x6b5a4b,
@@ -53,7 +48,6 @@ export function createMarketEnvironment(
   aheadLight.position.set(0, 2.5, 11);
   envGroup.add(aheadLight);
 
-  // 3. Damp Cobblestone Walkway, Curbs, and Side Market Walls
   const floorMat = new THREE.MeshStandardMaterial({
     color: isDark ? 0x1f1812 : 0x5c5045,
     roughness: 0.85,
@@ -81,7 +75,6 @@ export function createMarketEnvironment(
     envGroup.add(curb);
   });
 
-  // Aged Market Side Partition Walls (backdrop for wall posters & booths)
   const wallGeo = new THREE.PlaneGeometry(corridorLength + 18, 3.4);
   const wallMat = new THREE.MeshStandardMaterial({
     color: isDark ? 0x1d1915 : 0xd6cab8,
@@ -96,7 +89,6 @@ export function createMarketEnvironment(
     envGroup.add(wall);
   });
 
-  // 4. Corrugated Zinc Roof Overhead
   const roofMat = new THREE.MeshStandardMaterial({
     color: isDark ? 0x1d2023 : 0x3b4146,
     map: tex.roofMap,
@@ -112,7 +104,6 @@ export function createMarketEnvironment(
     envGroup.add(roof);
   });
 
-  // 5. Batched Trusses, Posts, Awnings & Red-White Bunting (InstancedMesh)
   const trussMat = new THREE.MeshStandardMaterial({
     color: isDark ? 0x18120e : 0x2e241c,
     roughness: 0.42,
@@ -194,7 +185,6 @@ export function createMarketEnvironment(
   whiteAwning.instanceMatrix.needsUpdate = true;
   envGroup.add(redAwning, whiteAwning);
 
-  // 6. Lightweight Hanging Bulbs & Additive Glow Sprites (Zero transmission double-pass!)
   const cordGeo = new THREE.CylinderGeometry(0.008, 0.008, 0.72, 4);
   const bulbGeo = new THREE.SphereGeometry(0.065, 8, 8);
   const cordMat = new THREE.MeshStandardMaterial({ color: 0x110d0a, roughness: 0.9 });

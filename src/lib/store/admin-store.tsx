@@ -1,6 +1,6 @@
 'use client';
 
-import React, {
+import {
   createContext,
   useContext,
   useReducer,
@@ -8,7 +8,8 @@ import React, {
   useState,
   useRef,
   useCallback,
-  ReactNode,
+  useMemo,
+  type ReactNode,
 } from 'react';
 import type {
   AdminCommodity,
@@ -67,7 +68,6 @@ async function syncAdminMutation(
       body: JSON.stringify({ action, ...extra }),
     });
   } catch {
-    // Keep optimistic client state if server is temporarily unreachable
   }
 }
 
@@ -109,7 +109,6 @@ export function AdminStoreProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('hargaku_admin_store_v1');
       localStorage.removeItem('hargaku_admin_store_v2');
     } catch {
-      // Fallback silently to initial state
     }
 
     fetch('/api/v1/admin/bootstrap', { cache: 'no-store' })
@@ -132,7 +131,6 @@ export function AdminStoreProvider({ children }: { children: ReactNode }) {
         }
       })
       .catch(() => {
-        // Offline or unreachable fallback uses cached local data
       })
       .finally(() => {
         if (active) setIsLoaded(true);
@@ -148,7 +146,6 @@ export function AdminStoreProvider({ children }: { children: ReactNode }) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch {
-        // Ignore storage quota errors
       }
     }
   }, [state, isLoaded]);
@@ -240,38 +237,30 @@ export function AdminStoreProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch {
-      // Ignore storage errors
     }
   }, []);
 
-  return (
-    <AdminStoreContext.Provider
-      value={{
-        isLoaded,
-        dataSource,
-        currentUser: state.currentUser || INITIAL_ADMIN_STATE.currentUser,
-        commodities: state.commodities,
-        markets: state.markets,
-        dailyPrices: state.dailyPrices,
-        reports: state.reports,
-        updateProfile,
-        addCommodity,
-        updateCommodity,
-        deleteCommodity,
-        addMarket,
-        updateMarket,
-        deleteMarket,
-        updateDailyPrices,
-        addReport,
-        approveReport,
-        rejectReport,
-        requestReportInfo,
-        resetToDefaultData,
-      }}
-    >
-      {children}
-    </AdminStoreContext.Provider>
+  const contextValue = useMemo<AdminStoreContextType>(
+    () => ({
+      isLoaded,
+      dataSource,
+      currentUser: state.currentUser || INITIAL_ADMIN_STATE.currentUser,
+      commodities: state.commodities,
+      markets: state.markets,
+      dailyPrices: state.dailyPrices,
+      reports: state.reports,
+      updateProfile, addCommodity, updateCommodity, deleteCommodity,
+      addMarket, updateMarket, deleteMarket, updateDailyPrices,
+      addReport, approveReport, rejectReport, requestReportInfo, resetToDefaultData,
+    }),
+    [
+      isLoaded, dataSource, state, updateProfile, addCommodity, updateCommodity,
+      deleteCommodity, addMarket, updateMarket, deleteMarket, updateDailyPrices,
+      addReport, approveReport, rejectReport, requestReportInfo, resetToDefaultData,
+    ]
   );
+
+  return <AdminStoreContext.Provider value={contextValue}>{children}</AdminStoreContext.Provider>;
 }
 
 export function useAdminStore(): AdminStoreContextType {

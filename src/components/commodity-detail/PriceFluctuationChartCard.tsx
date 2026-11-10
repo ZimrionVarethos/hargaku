@@ -41,7 +41,6 @@ export function PriceFluctuationChartCard({ detail }: Props) {
 
   return (
     <div className="bg-white rounded-[18px] outline outline-1 outline-[#E5E3DE] p-5 sm:p-6 shadow-xs flex flex-col justify-between gap-5">
-      {/* Top Header & Range Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex flex-col gap-0.5">
           <h3 className="text-[16px] font-bold text-[#1B1A18] tracking-tight">
@@ -52,7 +51,6 @@ export function PriceFluctuationChartCard({ detail }: Props) {
           </p>
         </div>
 
-        {/* Range Tabs */}
         <div className="inline-flex items-center p-1 rounded-[8px] bg-[#FAF9F5] outline outline-1 outline-[#E5E3DE] text-[11px] font-medium w-fit">
           <button
             type="button"
@@ -84,7 +82,6 @@ export function PriceFluctuationChartCard({ detail }: Props) {
         </div>
       </div>
 
-      {/* Legend Indicators */}
       <div className="flex items-center justify-between text-[11px] text-[#8C8B85] border-b border-[#E5E3DE] pb-2">
         <span>Maks 30 Hari: Rp {maxVal.toLocaleString('id-ID')}</span>
         <span className="font-semibold text-[#1B1A18]">
@@ -92,9 +89,7 @@ export function PriceFluctuationChartCard({ detail }: Props) {
         </span>
       </div>
 
-      {/* Visual Chart Canvas */}
       <div className="relative h-44 w-full flex flex-col justify-end">
-        {/* HAP Threshold Line */}
         <div
           className="absolute left-0 right-0 border-b border-dashed border-[#1B1A18] pointer-events-none z-10 flex items-center justify-end"
           style={{ top: `${hapTopPercent}%` }}
@@ -104,7 +99,6 @@ export function PriceFluctuationChartCard({ detail }: Props) {
           </span>
         </div>
 
-        {/* Bars Container */}
         <div className="h-full flex items-end gap-1.5 sm:gap-2 pt-6">
           {DAILY_SERIES_30D.map((item, idx) => {
             const barHeight = Math.round(((item.price - minVal) / range) * 100);
@@ -135,7 +129,6 @@ export function PriceFluctuationChartCard({ detail }: Props) {
           })}
         </div>
 
-        {/* Date Axis */}
         <div className="flex items-center justify-between text-[10px] text-[#8C8B85] pt-2 border-t border-[#E5E3DE]">
           <span>22 Sep</span>
           <span>29 Sep</span>

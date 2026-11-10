@@ -36,7 +36,6 @@ export function createMarketTexturePack(): MarketTexturePack {
     return t;
   };
 
-  // 1. Weathered Wood Planks PBR (256x256)
   const wS = 256;
   const { c: wc, ctx: wctx } = makeCanvas(wS, wS);
   wctx.fillStyle = '#6B4223';
@@ -75,7 +74,6 @@ export function createMarketTexturePack(): MarketTexturePack {
   const woodNorm = reg(wrapRepeat(new THREE.CanvasTexture(wnc), 1, 1));
   const woodRough = reg(wrapRepeat(new THREE.CanvasTexture(wrc), 1, 1));
 
-  // 2. Damp Market Stone Walkway PBR (256x256)
   const sS = 256;
   const { c: sc, ctx: sctx } = makeCanvas(sS, sS);
   sctx.fillStyle = '#4B4138';
@@ -90,7 +88,6 @@ export function createMarketTexturePack(): MarketTexturePack {
       sctx.fillRect(x + off + 1, y + 1, bw - 2, bh - 2);
     }
   }
-  // Subtle green leaf litter flecks on wet floor
   sctx.fillStyle = 'rgba(34, 85, 42, 0.32)';
   for (let i = 0; i < 18; i++) {
     const lx = (i * 53) % sS;
@@ -122,7 +119,6 @@ export function createMarketTexturePack(): MarketTexturePack {
   const stoneNorm = reg(wrapRepeat(new THREE.CanvasTexture(snc), 2, 18));
   const stoneRough = reg(wrapRepeat(new THREE.CanvasTexture(src), 2, 18));
 
-  // 3. Corrugated Zinc Metal Roof PBR (128x128)
   const rS = 128;
   const { c: rc, ctx: rctx } = makeCanvas(rS, rS);
   const { c: rnc, ctx: rnctx } = makeCanvas(rS, rS);
@@ -145,7 +141,6 @@ export function createMarketTexturePack(): MarketTexturePack {
   const roofMap = reg(wrapRepeat(new THREE.CanvasTexture(rc), 4, 24));
   const roofNorm = reg(wrapRepeat(new THREE.CanvasTexture(rnc), 4, 24));
 
-  // 4. Woven Burlap Texture (128x128)
   const { c: bc, ctx: bctx } = makeCanvas(128, 128);
   bctx.fillStyle = '#A67C52';
   bctx.fillRect(0, 0, 128, 128);
@@ -156,7 +151,6 @@ export function createMarketTexturePack(): MarketTexturePack {
   }
   const burlapMap = reg(wrapRepeat(new THREE.CanvasTexture(bc), 2, 2));
 
-  // 5. Organic Micro-Bump Normal Map (128x128)
   const { c: oc, ctx: octx } = makeCanvas(128, 128);
   const oImg = octx.createImageData(128, 128);
   for (let y = 0; y < 128; y++) {
@@ -172,7 +166,6 @@ export function createMarketTexturePack(): MarketTexturePack {
   octx.putImageData(oImg, 0, 0);
   const organicNorm = reg(wrapRepeat(new THREE.CanvasTexture(oc), 1, 1));
 
-  // 6. Warm Lamp Halo Sprite Texture (128x128)
   const { c: gc, ctx: gctx } = makeCanvas(128, 128);
   const gGrad = gctx.createRadialGradient(64, 64, 4, 64, 64, 64);
   gGrad.addColorStop(0, 'rgba(255, 248, 210, 0.95)');

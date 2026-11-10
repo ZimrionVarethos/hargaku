@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { Map as LeafletMapInstance, Marker as LeafletMarkerInstance } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -39,7 +39,6 @@ export default function LeafletMarketMap({
   const mapRef = useRef<LeafletMapInstance | null>(null);
   const markersRef = useRef<Map<string, LeafletMarkerInstance>>(new Map());
 
-  // Initialize Leaflet Map
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
@@ -61,19 +60,16 @@ export default function LeafletMarketMap({
         attributionControl: true,
       });
 
-      // Standard clean OpenStreetMap tile layer (no watermark, zero API key)
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
       }).addTo(map);
 
-      // Neo-brutalist zoom control in top-right
       L.control.zoom({ position: 'topright' }).addTo(map);
 
       mapRef.current = map;
 
-      // Render markers
       renderMarkers(L, map);
     });
 
@@ -85,10 +81,8 @@ export default function LeafletMarketMap({
       }
       markersRef.current.clear();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fly to new center when region changes
   useEffect(() => {
     if (!mapRef.current || !center) return;
     mapRef.current.flyTo(center, zoom, {
@@ -96,7 +90,6 @@ export default function LeafletMarketMap({
     });
   }, [center, zoom]);
 
-  // Update markers when markets or activeMarketId changes
   useEffect(() => {
     if (!mapRef.current) return;
     import('leaflet').then((L) => {
@@ -104,10 +97,8 @@ export default function LeafletMarketMap({
         renderMarkers(L, mapRef.current);
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [markets, activeMarketId]);
 
-  // Pan smoothly to active market
   useEffect(() => {
     if (!mapRef.current || !activeMarketId) return;
     const target = markets.find((m) => m.id === activeMarketId);
@@ -119,7 +110,6 @@ export default function LeafletMarketMap({
   }, [activeMarketId, markets]);
 
   const renderMarkers = (L: typeof import('leaflet'), map: LeafletMapInstance) => {
-    // Clear previous markers
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current.clear();
 
@@ -129,7 +119,6 @@ export default function LeafletMarketMap({
       const isActive = market.id === activeMarketId;
       const isCheaper = market.status === 'cheaper';
 
-      // Neo-brutalist Clay HTML Pill Marker
       const htmlContent = `
         <div class="clay-leaflet-pin" style="transform: translate(-50%, -100%); transition: transform 0.2s ease;">
           <div style="
@@ -184,7 +173,6 @@ export default function LeafletMarketMap({
         zIndexOffset: isActive ? 1000 : 100,
       }).addTo(map);
 
-      // Popup Content
       const popupHtml = `
         <div style="font-family: inherit; padding: 4px 2px;">
           <p style="font-size: 10px; font-weight: 700; color: #8C8B85; text-transform: uppercase; margin: 0 0 2px;">Pasar Tradisional</p>

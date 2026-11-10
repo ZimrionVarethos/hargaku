@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import { ArrowSquareOut, Scales, Tag } from '@phosphor-icons/react';
 import { AssistantMessage } from '@/types/assistant';

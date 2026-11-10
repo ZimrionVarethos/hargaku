@@ -1,5 +1,3 @@
--- HargaKu Supabase PostgreSQL Schema & Row-Level Security Policies
--- Apply cleanly via Supavisor Session Pooler or Supabase SQL Editor
 
 CREATE TABLE IF NOT EXISTS commodities (
   id TEXT PRIMARY KEY,
@@ -74,7 +72,6 @@ CREATE INDEX IF NOT EXISTS idx_daily_prices_market ON daily_prices(market_id);
 CREATE INDEX IF NOT EXISTS idx_markets_region ON markets(region_id);
 CREATE INDEX IF NOT EXISTS idx_citizen_reports_status ON citizen_reports(status);
 
--- Public Read-Only Policies (Anon Key safe for public market transparency)
 ALTER TABLE commodities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE markets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_prices ENABLE ROW LEVEL SECURITY;
@@ -92,6 +89,3 @@ CREATE POLICY "public_read_daily_prices" ON daily_prices FOR SELECT USING (true)
 
 DROP POLICY IF EXISTS "public_read_approved_reports" ON citizen_reports;
 CREATE POLICY "public_read_approved_reports" ON citizen_reports FOR SELECT USING (status = 'APPROVED');
-
--- system_settings deliberately has ZERO anon policies so secrets never leak via PostgREST
-

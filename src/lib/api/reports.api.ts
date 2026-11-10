@@ -46,7 +46,6 @@ export async function submitCitizenReport(
       return json;
     }
   } catch {
-    // Graceful offline fallback below
   }
 
   const reportId = `REP-${Date.now().toString().slice(-6)}`;

@@ -14,7 +14,6 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    // Check local session validity
     if (!isAuthenticatedAdmin()) {
       router.replace('/admin/login');
     } else {

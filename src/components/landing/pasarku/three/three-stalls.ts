@@ -32,9 +32,6 @@ export interface StallPriceTagHandle {
   mesh: THREE.Mesh;
 }
 
-/**
- * Creates 3-tier stepped wooden stalls via InstancedMesh batching + organic produce + wall posters
- */
 export function createMarketStalls(
   scene: THREE.Scene,
   isDark: boolean,
@@ -97,7 +94,7 @@ export function createMarketStalls(
     const isL = c.side === 'left';
     const depth = c.zEnd - c.zStart;
     const posZ = (c.zStart + c.zEnd) / 2;
-    const dir = isL ? -1 : 1; // Visual left (+1.62) faces aisle center (-X)
+    const dir = isL ? -1 : 1;
     const benchCenterX = isL ? 1.62 : -1.62;
 
     tierDefs.forEach((tier, ti) => {
@@ -126,20 +123,17 @@ export function createMarketStalls(
       }
     });
 
-    // Compartment wooden divider partition
     dummy.position.set(benchCenterX, 0.58, posZ + depth / 2);
     dummy.scale.set(1.15, 1.15, 0.04);
     dummy.updateMatrix();
     divInst.setMatrixAt(dIdx++, dummy.matrix);
 
-    // Front chalk price tag facing into the central aisle
     const priceTag = create3DPriceTag(c.label, c.priceText, tagGeo);
     priceTag.position.set(benchCenterX + dir * 0.57, 0.48, posZ);
     priceTag.rotation.y = isL ? -Math.PI / 2 : Math.PI / 2;
     stallsGroup.add(priceTag);
     priceTags.push({ compartmentId: c.id, label: c.label, mesh: priceTag });
 
-    // Raycast Hitbox covering both produce counter & side banner cleanly without overlap
     const hitGeo = new THREE.BoxGeometry(1.6, 2.55, Math.max(0.5, depth - 0.16));
     const hitbox = new THREE.Mesh(hitGeo, hitMat);
     hitbox.position.set(isL ? 1.75 : -1.75, 1.25, posZ);

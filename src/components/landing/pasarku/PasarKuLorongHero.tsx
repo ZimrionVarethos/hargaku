@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useHeroAnimation } from './useHeroAnimation';
 import { useMarketWalk } from './useMarketWalk';
 import { getMarketStalls } from '@/lib/data/market-stalls';
@@ -17,7 +17,6 @@ interface Props {
 }
 
 export function PasarKuLorongHero({ onSelectCommodity }: Props) {
-  const { canvasRef } = useHeroAnimation();
   const {
     containerRef,
     scrollProgress,
@@ -29,13 +28,13 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
     scrollToEntrance,
     scrollToStall,
   } = useMarketWalk();
+  const { canvasRef } = useHeroAnimation(scrollProgress < 0.22);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const liveCommodities = useLiveBogorCommodities();
   const stalls = useMemo(() => getMarketStalls(liveCommodities), [liveCommodities]);
 
-  // Keyboard navigation when user is walking in the market corridor
   useEffect(() => {
     if (!isInsideMarket) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -56,14 +55,12 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isInsideMarket, activeStallIndex, stalls.length, scrollToStall, isDrawerOpen]);
 
-  // Entrance zoom math
   const zoomFactor = Math.min(3.5, 1 + scrollProgress * 14);
   const wingLeftTranslateX = Math.min(140, scrollProgress * 580);
   const wingRightTranslateX = Math.min(140, scrollProgress * 580);
   const heroTextOpacity = Math.max(0, 1 - scrollProgress * 7);
   const marketAlleyOpacity = Math.min(1, Math.max(0, (scrollProgress - 0.08) * 8));
 
-  // Exit corridor light burst math (radiant morning light bloom transitioning to next section)
   const exitBloomOpacity = walkProgress > 0.85 ? Math.min(1, (walkProgress - 0.85) / 0.12) : 0;
   const hudOpacity = Math.max(0, 1 - exitBloomOpacity * 1.5);
 
@@ -81,20 +78,17 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
       className="relative w-full min-h-[420vh] sm:min-h-[480vh] bg-[#F9F3EE]"
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between border-b-2 border-[var(--border-ink)]">
-        
-        {/* Layer 1: Exterior Market Gate & Zoom Stage */}
+
         <LorongEntranceGate
           canvasRef={canvasRef}
           zoomFactor={zoomFactor}
           wingLeftTranslateX={wingLeftTranslateX}
           wingRightTranslateX={wingRightTranslateX}
           heroTextOpacity={heroTextOpacity}
-          isInsideMarket={isInsideMarket}
           scrollProgress={scrollProgress}
           onEnterMarket={scrollToMarket}
         />
 
-        {/* Layer 2: Inside Real Indonesian Market Alley Viewport */}
         <div
           className="relative z-20 w-full h-full flex flex-col justify-between transition-opacity duration-200"
           style={{
@@ -102,7 +96,6 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
             pointerEvents: isInsideMarket ? 'auto' : 'none',
           }}
         >
-          {/* Top HUD with Distance Odometer and Quick Stall Tabs */}
           <div style={{ opacity: hudOpacity, transition: 'opacity 0.2s' }}>
             <LorongWalkHud
               stalls={stalls}
@@ -115,26 +108,21 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
             />
           </div>
 
-          {/* True 3D WebGL Three.js Traditional Market Corridor with Walk Camera */}
           <LorongThreeMarketAlley
             walkProgress={walkProgress}
             walkMeters={walkMeters}
-            searchQuery={searchQuery}
             onSelectCommodity={onSelectCommodity}
           />
 
-          {/* Floating Bottom Control Bar */}
           <div style={{ opacity: hudOpacity, transition: 'opacity 0.2s' }}>
             <LorongBottomBar
               stalls={stalls}
               activeStallIndex={activeStallIndex}
-              walkMeters={walkMeters}
               onSelectStall={scrollToStall}
               onToggleDrawer={() => setIsDrawerOpen((prev) => !prev)}
             />
           </div>
 
-          {/* Layer 3: Radiant Exit Sunlight Burst & Transition Out to Next Section */}
           <div
             className="absolute inset-0 z-40 pointer-events-none flex flex-col items-center justify-center transition-opacity duration-300"
             style={{
@@ -169,7 +157,6 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
 
       </div>
 
-      {/* Slide-Up Drawer for All 53 Commodities */}
       <LorongCommodityDrawer
         isOpen={isDrawerOpen}
         stalls={stalls}

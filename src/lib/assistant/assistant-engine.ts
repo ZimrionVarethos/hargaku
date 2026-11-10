@@ -14,8 +14,6 @@ export async function processAssistantMessage(
   userText: string,
   region: Region
 ): Promise<AssistantMessage> {
-  await new Promise((resolve) => setTimeout(resolve, 250));
-
   const lower = userText.toLowerCase().trim();
   const timestamp = new Date().toLocaleTimeString('id-ID', {
     hour: '2-digit',

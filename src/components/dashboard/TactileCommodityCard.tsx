@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { CommoditySummary } from '@/types';
-import { ArrowUpRight } from '@phosphor-icons/react';
 
 interface Props {
   commodity: CommoditySummary;
@@ -12,7 +11,6 @@ export function TactileCommodityCard({ commodity }: Props) {
   const isRising = commodity.changePercentage > 0;
   const isDropping = commodity.changePercentage < 0;
 
-  // Determine Semantic Status Pill according to Clay Foundations & Anti-AI-Slop rule
   let statusLabel = 'Wajar';
   let statusBadgeStyle = 'bg-[#F4F3F0] text-[#1B1A18] outline-[#E5E3DE]';
 
@@ -29,7 +27,6 @@ export function TactileCommodityCard({ commodity }: Props) {
     statusBadgeStyle = 'bg-[#EEF773] text-[#1B1A18] outline-[#1B1A18]';
   }
 
-  // 14-day Sparkline calculations
   const sparkline = commodity.sparkline || [
     commodity.previousAvgPrice,
     commodity.previousAvgPrice,
@@ -45,7 +42,6 @@ export function TactileCommodityCard({ commodity }: Props) {
       href={`/komoditas/${commodity.slug}`}
       className="group flex flex-col justify-between p-5 rounded-[16px] bg-white outline outline-1 outline-[#E5E3DE] hover:outline-[#1B1A18] hover:shadow-[0_4px_16px_rgba(27,26,24,0.06)] transition-all gap-4"
     >
-      {/* Top Header */}
       <div className="flex items-start justify-between gap-2">
         <span className="text-[15px] font-semibold text-[#1B1A18] group-hover:text-[#FF7714] transition-colors leading-[1.3]">
           {commodity.name}
@@ -57,7 +53,6 @@ export function TactileCommodityCard({ commodity }: Props) {
         </span>
       </div>
 
-      {/* Price & Change Section */}
       <div className="flex flex-col gap-1">
         <div className="flex items-baseline gap-1">
           <span className="text-[22px] font-bold text-[#1B1A18] tabular-nums tracking-tight">
@@ -88,7 +83,6 @@ export function TactileCommodityCard({ commodity }: Props) {
         </div>
       </div>
 
-      {/* 14-day Tactile Sparkline Strip */}
       <div className="flex flex-col gap-1">
         <div className="h-8 flex items-end gap-[3px] p-1.5 bg-[#FAF9F5] rounded-[8px] outline outline-1 outline-[#E5E3DE]/70">
           {sparkline.map((val, idx) => {
@@ -118,7 +112,6 @@ export function TactileCommodityCard({ commodity }: Props) {
         </div>
       </div>
 
-      {/* Card Footer: Source & Reference */}
       <div className="pt-3 border-t border-[#E5E3DE] flex items-center justify-between text-[11px]">
         <span className="text-[#8E8D86]">
           Sumber: {commodity.source || 'PIHPS'} · 06:00

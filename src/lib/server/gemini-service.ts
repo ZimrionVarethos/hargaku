@@ -43,32 +43,42 @@ function buildSourceComparisons(
     picked = picked.slice(0, 3);
   }
 
+  const approvedReports = reports.filter((r) => r.status === 'APPROVED');
+
   return picked.map((com) => {
-    const marketPrices: Array<{ market: AdminMarket; price: number }> = [];
+    let priceSum = 0;
+    let priceCount = 0;
+    let cheapestMarket: { market: AdminMarket; price: number } | undefined;
+
     for (const m of scopeMarkets) {
       const rec = dailyPrices[`${m.id}_${com.id}`];
       if (rec && rec.price > 0) {
-        marketPrices.push({ market: m, price: rec.price });
+        priceSum += rec.price;
+        priceCount++;
+        if (!cheapestMarket || rec.price < cheapestMarket.price) {
+          cheapestMarket = { market: m, price: rec.price };
+        }
       }
     }
 
     const regionalFactor = region.disparityIndex || 1.0;
     const hapRegional = Math.round((com.hapHetPrice * regionalFactor) / 100) * 100;
     const pihpsAvg =
-      marketPrices.length > 0
-        ? Math.round(marketPrices.reduce((s, x) => s + x.price, 0) / marketPrices.length / 100) * 100
+      priceCount > 0
+        ? Math.round(priceSum / priceCount / 100) * 100
         : Math.round((hapRegional * 1.04) / 100) * 100;
 
-    const sortedMarkets = [...marketPrices].sort((a, b) => a.price - b.price);
-    const cheapestMarket = sortedMarkets[0];
     const localMarketPrice = cheapestMarket
       ? cheapestMarket.price
       : Math.round((pihpsAvg * 0.97) / 100) * 100;
 
-    const approvedReport = reports.find(
-      (r) => r.status === 'APPROVED' && r.commodityName.toLowerCase().includes(com.name.split(' ')[0].toLowerCase())
+    const comFirstWord = com.name.split(' ')[0].toLowerCase();
+    const approvedReport = approvedReports.find((r) =>
+      r.commodityName.toLowerCase().includes(comFirstWord)
     );
-    const citizenPrice = approvedReport ? approvedReport.normalizedPricePerKg : Math.round((localMarketPrice * 0.99) / 100) * 100;
+    const citizenPrice = approvedReport
+      ? approvedReport.normalizedPricePerKg
+      : Math.round((localMarketPrice * 0.99) / 100) * 100;
 
     const candidates = [
       {
@@ -79,7 +89,7 @@ function buildSourceComparisons(
       {
         sourceName: 'Survei PIHPS Bank Indonesia',
         price: pihpsAvg,
-        note: `Rerata ${marketPrices.length || 1} pasar terpantau`,
+        note: `Rerata ${priceCount || 1} pasar terpantau`,
       },
       {
         sourceName: cheapestMarket ? `${cheapestMarket.market.name} (Data Lapak)` : 'Perumda PPJ / Pasar Rakyat',
@@ -103,7 +113,10 @@ function buildSourceComparisons(
       ? candidates
       : [{ sourceName: 'Panel Harga Bapanas (HAP/HET)', price: hapRegional, note: `Acuan ${region.name}` }];
 
-    const minPrice = Math.min(...activeList.map((s) => s.price));
+    let minPrice = Infinity;
+    for (const s of activeList) {
+      if (s.price < minPrice) minPrice = s.price;
+    }
     const sources = activeList.map((s) => ({ ...s, isLowest: s.price === minPrice }));
     const best = sources.find((s) => s.isLowest) || sources[0];
 
@@ -156,17 +169,17 @@ export async function generateMultiSourceAiReply(input: {
   let dailyPrices = INITIAL_DAILY_PRICES;
   let reports: AdminReport[] = [];
 
-  try {
-    const dbData = await fetchBootstrapFromDb();
+  const [dbData, cfg] = await Promise.all([
+    fetchBootstrapFromDb().catch(() => null),
+    getAiRuntimeConfig(),
+  ]);
+
+  if (dbData) {
     if (dbData.commodities.length > 0) commodities = dbData.commodities;
     if (dbData.markets.length > 0) markets = dbData.markets;
     if (Object.keys(dbData.dailyPrices).length > 0) dailyPrices = dbData.dailyPrices;
     reports = dbData.reports;
-  } catch {
-    // Graceful fallback to baseline dataset if DB is offline
   }
-
-  const cfg = await getAiRuntimeConfig();
   const sourceComparisons = buildSourceComparisons(
     input.message,
     region,

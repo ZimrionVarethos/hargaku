@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback, type FormEvent } from 'react';
 import { CommoditySummary, Market, PriceCheckResult } from '@/types';
 import { submitPriceCheck } from '@/lib/api/price-check.api';
 import { useRegion } from '@/lib/store/region-store';
@@ -24,7 +24,7 @@ export function PriceCheckerContainer({
   initialMarketId,
 }: Props) {
   const { selectedRegion, regionMarkets } = useRegion();
-  const { commodities: liveCommodities, markets: liveMarkets } = useLiveCatalog(selectedRegion.id);
+  const { commodities: liveCommodities, markets: liveMarkets } = useLiveCatalog();
 
   const currentCommodities =
     liveCommodities.length > 0 ? liveCommodities : initialCommodities;
@@ -35,7 +35,6 @@ export function PriceCheckerContainer({
         const found = initialCommodities.find((c) => c.slug === initialCommoditySlug);
         if (found) return found.id;
       }
-      // Default to Cabai Rawit Merah (matching node SWBPt in pen app)
       const cabaiRawit = initialCommodities.find((c) => c.slug === 'cabai-rawit-merah');
       return cabaiRawit ? cabaiRawit.id : initialCommodities[0]?.id || '';
     }
@@ -59,24 +58,20 @@ export function PriceCheckerContainer({
     () => initialMarketId || activeMarkets[0]?.id || ''
   );
 
-  // If selected market is not in active region's markets, reset to first market of region
   useEffect(() => {
     if (activeMarkets.length > 0 && !activeMarkets.some((m) => m.id === selectedMarketId)) {
       setSelectedMarketId(activeMarkets[0].id);
     }
   }, [activeMarkets, selectedMarketId]);
 
-  // Default to Rp 15.000 for 2 ons (matching node SWBPt in pen app: Rp 15.000 per 2 ons = Rp 75.000/kg)
   const [rawPriceInput, setRawPriceInput] = useState<string>('Rp 15.000');
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<PriceCheckResult | null>(null);
 
-  // Compute numeric price from string
   const numericRawPrice = useMemo(() => {
     return parseInt(rawPriceInput.replace(/\D/g, ''), 10) || 0;
   }, [rawPriceInput]);
 
-  // Compute normalized price per standard kg or liter
   const normalizedPricePerKg = useMemo(() => {
     if (numericRawPrice <= 0) return 0;
     const unit = TAKARAN_UNITS.find((u) => u.id === selectedUnitId);
@@ -86,7 +81,6 @@ export function PriceCheckerContainer({
     return Math.round((numericRawPrice * 1000) / totalGrams);
   }, [numericRawPrice, takaranAmount, selectedUnitId]);
 
-  // Selected commodity object
   const selectedCommodity = useMemo(() => {
     return (
       currentCommodities.find((c) => c.id === selectedCommodityId) ||
@@ -94,12 +88,10 @@ export function PriceCheckerContainer({
     );
   }, [currentCommodities, selectedCommodityId]);
 
-  // Selected market object
   const selectedMarket = useMemo(() => {
     return activeMarkets.find((m) => m.id === selectedMarketId) || initialMarkets.find((m) => m.id === selectedMarketId);
   }, [activeMarkets, initialMarkets, selectedMarketId]);
 
-  // Formatted price handler
   const handlePriceChange = (val: string) => {
     const num = parseInt(val.replace(/\D/g, ''), 10);
     if (isNaN(num)) {
@@ -109,8 +101,7 @@ export function PriceCheckerContainer({
     }
   };
 
-  // Perform calculation
-  const executeEvaluation = async () => {
+  const executeEvaluation = useCallback(async () => {
     if (!selectedCommodityId || normalizedPricePerKg <= 0) return;
     setLoading(true);
     try {
@@ -122,21 +113,18 @@ export function PriceCheckerContainer({
       });
       setResult(res);
     } catch {
-      // Fallback evaluation
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCommodityId, normalizedPricePerKg, selectedMarketId, selectedRegion.slug]);
 
-  // Initial calculation on mount and when region changes
   useEffect(() => {
-    executeEvaluation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCommodityId, normalizedPricePerKg, selectedMarketId, selectedRegion.id]);
+    void executeEvaluation();
+  }, [executeEvaluation]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    executeEvaluation();
+    void executeEvaluation();
   };
 
   const selectedUnitLabel =
@@ -144,7 +132,6 @@ export function PriceCheckerContainer({
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Top Interactive Row: Form + Evaluation Result */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         <PriceCheckForm
           commodities={currentCommodities}
@@ -185,7 +172,6 @@ export function PriceCheckerContainer({
         )}
       </div>
 
-      {/* Bottom Knowledge Row: Comprehensive Methodology */}
       <div className="w-full">
         <PriceMethodologyCard />
       </div>

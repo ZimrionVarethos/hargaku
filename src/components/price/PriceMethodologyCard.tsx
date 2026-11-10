@@ -13,7 +13,6 @@ export function PriceMethodologyCard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-[12px]">
-        {/* Wajar */}
         <div className="flex flex-col gap-1 p-3 rounded-[10px] bg-[var(--bg-paper)]/60 border border-[var(--border-subtle)]">
           <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded-[4px] bg-[var(--forest-surface)] text-[var(--forest-ink)] border border-[var(--border-ink)] w-fit">
             Wajar
@@ -23,7 +22,6 @@ export function PriceMethodologyCard() {
           </span>
         </div>
 
-        {/* Agak Mahal */}
         <div className="flex flex-col gap-1 p-3 rounded-[10px] bg-[var(--bg-paper)]/60 border border-[var(--border-subtle)]">
           <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded-[4px] bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] w-fit">
             Agak Mahal
@@ -33,7 +31,6 @@ export function PriceMethodologyCard() {
           </span>
         </div>
 
-        {/* Terlalu Mahal */}
         <div className="flex flex-col gap-1 p-3 rounded-[10px] bg-[var(--bg-paper)]/60 border border-[var(--border-subtle)]">
           <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded-[4px] bg-[var(--accent-chili-soft)] text-[var(--accent-chili)] border border-[var(--accent-chili)] w-fit">
             Terlalu Mahal
@@ -43,7 +40,6 @@ export function PriceMethodologyCard() {
           </span>
         </div>
 
-        {/* Jauh Lebih Murah */}
         <div className="flex flex-col gap-1 p-3 rounded-[10px] bg-[var(--bg-paper)]/60 border border-[var(--border-subtle)]">
           <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded-[4px] bg-[#EEF773] text-[#102B03] border border-[var(--border-ink)] w-fit">
             Jauh Lebih Murah

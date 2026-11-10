@@ -69,9 +69,8 @@ export function createChiliGeo(): THREE.BufferGeometry {
   const uv = geo.attributes.uv;
 
   for (let i = 0; i < pos.count; i++) {
-    const uAlong = uv.getX(i); // 0=stem, 1=pointed tip
+    const uAlong = uv.getX(i);
     const vWrap = uv.getY(i);
-    // Align UV vertically with chiliTex (top=green calyx stem at v=1, tip=v=0)
     uv.setXY(i, vWrap, 1 - uAlong);
 
     const z = pos.getZ(i);
@@ -92,34 +91,30 @@ export function createChiliGeo(): THREE.BufferGeometry {
 }
 
 export function createFishGeo(): THREE.BufferGeometry {
-  // Mackerel (Ikan Kembung): X=length(-0.155 tail..+0.145 head), Y=height, Z=lateral thin width
   const geo = new THREE.SphereGeometry(1, 16, 10);
   const pos = geo.attributes.position;
   const uv = geo.attributes.uv;
 
   for (let i = 0; i < pos.count; i++) {
-    const sx = pos.getX(i); // -1..+1
-    const sy = pos.getY(i); // -1..+1
-    const sz = pos.getZ(i); // -1..+1
+    const sx = pos.getX(i);
+    const sy = pos.getY(i);
+    const sz = pos.getZ(i);
 
     let x = sx * 0.145;
     let y = sy * 0.038;
     let z = sz * 0.016;
 
     if (sx < -0.45) {
-      // Narrow peduncle then flare into forked V tail fin
-      const t = (-0.45 - sx) / 0.55; // 0 at peduncle -> 1 at tail tip
+      const t = (-0.45 - sx) / 0.55;
       const flare = 0.26 + t * 1.15;
       y = sy * 0.038 * flare;
       z = sz * 0.016 * Math.max(0.1, 0.55 - t * 0.45);
-      // Fork V indentation at center of tail fin
       const absY = Math.abs(sy);
       x -= t * 0.012;
       if (t > 0.5 && absY < 0.55) {
         x += (1 - absY / 0.55) * 0.022;
       }
     } else if (sx > 0.55) {
-      // Taper nose at head
       const h = (sx - 0.55) / 0.45;
       const taper = 1 - h * 0.45;
       y *= taper;
@@ -127,7 +122,6 @@ export function createFishGeo(): THREE.BufferGeometry {
     }
 
     pos.setXYZ(i, x, y, z);
-    // Map U: 0=tail..1=head, V: 0=silver belly..1=blue dorsal
     const u = Math.max(0.02, Math.min(0.98, (x + 0.155) / 0.3));
     const v = Math.max(0.02, Math.min(0.98, 0.5 + y * 11.5));
     uv.setXY(i, u, v);

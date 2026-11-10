@@ -9,8 +9,8 @@ import {
   insertReportDb,
   updateReportStatusDb,
   appendReportNoteDb,
-  resetDefaultDataDb,
 } from '@/lib/server/admin-db';
+import { resetDefaultDataDb } from '@/lib/server/admin-db-reset';
 import type { AdminAction, AdminCommodity, AdminMarket } from '@/lib/types/admin';
 
 export async function POST(req: NextRequest) {

@@ -17,7 +17,7 @@ export type IslandCorridor =
 
 export interface Region {
   id: string;
-  name: string; // e.g. "Jawa Barat", "DKI Jakarta", "Kalimantan Timur"
+  name: string;
   slug: string;
   province?: string;
   island: IslandCorridor;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { AdminMarket } from '@/lib/types/admin';
 import { useAdminStore } from '@/lib/store/admin-store';
 import { MARKET_ISLAND_FILTERS, REGION_ISLAND_MAP } from './admin-data';
@@ -239,7 +239,6 @@ export function AdminMarketsView() {
         </div>
       </div>
 
-      {/* Pagination Footer */}
       <AdminPagination
         currentPage={currentPage}
         totalPages={totalPages}

@@ -104,7 +104,6 @@ export function AdminDailyPricesView() {
 
   return (
     <div className="space-y-6">
-      {/* Header controls */}
       <AdminMarketSelector
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -187,7 +186,6 @@ export function AdminDailyPricesView() {
         </div>
       )}
 
-      {/* Main Prices Form Table */}
       <DailyPriceTable
         currentMarketName={currentMarket?.name || 'Pasar'}
         activeCommodities={activeCommodities}

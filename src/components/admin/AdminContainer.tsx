@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import { AdminStoreProvider } from '@/lib/store/admin-store';
+import { useState } from 'react';
 import { AdminTopbar } from './AdminTopbar';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminOverviewView } from './AdminOverviewView';
@@ -19,12 +18,9 @@ function AdminWorkspace() {
   return (
     <div className="flex-1 flex flex-col justify-between gap-6">
       <div className="space-y-6 flex-1 flex flex-col">
-        {/* Topbar Console */}
         <AdminTopbar onOpenMobileSidebar={() => setIsMobileNavOpen(true)} />
 
-        {/* Main SaaS Workspace Body: Sidebar + Active View */}
         <div className="flex-1 flex flex-col lg:flex-row gap-6 items-start">
-          {/* Left Sidebar */}
           <AdminSidebar
             activeModule={activeModule}
             onSelectModule={setActiveModule}
@@ -32,7 +28,6 @@ function AdminWorkspace() {
             onCloseMobile={() => setIsMobileNavOpen(false)}
           />
 
-          {/* Right Active Module Work Area */}
           <main className="flex-1 w-full min-w-0">
             {activeModule === 'overview' && (
               <AdminOverviewView onNavigate={setActiveModule} />

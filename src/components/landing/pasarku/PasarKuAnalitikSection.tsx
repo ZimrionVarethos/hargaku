@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useLiveBogorCommodities } from '@/lib/data/live-bogor-sync';
 
 const CHART_CATEGORIES = [
@@ -37,7 +37,7 @@ export function PasarKuAnalitikSection() {
   return (
     <section id="analitikSection" className="border-b-2 border-[var(--border-ink)] py-12 bg-[var(--bg-muted)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="inline-block px-3 py-1 rounded-full text-xs font-bold border border-[var(--border-ink)] bg-[var(--bg-card)] text-[var(--accent-chili)] mb-2">
@@ -68,8 +68,7 @@ export function PasarKuAnalitikSection() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-          
-          {/* 4 Cols Left: Metrics */}
+
           <div className="lg:col-span-4 flex flex-col justify-between gap-3">
             <div className="market-card p-4 flex-1 flex flex-col justify-center">
               <span className="text-xs font-bold text-[var(--text-muted)]">Harga Tertinggi ({selectedCategory})</span>
@@ -102,7 +101,6 @@ export function PasarKuAnalitikSection() {
             </div>
           </div>
 
-          {/* 8 Cols Right: Responsive Tactile SVG Bar Chart */}
           <div className="lg:col-span-8 market-card p-5 flex flex-col justify-between">
             <div className="flex items-center justify-between text-xs font-bold text-[var(--text-secondary)] mb-4">
               <span>Bilah Harga per Komoditas (Rp)</span>
@@ -118,10 +116,8 @@ export function PasarKuAnalitikSection() {
               </div>
             </div>
 
-            {/* Bars container */}
             <div className="h-64 flex items-end gap-2 pt-6 pb-2 px-2 overflow-x-auto relative">
-              
-              {/* Average benchmark horizontal dotted line */}
+
               {maxPrice > 0 && (
                 <div
                   className="absolute left-0 right-0 border-b-2 border-dashed border-[var(--wave-line-gold)] pointer-events-none z-10"
@@ -145,7 +141,6 @@ export function PasarKuAnalitikSection() {
                     onMouseEnter={() => setHoveredIdx(idx)}
                     onMouseLeave={() => setHoveredIdx(null)}
                   >
-                    {/* Hover tooltip */}
                     {isHovered && (
                       <div className="absolute -top-12 z-20 px-2 py-1 rounded bg-[#132E20] text-[#F9F3EE] text-[10px] font-bold whitespace-nowrap shadow-md pointer-events-none">
                         <div>{item.name}</div>
@@ -179,4 +174,3 @@ export function PasarKuAnalitikSection() {
     </section>
   );
 }
-

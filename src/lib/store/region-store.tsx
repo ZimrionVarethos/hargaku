@@ -1,6 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  type ReactNode,
+} from 'react';
 import { Region, Market } from '@/types';
 import { MOCK_REGIONS, DEFAULT_REGION } from '@/lib/mock/regions.data';
 import { MOCK_MARKETS } from '@/lib/mock/markets.data';
@@ -17,10 +25,9 @@ const RegionContext = createContext<RegionContextValue | undefined>(undefined);
 
 const STORAGE_KEY = 'hargaku_active_region_id';
 
-export function RegionProvider({ children }: { children: React.ReactNode }) {
+export function RegionProvider({ children }: { children: ReactNode }) {
   const [selectedRegion, setSelectedRegionState] = useState<Region>(DEFAULT_REGION);
 
-  // Sync with localStorage on client mount
   useEffect(() => {
     try {
       const savedId = localStorage.getItem(STORAGE_KEY);
@@ -31,41 +38,39 @@ export function RegionProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } catch {
-      // LocalStorage access may fail in restricted/iframe environments
     }
   }, []);
 
-  const setSelectedRegion = (region: Region) => {
+  const setSelectedRegion = useCallback((region: Region) => {
     setSelectedRegionState(region);
     try {
       localStorage.setItem(STORAGE_KEY, region.id);
     } catch {
-      // ignore storage errors
     }
-  };
+  }, []);
 
   const regionMarkets = useMemo(() => {
     const list = MOCK_MARKETS.filter((m) => m.regionId === selectedRegion.id);
     return list.length > 0 ? list : MOCK_MARKETS.filter((m) => m.regionId === 'reg_jabar');
   }, [selectedRegion]);
 
-  const calculateRegionalPrice = (baseNationalPrice: number): number => {
-    return Math.round(baseNationalPrice * selectedRegion.disparityIndex);
-  };
-
-  return (
-    <RegionContext.Provider
-      value={{
-        selectedRegion,
-        setSelectedRegion,
-        allRegions: MOCK_REGIONS,
-        regionMarkets,
-        calculateRegionalPrice,
-      }}
-    >
-      {children}
-    </RegionContext.Provider>
+  const calculateRegionalPrice = useCallback(
+    (baseNationalPrice: number): number => Math.round(baseNationalPrice * selectedRegion.disparityIndex),
+    [selectedRegion]
   );
+
+  const contextValue = useMemo<RegionContextValue>(
+    () => ({
+      selectedRegion,
+      setSelectedRegion,
+      allRegions: MOCK_REGIONS,
+      regionMarkets,
+      calculateRegionalPrice,
+    }),
+    [selectedRegion, setSelectedRegion, regionMarkets, calculateRegionalPrice]
+  );
+
+  return <RegionContext.Provider value={contextValue}>{children}</RegionContext.Provider>;
 }
 
 export function useRegion() {

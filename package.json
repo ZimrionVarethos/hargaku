@@ -12,10 +12,8 @@
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
-    "@supabase/supabase-js": "^2.119.0",
     "@types/three": "^0.187.0",
     "leaflet": "^1.9.4",
-    "lucide-react": "^1.16.0",
     "mapbox-gl": "^3.34.2",
     "next": "^16.4.2",
     "pg": "^8.23.1",

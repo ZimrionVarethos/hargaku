@@ -28,12 +28,10 @@ export function AdminProfileModal({ isOpen, onClose }: AdminProfileModalProps) {
   const getCleanEmail = (val?: string) =>
     val?.toLowerCase().includes('hendra') ? 'admin@hargaku.id' : val || 'admin@hargaku.id';
 
-  // Form states
   const [name, setName] = useState(getCleanName(user.name || user.fullName));
   const [email, setEmail] = useState(getCleanEmail(user.email));
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Password state
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

@@ -28,22 +28,18 @@ export function CommodityDashboardView({ initialCommodities }: Props) {
   const [selectedCategory, setSelectedCategory] =
     useState<DashboardCategoryFilter>('ALL');
 
-  // Filter and Sort Commodities
   const processedCommodities = useMemo(() => {
     let list = [...currentCommodities];
 
-    // Filter by category
     if (selectedCategory !== 'ALL') {
       list = list.filter((item) => item.category === selectedCategory);
     }
 
-    // Filter by search query
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       list = list.filter((item) => item.name.toLowerCase().includes(q));
     }
 
-    // Sort commodities
     switch (selectedSort) {
       case 'CHANGE_DESC':
         list.sort((a, b) => Math.abs(b.changePercentage) - Math.abs(a.changePercentage));
@@ -64,10 +60,8 @@ export function CommodityDashboardView({ initialCommodities }: Props) {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Alert Banner (Price Surge) */}
       <PriceSurgeAlertBanner />
 
-      {/* Filter and Search Bar */}
       <DashboardFilterBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -83,7 +77,6 @@ export function CommodityDashboardView({ initialCommodities }: Props) {
         markets={liveMarkets}
       />
 
-      {/* Commodity Content Area: Cards Grid or Dense Ledger Table */}
       {processedCommodities.length === 0 ? (
         <div className="w-full py-16 text-center bg-white rounded-[16px] outline outline-1 outline-[#E5E3DE] flex flex-col items-center justify-center gap-2">
           <p className="text-[15px] font-semibold text-[#1B1A18]">
@@ -113,7 +106,6 @@ export function CommodityDashboardView({ initialCommodities }: Props) {
         </div>
       )}
 
-      {/* Status Legend & Methodology Card */}
       <StatusLegendCard />
     </div>
   );

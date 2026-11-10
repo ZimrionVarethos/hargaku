@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { AdminCommodity } from '@/lib/types/admin';
 import { useAdminStore } from '@/lib/store/admin-store';
 import { COMMODITY_CATEGORY_FILTERS } from './admin-data';
@@ -250,7 +250,6 @@ export function AdminCommoditiesView() {
         </div>
       </div>
 
-      {/* Pagination Footer */}
       <AdminPagination
         currentPage={currentPage}
         totalPages={totalPages}

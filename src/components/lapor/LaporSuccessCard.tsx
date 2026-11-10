@@ -51,7 +51,6 @@ export function LaporSuccessCard({
         </div>
       </div>
 
-      {/* Structured Ledger Card */}
       <div className="bg-[var(--bg-muted)] rounded-xl border border-[var(--border-subtle)] p-5 flex flex-col gap-3 text-[13px]">
         <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
           <span className="text-[var(--text-muted)] font-medium">Nomor Laporan</span>
@@ -95,7 +94,6 @@ export function LaporSuccessCard({
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
         <button
           type="button"

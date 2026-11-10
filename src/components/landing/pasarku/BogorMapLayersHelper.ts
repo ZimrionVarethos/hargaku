@@ -58,7 +58,6 @@ export function applyPasarKuAtmosphere(map: MapboxMap, isDark: boolean): void {
     map.setConfigProperty('basemap', 'showPointOfInterestLabels', false);
     map.setConfigProperty('basemap', 'showTransitLabels', false);
   } catch {
-    // Classic styles do not expose Standard basemap config properties
   }
 
   try {
@@ -80,7 +79,6 @@ export function applyPasarKuAtmosphere(map: MapboxMap, isDark: boolean): void {
           }
     );
   } catch {
-    // Graceful no-op if fog is unsupported on current device GPU
   }
 }
 
@@ -175,7 +173,6 @@ export function addPasarKuDesignLayers(
     });
   }
 
-  // Fallback urban 3D extrusions only when composite vector source exists
   const style = map.getStyle();
   if (style?.sources?.composite && !map.getLayer(EXTRUSION_LAYER_ID)) {
     try {
@@ -194,7 +191,6 @@ export function addPasarKuDesignLayers(
         },
       });
     } catch {
-      // Mapbox Standard style renders native 3D buildings automatically
     }
   }
 }

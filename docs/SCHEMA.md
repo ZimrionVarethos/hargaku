@@ -11,7 +11,7 @@ Dokumen ini adalah **Single Source of Truth (SSOT)** untuk seluruh struktur data
 
 | Aspek | Standar yang Digunakan | Keterangan |
 | :--- | :--- | :--- |
-| **Engine** | PostgreSQL 17 (Supabase) | Diakses melalui Supavisor Session Pooler (`pg`) + `@supabase/supabase-js` |
+| **Engine** | PostgreSQL 17 (Supabase) | Diakses melalui Supavisor Session Pooler (`pg` Pool) dengan parameterized SQL |
 | **Penamaan Tabel** | `snake_case`, plural | `commodities`, `markets`, `official_prices`, `citizen_reports` |
 | **Penamaan Kolom** | `snake_case` | `commodity_id`, `reported_price`, `recorded_date` |
 | **Primary Key** | CUID / UUIDv7 string (`VARCHAR(36)`) | `id String @id @default(cuid())` |

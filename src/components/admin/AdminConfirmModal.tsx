@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { Warning, Trash, ArrowsCounterClockwise } from '@phosphor-icons/react';
+import { Trash, ArrowsCounterClockwise } from '@phosphor-icons/react';
 
 interface AdminConfirmModalProps {
   isOpen: boolean;

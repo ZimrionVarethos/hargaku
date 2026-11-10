@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchBootstrapFromDb, insertReportDb } from '@/lib/server/admin-db';
+import { fetchCatalogFromDb, insertReportDb } from '@/lib/server/admin-db';
 import type { AdminReport } from '@/lib/types/admin';
 
 export async function POST(req: NextRequest) {
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { commodities, markets, dailyPrices } = await fetchBootstrapFromDb();
+    const { commodities, markets, dailyPrices } = await fetchCatalogFromDb();
     const com = commodities.find((c) => c.id === body.commodityId || c.slug === body.commodityId);
     const mkt = markets.find((m) => m.id === body.marketId || m.slug === body.marketId);
 

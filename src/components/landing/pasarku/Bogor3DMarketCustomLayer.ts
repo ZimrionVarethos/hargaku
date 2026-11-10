@@ -1,6 +1,7 @@
 import mapboxgl, { type CustomLayerInterface, type Map as MapboxMap } from 'mapbox-gl';
 import * as THREE from 'three';
 import type { BogorMarket, MarketTier } from '@/lib/data/bogor-markets';
+import { TIER_SCALE, buildTierGeometrySet, type TierGeometrySet } from './bogor-3d-geometries';
 
 interface MarketMeshBundle {
   marketId: string;
@@ -9,18 +10,6 @@ interface MarketMeshBundle {
   ringMesh: THREE.Mesh;
   lanternMat: THREE.MeshStandardMaterial;
   baseBeaconY: number;
-}
-
-const TIER_SCALE: Record<MarketTier, { w: number; h: number; roofColor: number }> = {
-  induk: { w: 82, h: 52, roofColor: 0xa92717 },
-  sentra: { w: 66, h: 40, roofColor: 0xc2611a },
-  rakyat: { w: 54, h: 32, roofColor: 0x245034 },
-};
-
-function createSharedBoxGeometry(w: number, h: number, d: number, yCenter: number): THREE.BoxGeometry {
-  const geo = new THREE.BoxGeometry(w, h, d);
-  geo.translate(0, yCenter, 0);
-  return geo;
 }
 
 export class Bogor3DMarketCustomLayer implements CustomLayerInterface {
@@ -45,6 +34,10 @@ export class Bogor3DMarketCustomLayer implements CustomLayerInterface {
   private animating = true;
   private sunLight: THREE.DirectionalLight | null = null;
   private fillLight: THREE.HemisphereLight | null = null;
+  private readonly scratchProjection = new THREE.Matrix4();
+  private readonly scratchTransform = new THREE.Matrix4();
+  private readonly scratchRot = new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+  private readonly scratchScale: THREE.Vector3;
 
   constructor(
     markets: BogorMarket[],
@@ -58,6 +51,7 @@ export class Bogor3DMarketCustomLayer implements CustomLayerInterface {
     this.isDark = isDark;
     this.originMercator = mapboxgl.MercatorCoordinate.fromLngLat(originLngLat, 0);
     this.meterScale = this.originMercator.meterInMercatorCoordinateUnits();
+    this.scratchScale = new THREE.Vector3(this.meterScale, -this.meterScale, this.meterScale);
   }
 
   public setState(params: {
@@ -132,8 +126,13 @@ export class Bogor3DMarketCustomLayer implements CustomLayerInterface {
     };
     this.sharedMaterials.push(roofMats.induk, roofMats.sentra, roofMats.rakyat);
 
+    const tierGeometries: Partial<Record<MarketTier, TierGeometrySet>> = {};
+
     for (const m of this.markets) {
       const cfg = TIER_SCALE[m.tier];
+      const geoSet =
+        tierGeometries[m.tier] || (tierGeometries[m.tier] = buildTierGeometrySet(m.tier, this.sharedGeometries));
+
       const merch = mapboxgl.MercatorCoordinate.fromLngLat([m.lng, m.lat], 0);
       const dx = (merch.x - this.originMercator.x) / this.meterScale;
       const dz = (merch.y - this.originMercator.y) / this.meterScale;
@@ -146,56 +145,21 @@ export class Bogor3DMarketCustomLayer implements CustomLayerInterface {
       const wallH = cfg.h * 0.44;
       const plinthH = 4.5;
 
-      const plinthGeo = createSharedBoxGeometry(w * 1.16, plinthH, d * 1.16, plinthH / 2);
-      const hallGeo = createSharedBoxGeometry(w * 0.86, wallH, d * 0.86, plinthH + wallH / 2);
-      const awningGeo = createSharedBoxGeometry(w * 1.04, 2.8, d * 1.04, plinthH + wallH * 0.45);
-      const lanternGeo = createSharedBoxGeometry(w * 0.89, 3.6, d * 0.89, plinthH + wallH * 0.72);
-
-      const lowerRoofGeo = new THREE.CylinderGeometry(w * 0.38, w * 0.72, cfg.h * 0.28, 4);
-      lowerRoofGeo.rotateY(Math.PI / 4);
-      lowerRoofGeo.translate(0, plinthH + wallH + cfg.h * 0.14, 0);
-
-      const upperRoofGeo = new THREE.ConeGeometry(w * 0.42, cfg.h * 0.28, 4);
-      upperRoofGeo.rotateY(Math.PI / 4);
-      upperRoofGeo.translate(0, plinthH + wallH + cfg.h * 0.41, 0);
-
-      const spireGeo = new THREE.SphereGeometry(w * 0.075, 10, 8);
-      spireGeo.translate(0, plinthH + wallH + cfg.h * 0.56, 0);
-
-      const pillarGeo = createSharedBoxGeometry(3.2, wallH + 1, 3.2, plinthH + wallH / 2);
-      const ringGeo = new THREE.RingGeometry(w * 0.72, w * 0.9, 32);
-      ringGeo.rotateX(-Math.PI / 2);
-      ringGeo.translate(0, 1.5, 0);
-
-      const beaconGeo = new THREE.OctahedronGeometry(w * 0.16, 0);
       const lanternMat = new THREE.MeshStandardMaterial({
         color: 0xfef08a,
         emissive: 0xf59e0b,
         emissiveIntensity: m.id === this.activeMarketId ? 1.55 : 0.45,
         roughness: 0.3,
       });
-
-      this.sharedGeometries.push(
-        plinthGeo,
-        hallGeo,
-        awningGeo,
-        lanternGeo,
-        lowerRoofGeo,
-        upperRoofGeo,
-        spireGeo,
-        pillarGeo,
-        ringGeo,
-        beaconGeo
-      );
       this.sharedMaterials.push(lanternMat);
 
-      group.add(new THREE.Mesh(plinthGeo, plinthMat));
-      group.add(new THREE.Mesh(hallGeo, wallMat));
-      group.add(new THREE.Mesh(awningGeo, awningMat));
-      group.add(new THREE.Mesh(lanternGeo, lanternMat));
-      group.add(new THREE.Mesh(lowerRoofGeo, roofMats[m.tier]));
-      group.add(new THREE.Mesh(upperRoofGeo, roofMats[m.tier]));
-      group.add(new THREE.Mesh(spireGeo, goldMat));
+      group.add(new THREE.Mesh(geoSet.plinthGeo, plinthMat));
+      group.add(new THREE.Mesh(geoSet.hallGeo, wallMat));
+      group.add(new THREE.Mesh(geoSet.awningGeo, awningMat));
+      group.add(new THREE.Mesh(geoSet.lanternGeo, lanternMat));
+      group.add(new THREE.Mesh(geoSet.lowerRoofGeo, roofMats[m.tier]));
+      group.add(new THREE.Mesh(geoSet.upperRoofGeo, roofMats[m.tier]));
+      group.add(new THREE.Mesh(geoSet.spireGeo, goldMat));
 
       const px = w * 0.44;
       const pz = d * 0.44;
@@ -205,17 +169,17 @@ export class Bogor3DMarketCustomLayer implements CustomLayerInterface {
         [-px, pz],
         [px, pz],
       ]) {
-        const col = new THREE.Mesh(pillarGeo, pillarMat);
+        const col = new THREE.Mesh(geoSet.pillarGeo, pillarMat);
         col.position.set(cx, 0, cz);
         group.add(col);
       }
 
-      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+      const ringMesh = new THREE.Mesh(geoSet.ringGeo, ringMat);
       ringMesh.visible = m.id === this.activeMarketId;
       group.add(ringMesh);
 
       const baseBeaconY = plinthH + wallH + cfg.h * 0.8;
-      const beaconMesh = new THREE.Mesh(beaconGeo, beaconMat);
+      const beaconMesh = new THREE.Mesh(geoSet.beaconGeo, beaconMat);
       beaconMesh.position.set(0, baseBeaconY, 0);
       beaconMesh.visible = m.id === this.activeMarketId;
       group.add(beaconMesh);
@@ -250,13 +214,13 @@ export class Bogor3DMarketCustomLayer implements CustomLayerInterface {
       }
     }
 
-    const projection = new THREE.Matrix4().fromArray(matrix);
-    const localTransform = new THREE.Matrix4()
+    this.scratchProjection.fromArray(matrix);
+    this.scratchTransform
       .makeTranslation(this.originMercator.x, this.originMercator.y, this.originMercator.z)
-      .scale(new THREE.Vector3(this.meterScale, -this.meterScale, this.meterScale))
-      .multiply(new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2));
+      .scale(this.scratchScale)
+      .multiply(this.scratchRot);
 
-    this.camera.projectionMatrix = projection.multiply(localTransform);
+    this.camera.projectionMatrix.multiplyMatrices(this.scratchProjection, this.scratchTransform);
 
     if (this.renderer) {
       this.renderer.resetState();

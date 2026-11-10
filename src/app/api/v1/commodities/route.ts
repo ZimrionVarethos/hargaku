@@ -1,39 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchBootstrapFromDb } from '@/lib/server/admin-db';
+import { fetchCatalogFromDb } from '@/lib/server/admin-db';
 import { MOCK_COMMODITY_SUMMARIES } from '@/lib/mock/commodities.data';
-import type { CommodityCategory, CommoditySummary } from '@/types';
-
-function mapCat(category: string): CommodityCategory {
-  if (category === 'BERAS') return 'BERAS';
-  if (category === 'CABAI_BAWANG') return 'CABAI_BAWANG';
-  if (category === 'DAGING') return 'DAGING_TELUR';
-  if (category === 'MINYAK') return 'MINYAK_GULA';
-  if (category === 'SAYUR') return 'SAYURAN';
-  return 'CABAI_BAWANG';
-}
+import { mapAdminCategoryToPublic } from '@/lib/utils';
+import type { CommoditySummary } from '@/types';
 
 export async function GET(req: NextRequest) {
   const categoryParam = req.nextUrl.searchParams.get('category');
 
   try {
-    const { commodities, markets, dailyPrices } = await fetchBootstrapFromDb();
+    const { commodities, markets, dailyPrices } = await fetchCatalogFromDb();
     const activeMarkets = markets.filter((m) => m.isActive);
 
     const list: CommoditySummary[] = commodities
       .filter((c) => c.isActive)
       .map((c) => {
-        const entries = activeMarkets
-          .map((m) => dailyPrices[`${m.id}_${c.id}`])
-          .filter((r): r is NonNullable<typeof r> => Boolean(r && r.price > 0));
+        let sumCurrent = 0;
+        let sumPrev = 0;
+        let count = 0;
+        for (const m of activeMarkets) {
+          const rec = dailyPrices[`${m.id}_${c.id}`];
+          if (rec && rec.price > 0) {
+            sumCurrent += rec.price;
+            sumPrev += rec.previousPrice || rec.price;
+            count++;
+          }
+        }
 
-        const avg =
-          entries.length > 0
-            ? Math.round(entries.reduce((acc, e) => acc + e.price, 0) / entries.length)
-            : c.hapHetPrice;
-        const prev =
-          entries.length > 0
-            ? Math.round(entries.reduce((acc, e) => acc + (e.previousPrice || e.price), 0) / entries.length)
-            : c.hapHetPrice;
+        const avg = count > 0 ? Math.round(sumCurrent / count) : c.hapHetPrice;
+        const prev = count > 0 ? Math.round(sumPrev / count) : c.hapHetPrice;
         const pct = prev > 0 ? Math.round(((avg - prev) / prev) * 1000) / 10 : 0;
 
         let statusVsHap: CommoditySummary['statusVsHap'] = 'EQUAL_HAP';
@@ -44,7 +38,7 @@ export async function GET(req: NextRequest) {
           id: c.id,
           name: c.name,
           slug: c.slug,
-          category: mapCat(c.category),
+          category: mapAdminCategoryToPublic(c.category),
           unit: c.unit,
           imageUrl: c.imageUrl || '/images/commodities/default.png',
           currentAvgPrice: avg,

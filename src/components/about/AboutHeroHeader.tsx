@@ -3,7 +3,6 @@ import Link from 'next/link';
 export function AboutHeroHeader() {
   return (
     <div className="flex flex-col gap-6 pb-4">
-      {/* Breadcrumb */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[12px] text-[var(--text-muted)]">
         <Link href="/" className="hover:text-[var(--text-primary)] transition-colors">
           Beranda
@@ -12,7 +11,6 @@ export function AboutHeroHeader() {
         <span className="text-[var(--text-primary)] font-bold">Tentang &amp; Sumber Data</span>
       </nav>
 
-      {/* Main Headline & Eyebrow */}
       <div className="space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--bg-card)] border border-[var(--border-ink)] shadow-xs">
           <span className="w-2 h-2 rounded-full bg-[var(--accent-chili)]" />
@@ -32,7 +30,6 @@ export function AboutHeroHeader() {
         </p>
       </div>
 
-      {/* Quick Jump Anchor Pills */}
       <div className="flex flex-wrap items-center gap-2.5 pt-2">
         <a
           href="#sumber-data"

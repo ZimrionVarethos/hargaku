@@ -17,7 +17,6 @@ export function PetaMarketRankTable({
   onSelectMarket,
   commodityName,
 }: Props) {
-  // Sort markets from lowest price to highest
   const sortedMarkets = [...markets].sort((a, b) => a.price - b.price);
 
   return (
@@ -63,7 +62,6 @@ export function PetaMarketRankTable({
                   }`}
                   onClick={() => onSelectMarket(m.marketId)}
                 >
-                  {/* Rank & Market */}
                   <td className="py-3.5 pl-3.5 sm:pl-4 pr-4">
                     <div className="flex items-center gap-3">
                       <span
@@ -91,17 +89,14 @@ export function PetaMarketRankTable({
                     </div>
                   </td>
 
-                  {/* Price */}
                   <td className="py-3.5 px-4 text-right font-extrabold text-[var(--forest-ink)] tabular-nums text-[14px]">
                     {formatRupiah(m.price)}
                   </td>
 
-                  {/* Regional Average Price */}
                   <td className="py-3.5 px-4 text-right font-medium text-[var(--text-secondary)] tabular-nums text-[13px]">
                     {formatRupiah(m.regionalAvgPrice ?? m.price)}
                   </td>
 
-                  {/* Deviation */}
                   <td className="py-3.5 px-4 text-center">
                     {m.diffPercent < 0 ? (
                       <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#E2EFE6] text-[#245034] border border-[#245034]/30 tabular-nums">
@@ -118,7 +113,6 @@ export function PetaMarketRankTable({
                     )}
                   </td>
 
-                  {/* Reports Count */}
                   <td className="py-3.5 px-4 text-right text-[12px] text-[var(--text-secondary)] tabular-nums">
                     <span>{m.reportsCount} laporan</span>
                     <span className="block text-[10px] text-[var(--text-muted)]">
@@ -126,7 +120,6 @@ export function PetaMarketRankTable({
                     </span>
                   </td>
 
-                  {/* Actions */}
                   <td className="py-3.5 pr-3.5 sm:pr-4 pl-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button

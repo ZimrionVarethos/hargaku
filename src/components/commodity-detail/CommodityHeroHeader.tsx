@@ -15,7 +15,6 @@ export function CommodityHeroHeader({ detail, changePercentage = 8.5 }: Props) {
   const isRising = changePercentage > 0;
   const isDropping = changePercentage < 0;
 
-  // Determine semantic status badge
   let statusBadgeStyle = 'bg-[#F4F3F0] text-[#1B1A18] outline-[#E5E3DE]';
   let statusLabel = 'Wajar';
 
@@ -34,7 +33,6 @@ export function CommodityHeroHeader({ detail, changePercentage = 8.5 }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Title & Actions Row */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-2 border-b border-[#E5E3DE]">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3 flex-wrap">
@@ -53,7 +51,6 @@ export function CommodityHeroHeader({ detail, changePercentage = 8.5 }: Props) {
           </p>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex items-center gap-3 flex-wrap">
           <Link
             href={`/cek-harga?commodity=${detail.slug}`}
@@ -73,7 +70,6 @@ export function CommodityHeroHeader({ detail, changePercentage = 8.5 }: Props) {
         </div>
       </div>
 
-      {/* Hero Price Display */}
       <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
         <span className="text-[38px] sm:text-[44px] font-bold text-[#1B1A18] tracking-tight tabular-nums">
           Rp {detail.currentPriceStats.cityAverage.toLocaleString('id-ID')}

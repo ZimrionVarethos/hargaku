@@ -75,7 +75,6 @@ export async function getAiRuntimeConfig(): Promise<AiRuntimeConfig> {
           enabledSources = parsed.filter((s): s is string => typeof s === 'string');
         }
       } catch {
-        // Fallback silently to default source list
       }
     }
 
@@ -133,7 +132,6 @@ export async function getPublicMapConfig(): Promise<PublicMapConfig> {
       return { mapboxToken: dbToken, source: 'supabase-db' };
     }
   } catch {
-    // Fallback to optional env if DB is momentarily unavailable
   }
 
   const envToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN?.trim();
@@ -166,51 +164,59 @@ export async function saveAiSettings(input: {
   systemInstruction?: string;
   enabledSources?: string[];
 }): Promise<AiPublicSettings> {
+  const keys: string[] = [];
+  const values: string[] = [];
+  const descriptions: string[] = [];
+  const secrets: boolean[] = [];
+
   if (input.geminiApiKey && input.geminiApiKey.trim().length > 8) {
-    await dbQuery(
-      `INSERT INTO system_settings (key, value, description, is_secret, updated_at)
-       VALUES ('gemini_api_key', $1, 'API Key Google Gemini dinamis via Admin Dashboard', true, NOW())
-       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, is_secret = true, updated_at = NOW()`,
-      [input.geminiApiKey.trim()]
-    );
+    keys.push('gemini_api_key');
+    values.push(input.geminiApiKey.trim());
+    descriptions.push('API Key Google Gemini dinamis via Admin Dashboard');
+    secrets.push(true);
   }
 
   if (input.mapboxAccessToken && input.mapboxAccessToken.trim().length > 8) {
-    await dbQuery(
-      `INSERT INTO system_settings (key, value, description, is_secret, updated_at)
-       VALUES ('mapbox_access_token', $1, 'Token publik Mapbox GL JS untuk Peta 3D 13 Unit Pasar', false, NOW())
-       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
-      [input.mapboxAccessToken.trim()]
-    );
+    keys.push('mapbox_access_token');
+    values.push(input.mapboxAccessToken.trim());
+    descriptions.push('Token publik Mapbox GL JS untuk Peta 3D 13 Unit Pasar');
+    secrets.push(false);
   }
 
   if (input.geminiModel && input.geminiModel.trim()) {
-    await dbQuery(
-      `INSERT INTO system_settings (key, value, description, is_secret, updated_at)
-       VALUES ('gemini_model', $1, 'Model Gemini aktif', false, NOW())
-       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
-      [input.geminiModel.trim()]
-    );
+    keys.push('gemini_model');
+    values.push(input.geminiModel.trim());
+    descriptions.push('Model Gemini aktif');
+    secrets.push(false);
   }
 
   if (input.systemInstruction && input.systemInstruction.trim()) {
-    await dbQuery(
-      `INSERT INTO system_settings (key, value, description, is_secret, updated_at)
-       VALUES ('ai_system_instruction', $1, 'Instruksi sistem asisten AI HargaKu', false, NOW())
-       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
-      [input.systemInstruction.trim()]
-    );
+    keys.push('ai_system_instruction');
+    values.push(input.systemInstruction.trim());
+    descriptions.push('Instruksi sistem asisten AI HargaKu');
+    secrets.push(false);
   }
 
   if (Array.isArray(input.enabledSources) && input.enabledSources.length > 0) {
+    keys.push('price_sources_config');
+    values.push(JSON.stringify(input.enabledSources));
+    descriptions.push('Sumber pembanding harga AI');
+    secrets.push(false);
+  }
+
+  if (keys.length > 0) {
     await dbQuery(
       `INSERT INTO system_settings (key, value, description, is_secret, updated_at)
-       VALUES ('price_sources_config', $1, 'Sumber pembanding harga AI', false, NOW())
-       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
-      [JSON.stringify(input.enabledSources)]
+       SELECT u.k, u.v, u.d, u.s, NOW()
+       FROM UNNEST($1::text[], $2::text[], $3::text[], $4::boolean[]) AS u(k, v, d, s)
+       ON CONFLICT (key) DO UPDATE SET
+         value = EXCLUDED.value,
+         description = EXCLUDED.description,
+         is_secret = EXCLUDED.is_secret,
+         updated_at = NOW()`,
+      [keys, values, descriptions, secrets]
     );
   }
 
   return getPublicAiSettings();
 }
-

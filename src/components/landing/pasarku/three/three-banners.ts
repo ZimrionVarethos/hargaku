@@ -174,7 +174,6 @@ function createBannerTexture(
   ctx.lineWidth = compact ? 6 : 8;
   ctx.strokeRect(3, 3, w - 6, h - 6);
 
-  // Header ribbon
   const topH = Math.round(h * 0.27);
   ctx.fillStyle = pal.header;
   ctx.fillRect(6, 6, w - 12, topH);
@@ -185,7 +184,6 @@ function createBannerTexture(
   ctx.textAlign = 'left';
   ctx.fillText(headerText, 16, topH * 0.72);
 
-  // Medallion illustration on both wall posters and hanging signs (no static prices)
   const iconX = compact ? Math.round(w * 0.18) : Math.round(w * 0.16);
   const iconY = Math.round(h * 0.64);
   const iconR = compact ? 30 : 48;
@@ -204,7 +202,6 @@ function createBannerTexture(
   drawProduceGlyph(ctx, comp.produceType, 0, 0);
   ctx.restore();
 
-  // Main Commodity Title (auto-scaled so it never clips)
   const textX = compact ? Math.round(w * 0.34) : Math.round(w * 0.3);
   const maxTextW = w - textX - 20;
   const titleText = comp.name.toUpperCase();
@@ -212,7 +209,6 @@ function createBannerTexture(
   ctx.fillStyle = isDark ? '#F9F3EE' : '#132E20';
   ctx.fillText(titleText, textX, Math.round(h * 0.56));
 
-  // Subtle dynamic info tag without hardcoded price (prices live inside interactive stall tags & modal)
   const subLabel = compact ? 'LAPAK KOMODITAS' : 'KLIK LAPAK UNTUK CEK HARGA TERKINI';
   fitFont(ctx, subLabel, maxTextW - 12, Math.round(h * 0.115), 11);
   ctx.fillStyle = isDark ? '#A7F3D0' : '#245034';
@@ -243,7 +239,6 @@ export function createMarketBanners(
     const isL = c.side === 'left';
     const posZ = (c.zStart + c.zEnd) / 2;
 
-    // 1. High-resolution Side Wall Poster on left (+2.41) or right (-2.41) wall
     const wallTex = createBannerTexture(c, 512, 224, isDark, false);
     const wallMat = new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.85, metalness: 0.02 });
     const wallBanner = new THREE.Mesh(wallGeo, wallMat);
@@ -251,7 +246,6 @@ export function createMarketBanners(
     wallBanner.rotation.y = isL ? -Math.PI / 2 : Math.PI / 2;
     group.add(wallBanner);
 
-    // 2. Hanging Bracket Sign cleanly below top HUD height
     const signTex = createBannerTexture(c, 320, 152, isDark, true);
     const signMat = new THREE.MeshStandardMaterial({
       map: signTex,

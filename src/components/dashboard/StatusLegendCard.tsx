@@ -10,7 +10,6 @@ export function StatusLegendCard() {
           Indikator Status Harga Terhadap Acuan Resmi:
         </span>
 
-        {/* 4 Status Badges Row */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)]">
             Wajar (Sesuai HAP &plusmn;5%)

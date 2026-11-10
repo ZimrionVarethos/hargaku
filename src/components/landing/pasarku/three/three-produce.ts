@@ -26,6 +26,11 @@ function rng(seed: number) {
   return x - Math.floor(x);
 }
 
+const scratchEuler = new THREE.Euler();
+const scratchQuat = new THREE.Quaternion();
+const scratchPos = new THREE.Vector3();
+const scratchScale = new THREE.Vector3();
+
 function pushInst(
   list: InstanceItem[],
   x: number, y: number, z: number,
@@ -33,10 +38,11 @@ function pushInst(
   sx: number, sy: number, sz: number,
   hexColor: number
 ) {
-  const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, ry, rz));
-  const m = new THREE.Matrix4().compose(
-    new THREE.Vector3(x, y, z), q, new THREE.Vector3(sx, sy, sz)
-  );
+  scratchEuler.set(rx, ry, rz);
+  scratchQuat.setFromEuler(scratchEuler);
+  scratchPos.set(x, y, z);
+  scratchScale.set(sx, sy, sz);
+  const m = new THREE.Matrix4().compose(scratchPos, scratchQuat, scratchScale);
   list.push({ matrix: m, color: new THREE.Color(hexColor) });
 }
 
@@ -70,7 +76,7 @@ export function createInstancedMarketProduce(
 
   const buckets: Record<string, InstanceItem[]> = {
     tomato: [], orange: [], shallot: [], garlic: [], carrot: [],
-    chili: [], potato: [], cabbage: [], greens: [], egg: [],
+    chili: [], cabbage: [], greens: [], egg: [],
     fish: [], meat: [], oil: [], sack: [], crate: [], basin: [], mound: [],
   };
 
@@ -94,7 +100,7 @@ export function createInstancedMarketProduce(
 
   compartments.forEach((c) => {
     const isL = c.side === 'left';
-    const dir = isL ? -1 : 1; // Visual left (+1.62) faces aisle (-X)
+    const dir = isL ? -1 : 1;
     const cx = isL ? 1.62 : -1.62;
     const depth = c.zEnd - c.zStart;
     const cz = (c.zStart + c.zEnd) / 2;
@@ -104,7 +110,6 @@ export function createInstancedMarketProduce(
       { tx: cx - dir * 0.37, ty: 1.08 },
     ];
 
-    // Containers & floor sacks
     for (let dz = -depth / 2 + 0.32; dz <= depth / 2 - 0.32; dz += 0.56) {
       tiers.forEach((t, ti) => {
         if (c.produceType === 'wortel' && ti < 2) {
@@ -182,7 +187,6 @@ export function createInstancedMarketProduce(
         }
       } else if (c.produceType === 'ikan') {
         if (ti < 2) {
-          // Crushed ice mound inside blue fish trays + packed lateral Ikan Kembung
           pushInst(buckets.mound, t.tx, t.ty + 0.048, cz, 0, 0, 0, 0.9, 0.55, moundL, 0xe0f2fe);
           for (let dz = -depth / 2 + 0.26; dz <= depth / 2 - 0.26; dz += 0.22) {
             const s = seed + dz * 19;
@@ -202,7 +206,6 @@ export function createInstancedMarketProduce(
           pushInst(buckets.oil, t.tx + 0.06, t.ty, cz + dz + 0.06, 0, 0, 0, 1, 1, 1, 0xfbbf24);
         }
       } else {
-        // Beras & Gula: pearly white mound bins + woven sacks on back shelf
         if (ti < 2) {
           const binCol = c.produceType === 'gula' ? 0xfef3c7 : 0xf8fafc;
           pushInst(buckets.mound, t.tx, t.ty + 0.04, cz, 0, 0, 0, 0.96, 1.15, moundL, binCol);
@@ -220,27 +223,29 @@ export function createInstancedMarketProduce(
       ? new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness, clearcoat, clearcoatRoughness: 0.14, map: map || null, normalMap: norm || null })
       : new THREE.MeshStandardMaterial({ color: 0xffffff, roughness, metalness: 0.04, map: map || null, normalMap: norm || null });
 
-  const defs: Array<[string, () => THREE.BufferGeometry, THREE.Material, boolean]> = [
-    ['mound', createMoundGeo, mat(0.85, pTex.moundTex, tex.organicNorm), false],
-    ['tomato', createTomatoGeo, mat(0.18, pTex.tomatoTex, tex.organicNorm, 0.85), false],
-    ['orange', createOrangeGeo, mat(0.34, undefined, tex.organicNorm, 0.3), false],
-    ['shallot', createOnionGeo, mat(0.4, pTex.shallotTex, tex.organicNorm, 0.35), false],
-    ['garlic', createOnionGeo, mat(0.48, pTex.garlicTex, tex.organicNorm), false],
-    ['carrot', createCarrotGeo, mat(0.4, pTex.carrotTex, tex.organicNorm), false],
-    ['chili', createChiliGeo, mat(0.2, pTex.chiliTex, undefined, 0.72), false],
-    ['cabbage', createCabbageGeo, mat(0.54, pTex.cabbageTex, tex.organicNorm), true],
-    ['greens', createGreensBundleGeo, mat(0.7, undefined, tex.organicNorm), false],
-    ['egg', createEggGeo, mat(0.3, undefined, undefined, 0.4), false],
-    ['fish', createFishGeo, mat(0.18, pTex.fishTex, undefined, 0.82), false],
-    ['meat', createPotatoGeo, mat(0.32, pTex.meatTex, tex.organicNorm, 0.65), false],
-    ['oil', createOilBottleGeo, mat(0.15, undefined, undefined, 0.9), true],
-    ['sack', createSackGeo, mat(0.95, tex.burlapMap), true],
-    ['crate', createCrateGeo, mat(0.55), true],
-    ['basin', createBasinGeo, mat(0.28, undefined, undefined, 0.55), true],
+  const defs: Array<[string, () => THREE.BufferGeometry, () => THREE.Material, boolean]> = [
+    ['mound', createMoundGeo, () => mat(0.85, pTex.moundTex, tex.organicNorm), false],
+    ['tomato', createTomatoGeo, () => mat(0.18, pTex.tomatoTex, tex.organicNorm, 0.85), false],
+    ['orange', createOrangeGeo, () => mat(0.34, undefined, tex.organicNorm, 0.3), false],
+    ['shallot', createOnionGeo, () => mat(0.4, pTex.shallotTex, tex.organicNorm, 0.35), false],
+    ['garlic', createOnionGeo, () => mat(0.48, pTex.garlicTex, tex.organicNorm), false],
+    ['carrot', createCarrotGeo, () => mat(0.4, pTex.carrotTex, tex.organicNorm), false],
+    ['chili', createChiliGeo, () => mat(0.2, pTex.chiliTex, undefined, 0.72), false],
+    ['cabbage', createCabbageGeo, () => mat(0.54, pTex.cabbageTex, tex.organicNorm), true],
+    ['greens', createGreensBundleGeo, () => mat(0.7, undefined, tex.organicNorm), false],
+    ['egg', createEggGeo, () => mat(0.3, undefined, undefined, 0.4), false],
+    ['fish', createFishGeo, () => mat(0.18, pTex.fishTex, undefined, 0.82), false],
+    ['meat', createPotatoGeo, () => mat(0.32, pTex.meatTex, tex.organicNorm, 0.65), false],
+    ['oil', createOilBottleGeo, () => mat(0.15, undefined, undefined, 0.9), true],
+    ['sack', createSackGeo, () => mat(0.95, tex.burlapMap), true],
+    ['crate', createCrateGeo, () => mat(0.55), true],
+    ['basin', createBasinGeo, () => mat(0.28, undefined, undefined, 0.55), true],
   ];
 
-  defs.forEach(([key, geoFn, mMat, castShadow]) => {
-    const m = buildInstancedMesh(geoFn(), mMat, buckets[key], castShadow);
+  defs.forEach(([key, geoFn, matFn, castShadow]) => {
+    const items = buckets[key];
+    if (!items || items.length === 0) return;
+    const m = buildInstancedMesh(geoFn(), matFn(), items, castShadow);
     if (m) group.add(m);
   });
 

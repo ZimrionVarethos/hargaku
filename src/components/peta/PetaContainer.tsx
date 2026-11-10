@@ -23,7 +23,6 @@ export function PetaContainer({ initialCommodities }: Props) {
   const [selectedMarketId, setSelectedMarketId] = useState<string>('');
   const [isLightMode, setIsLightMode] = useState<boolean>(false);
 
-  // Dynamic markets for the selected region
   const currentRegionMarkets = useMemo(() => {
     const regionFiltered = rawMarkets.filter(
       (m) =>
@@ -46,47 +45,52 @@ export function PetaContainer({ initialCommodities }: Props) {
     return getMarketsByRegion(selectedRegion.id);
   }, [rawMarkets, selectedRegion]);
 
-  // Active commodity configuration
   const activeCommodity =
     PETA_COMMODITIES.find((c) => c.id === selectedCommodityId) ||
     PETA_COMMODITIES[0];
 
-  // Adjust base price with island logistics factor
-  const baseRegionalPrice = Math.round(
-    (activeCommodity.cityAvgPrice * (1 + (selectedRegion.logisticsCostPct || 0) / 100)) / 100
-  ) * 100;
+  const baseRegionalPrice =
+    Math.round(
+      (activeCommodity.cityAvgPrice * (1 + (selectedRegion.logisticsCostPct || 0) / 100)) / 100
+    ) * 100;
 
-  // Build unified markets list with price details
-  const marketsWithPrice: PetaMarketPrice[] = currentRegionMarkets.map((info, idx) => {
-    // Check if live admin daily price entry exists
-    const dailyRecord = dailyPrices[`${info.id}_${selectedCommodityId}`];
-    const livePrice = dailyRecord && dailyRecord.price > 0 ? dailyRecord.price : null;
+  const marketsWithPrice: PetaMarketPrice[] = useMemo(
+    () =>
+      currentRegionMarkets.map((info, idx) => {
+        const dailyRecord = dailyPrices[`${info.id}_${selectedCommodityId}`];
+        const livePrice = dailyRecord && dailyRecord.price > 0 ? dailyRecord.price : null;
 
-    // Natural market spread fallback: -4% to +4%
-    const variationMultiplier = idx === 0 ? 0.96 : idx === 1 ? 0.99 : idx === 2 ? 1.02 : 1.04;
-    const computedPrice = livePrice || Math.round((baseRegionalPrice * variationMultiplier) / 100) * 100;
-    const diffPercent = Math.round(((computedPrice - baseRegionalPrice) / baseRegionalPrice) * 1000) / 10;
-    const status = diffPercent < -2 ? ('cheaper' as const) : diffPercent > 2 ? ('expensive' as const) : ('average' as const);
+        const variationMultiplier = idx === 0 ? 0.96 : idx === 1 ? 0.99 : idx === 2 ? 1.02 : 1.04;
+        const computedPrice = livePrice || Math.round((baseRegionalPrice * variationMultiplier) / 100) * 100;
+        const diffPercent = Math.round(((computedPrice - baseRegionalPrice) / baseRegionalPrice) * 1000) / 10;
+        const status =
+          diffPercent < -2
+            ? ('cheaper' as const)
+            : diffPercent > 2
+            ? ('expensive' as const)
+            : ('average' as const);
 
-    return {
-      marketId: info.id,
-      name: info.name,
-      shortName: info.name.replace('Pasar ', '').split(' (')[0],
-      district: info.district,
-      address: `${info.district}, ${info.city}`,
-      latitude: info.latitude,
-      longitude: info.longitude,
-      xPercent: 50,
-      yPercent: 50,
-      price: computedPrice,
-      regionalAvgPrice: baseRegionalPrice,
-      diffPercent,
-      status,
-      reportsCount: 6 + (idx * 3),
-      lastUpdated: '06:00 WIB',
-      googleMapsUrl: `https://maps.google.com/?q=${encodeURIComponent(`${info.name} ${info.city}`)}`,
-    };
-  });
+        return {
+          marketId: info.id,
+          name: info.name,
+          shortName: info.name.replace('Pasar ', '').split(' (')[0],
+          district: info.district,
+          address: `${info.district}, ${info.city}`,
+          latitude: info.latitude,
+          longitude: info.longitude,
+          xPercent: 50,
+          yPercent: 50,
+          price: computedPrice,
+          regionalAvgPrice: baseRegionalPrice,
+          diffPercent,
+          status,
+          reportsCount: 6 + idx * 3,
+          lastUpdated: '06:00 WIB',
+          googleMapsUrl: `https://maps.google.com/?q=${encodeURIComponent(`${info.name} ${info.city}`)}`,
+        };
+      }),
+    [currentRegionMarkets, dailyPrices, selectedCommodityId, baseRegionalPrice]
+  );
 
   const activeMarketId =
     marketsWithPrice.find((m) => m.marketId === selectedMarketId)?.marketId ||
@@ -95,7 +99,6 @@ export function PetaContainer({ initialCommodities }: Props) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-      {/* Left Column: Filter Sidebar */}
       <div className="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-[96px]">
         <PetaFilterSidebar
           commodities={initialCommodities}
@@ -106,7 +109,6 @@ export function PetaContainer({ initialCommodities }: Props) {
         />
       </div>
 
-      {/* Right Column: Spatial Map & Ranking Table */}
       <div className="lg:col-span-8 xl:col-span-9 flex flex-col gap-6">
         {!isLightMode ? (
           <>

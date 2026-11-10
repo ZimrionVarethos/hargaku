@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import type { AdminModule } from '@/lib/types/admin';
 import { useAdminStore } from '@/lib/store/admin-store';
 import {
@@ -8,8 +7,6 @@ import {
   Storefront,
   ShieldCheck,
   Lightning,
-  WarningCircle,
-  CheckCircle,
   ArrowRight,
   Plus,
 } from '@phosphor-icons/react';

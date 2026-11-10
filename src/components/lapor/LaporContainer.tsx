@@ -111,7 +111,6 @@ export function LaporContainer({ commodities, markets }: Props) {
         hasPhoto: !!data.photoFile,
       });
     } catch {
-      // In case of simulated error
     } finally {
       setIsSubmitting(false);
     }
@@ -119,7 +118,6 @@ export function LaporContainer({ commodities, markets }: Props) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      {/* Left Column: Form or Success */}
       <div className="lg:col-span-7 xl:col-span-7">
         {submittedReport ? (
           <LaporSuccessCard
@@ -142,7 +140,6 @@ export function LaporContainer({ commodities, markets }: Props) {
         )}
       </div>
 
-      {/* Right Column: Verification Pipeline & Security Guarantees */}
       <div className="lg:col-span-5 xl:col-span-5">
         <LaporVerificationCard />
       </div>

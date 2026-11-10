@@ -27,7 +27,6 @@ export function AboutTeamAndTechStack() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Team Card */}
         <div className="market-card p-6 space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[var(--accent-chili)] text-white flex items-center justify-center font-bold text-[18px]">
@@ -63,7 +62,6 @@ export function AboutTeamAndTechStack() {
           </div>
         </div>
 
-        {/* Tech Stack Card */}
         <div className="lg:col-span-2 market-card p-6 flex flex-col justify-between gap-5">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -105,7 +103,6 @@ export function AboutTeamAndTechStack() {
             </div>
           </div>
 
-          {/* Action CTAs */}
           <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center gap-3">
             <Link
               href="/cek-harga"

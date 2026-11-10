@@ -20,7 +20,6 @@ export function ThreeLayerPriceCards({ detail }: Props) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-      {/* LAPIS 1: Acuan Resmi Bapanas */}
       <div className="market-card p-5 sm:p-6 flex flex-col justify-between gap-4">
         <div className="flex flex-col gap-3">
           <span className="text-[11px] font-bold text-[var(--accent-chili)] uppercase tracking-wider">
@@ -48,7 +47,6 @@ export function ThreeLayerPriceCards({ detail }: Props) {
         </div>
       </div>
 
-      {/* LAPIS 2: Rerata Kota PIHPS */}
       <div className="market-card p-5 sm:p-6 flex flex-col justify-between gap-4">
         <div className="flex flex-col gap-3">
           <span className="text-[11px] font-bold text-[var(--accent-chili)] uppercase tracking-wider">
@@ -76,7 +74,6 @@ export function ThreeLayerPriceCards({ detail }: Props) {
         </div>
       </div>
 
-      {/* LAPIS 3: Data Lapak Warga */}
       <div className="market-card p-5 sm:p-6 flex flex-col justify-between gap-4">
         <div className="flex flex-col gap-3">
           <span className="text-[11px] font-bold text-[var(--accent-chili)] uppercase tracking-wider">

@@ -9,7 +9,6 @@ import {
 export function LaporVerificationCard() {
   return (
     <div className="flex flex-col gap-6">
-      {/* 3 Steps Pipeline Card */}
       <div className="market-card p-5 sm:p-6 flex flex-col gap-5">
         <div>
           <h2 className="text-[17px] font-bold text-[var(--text-primary)] tracking-tight">
@@ -21,7 +20,6 @@ export function LaporVerificationCard() {
         </div>
 
         <div className="flex flex-col gap-4 text-[13px]">
-          {/* Step 1 */}
           <div className="flex items-start gap-3.5 p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-subtle)]">
             <div className="w-7 h-7 rounded-full bg-[var(--text-primary)] text-[var(--bg-paper)] flex items-center justify-center shrink-0 text-[12px] font-bold">
               1
@@ -36,7 +34,6 @@ export function LaporVerificationCard() {
             </div>
           </div>
 
-          {/* Step 2 */}
           <div className="flex items-start gap-3.5 p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-subtle)]">
             <div className="w-7 h-7 rounded-full bg-[var(--text-primary)] text-[var(--bg-paper)] flex items-center justify-center shrink-0 text-[12px] font-bold">
               2
@@ -51,7 +48,6 @@ export function LaporVerificationCard() {
             </div>
           </div>
 
-          {/* Step 3 */}
           <div className="flex items-start gap-3.5 p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-subtle)]">
             <div className="w-7 h-7 rounded-full bg-[#E2EFE6] text-[#245034] border border-[#245034] flex items-center justify-center shrink-0 text-[12px] font-bold">
               3
@@ -68,7 +64,6 @@ export function LaporVerificationCard() {
         </div>
       </div>
 
-      {/* Photo Guidelines & Ethics Card */}
       <div className="market-card p-5 sm:p-6 flex flex-col gap-4">
         <h3 className="text-[15px] font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-2">
           <Camera size={18} weight="bold" className="text-[var(--accent-chili)]" />

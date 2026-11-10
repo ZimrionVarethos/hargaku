@@ -59,7 +59,6 @@ export function PriceCheckForm({
       </h2>
 
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
-        {/* Pilih Komoditas */}
         <div className="flex flex-col gap-1.5">
           <label className="text-[13px] font-semibold text-[var(--text-primary)]">
             Pilih Komoditas
@@ -84,7 +83,6 @@ export function PriceCheckForm({
           </div>
         </div>
 
-        {/* Takaran Split Row */}
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
           <div className="sm:col-span-4 flex flex-col gap-1.5">
             <label className="text-[13px] font-semibold text-[var(--text-primary)]">
@@ -126,7 +124,6 @@ export function PriceCheckForm({
           </div>
         </div>
 
-        {/* Pilih Pasar */}
         <div className="flex flex-col gap-1.5">
           <label className="text-[13px] font-semibold text-[var(--text-primary)]">
             Lokasi Pasar Tradisional
@@ -151,7 +148,6 @@ export function PriceCheckForm({
           </div>
         </div>
 
-        {/* Harga Pedagang */}
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
             <label className="text-[13px] font-semibold text-[var(--text-primary)]">
@@ -172,7 +168,6 @@ export function PriceCheckForm({
           />
         </div>
 
-        {/* Action Button */}
         <button
           type="submit"
           disabled={loading}

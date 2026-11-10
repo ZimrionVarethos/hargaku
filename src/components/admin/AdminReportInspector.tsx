@@ -5,7 +5,6 @@ import {
   CheckCircle,
   Prohibit,
   WarningCircle,
-  FileText,
   Camera,
   Question,
 } from '@phosphor-icons/react';

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -90,7 +90,6 @@ export function BogorMarketDetailModal({
       />
 
       <div className="relative w-full max-w-xl market-card p-5 sm:p-6 z-10 max-h-[90vh] overflow-y-auto space-y-4">
-        {/* Header Bar */}
         <div className="flex items-start justify-between gap-3 pb-4 border-b-2 border-[var(--border-ink)]">
           <div className="space-y-2 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -126,7 +125,6 @@ export function BogorMarketDetailModal({
           </button>
         </div>
 
-        {/* Broadsheet Market Detail Sheet */}
         <div className="rounded-[14px] border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] p-4 sm:p-5 space-y-4">
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-lg bg-[var(--forest-surface)] border border-[var(--border-ink)] flex items-center justify-center shrink-0 mt-0.5 text-[var(--forest-ink)]">
@@ -174,7 +172,6 @@ export function BogorMarketDetailModal({
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
           <button
             type="button"
@@ -205,7 +202,6 @@ export function BogorMarketDetailModal({
           </a>
         </div>
 
-        {/* Unit Prev/Next Switcher */}
         {hasMultiple && (
           <div className="flex items-center justify-between gap-2 pt-3 border-t border-[var(--border-subtle)] text-xs">
             <button
@@ -235,4 +231,3 @@ export function BogorMarketDetailModal({
     </div>
   );
 }
-

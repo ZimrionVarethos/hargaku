@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { UploadSimple, FileText, X } from '@phosphor-icons/react';
 
 interface Props {

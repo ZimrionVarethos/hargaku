@@ -57,7 +57,6 @@ export function PetaSpatialStage({
 
   return (
     <div className="relative w-full rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-ink)] overflow-hidden min-h-[560px] sm:min-h-[620px] flex flex-col justify-between p-3.5 sm:p-5 shadow-[var(--shadow-hard)]">
-      {/* Interactive Leaflet Map Canvas (Full Stage Background) */}
       <div className="absolute inset-0 z-0">
         <LeafletMarketMap
           markets={mapItems}
@@ -69,7 +68,6 @@ export function PetaSpatialStage({
         />
       </div>
 
-      {/* Top Floating Control Bar: Legend & Active View Mode */}
       <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 bg-[var(--bg-card)]/95 backdrop-blur-md px-4 py-2.5 rounded-xl border border-[var(--border-ink)] shadow-sm max-w-fit">
         <div className="flex items-center gap-2 text-[12px] text-[var(--text-secondary)]">
           <span className="font-bold text-[var(--text-primary)]">Pantauan Spasial:</span>
@@ -85,10 +83,8 @@ export function PetaSpatialStage({
         </div>
       </div>
 
-      {/* Spacer to let user interact with map in center */}
       <div className="pointer-events-none flex-1 min-h-[180px]" />
 
-      {/* Bottom Floating Market Card */}
       {selectedMarket && (
         <div className="relative z-10 market-card p-4 sm:p-5 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in duration-200">
           <div className="flex flex-col gap-1.5">

@@ -31,7 +31,6 @@ export function MarketComparisonCard() {
         </p>
       </div>
 
-      {/* 5 Markets Horizontal Bar List */}
       <div className="flex flex-col gap-3.5">
         {MARKET_PRICES.map((m) => {
           const adjustedPrice = calculateRegionalPrice(m.price);
@@ -63,7 +62,6 @@ export function MarketComparisonCard() {
                 </span>
               </div>
 
-              {/* Bar line */}
               <div className="w-full h-2 rounded-full bg-[var(--bg-muted)] border border-[var(--border-subtle)] overflow-hidden flex">
                 <div
                   className="h-full rounded-full transition-all"

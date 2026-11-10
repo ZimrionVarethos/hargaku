@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { MapPin } from '@phosphor-icons/react';
 import { BOGOR_MARKETS } from '@/lib/data/bogor-markets';
 import { Bogor3DMapCanvas } from './Bogor3DMapCanvas';
@@ -99,7 +99,6 @@ export function PasarKuUnitPasarSection() {
           </div>
         </div>
 
-        {/* Interactive 3D Mapbox Stage */}
         <div ref={mapWrapperRef}>
           <Bogor3DMapCanvas
             allMarkets={BOGOR_MARKETS}
@@ -111,7 +110,6 @@ export function PasarKuUnitPasarSection() {
           />
         </div>
 
-        {/* Compact Single-Row Unit Quick Jump Strip */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
             <span className="inline-flex items-center gap-1.5 font-medium">

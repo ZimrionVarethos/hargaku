@@ -49,4 +49,4 @@ export const REGIONS_BY_ISLAND: Record<IslandCorridor, Region[]> = {
   MALUKU_PAPUA: MOCK_REGIONS.filter((r) => r.island === 'MALUKU_PAPUA'),
 };
 
-export const DEFAULT_REGION = MOCK_REGIONS[0]; // Jawa Barat (Kota Bogor baseline)
+export const DEFAULT_REGION = MOCK_REGIONS[0];

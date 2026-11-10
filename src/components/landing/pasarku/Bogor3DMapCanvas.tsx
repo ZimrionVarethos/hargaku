@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { WarningCircle } from '@phosphor-icons/react';
@@ -174,8 +174,6 @@ export function Bogor3DMapCanvas({
       mapRef.current = null;
       setMapReady(false);
     };
-    // Intentionally initialize Mapbox once per loaded token
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configLoaded, mapboxToken]);
 
   useEffect(() => {

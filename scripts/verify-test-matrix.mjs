@@ -9,49 +9,42 @@ const layers = {
 
 console.log('Running Test Matrix for Price Check Evaluation...');
 
-// TC-CW-01: Sama persis dengan acuan
 const tc1 = evaluatePrice(60000, 60000, layers);
 assert.equal(tc1.diffPercentage, 0.0);
 assert.equal(tc1.status, 'FAIR');
 assert.equal(tc1.statusBadgeColor, 'emerald');
 console.log('✓ TC-CW-01 passed: 0% -> FAIR (emerald)');
 
-// TC-CW-02: Batas atas toleransi wajar (+10%)
 const tc2 = evaluatePrice(66000, 60000, layers);
 assert.equal(tc2.diffPercentage, 10.0);
 assert.equal(tc2.status, 'FAIR');
 assert.equal(tc2.statusBadgeColor, 'emerald');
 console.log('✓ TC-CW-02 passed: +10% -> FAIR (emerald)');
 
-// TC-CW-03: Batas bawah toleransi wajar (-10%)
 const tc3 = evaluatePrice(54000, 60000, layers);
 assert.equal(tc3.diffPercentage, -10.0);
 assert.equal(tc3.status, 'FAIR');
 assert.equal(tc3.statusBadgeColor, 'emerald');
 console.log('✓ TC-CW-03 passed: -10% -> FAIR (emerald)');
 
-// TC-CW-04: Sedikit di atas batas wajar (+10.83%)
 const tc4 = evaluatePrice(66500, 60000, layers);
 assert.equal(tc4.diffPercentage, 10.83);
 assert.equal(tc4.status, 'SLIGHTLY_EXPENSIVE');
 assert.equal(tc4.statusBadgeColor, 'amber');
 console.log('✓ TC-CW-04 passed: +10.83% -> SLIGHTLY_EXPENSIVE (amber)');
 
-// TC-CW-05: Batas atas agak mahal (+25%)
 const tc5 = evaluatePrice(75000, 60000, layers);
 assert.equal(tc5.diffPercentage, 25.0);
 assert.equal(tc5.status, 'SLIGHTLY_EXPENSIVE');
 assert.equal(tc5.statusBadgeColor, 'amber');
 console.log('✓ TC-CW-05 passed: +25% -> SLIGHTLY_EXPENSIVE (amber)');
 
-// TC-CW-06: Di atas ambang wajar ekstrem (+26.67%)
 const tc6 = evaluatePrice(76000, 60000, layers);
 assert.equal(tc6.diffPercentage, 26.67);
 assert.equal(tc6.status, 'OVERPRICED');
 assert.equal(tc6.statusBadgeColor, 'rose');
 console.log('✓ TC-CW-06 passed: +26.67% -> OVERPRICED (rose)');
 
-// TC-CW-07: Jauh lebih murah dari acuan (<-15%)
 const tc7 = evaluatePrice(50000, 60000, layers);
 assert.equal(tc7.diffPercentage, -16.67);
 assert.equal(tc7.status, 'MUCH_CHEAPER');

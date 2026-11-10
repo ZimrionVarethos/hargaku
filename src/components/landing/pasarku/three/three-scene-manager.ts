@@ -25,8 +25,39 @@ export class ThreeMarketCorridorManager {
   private animId: number | null = null;
   private isDisposed = false;
   private isDirty = true;
+  private idleCounter = 0;
   private currentProgress = 0;
   private targetProgress = 0;
+
+  private readonly renderLoop = () => {
+    this.animId = null;
+    if (this.isDisposed) return;
+
+    const delta = this.targetProgress - this.currentProgress;
+    if (Math.abs(delta) > 0.0001) {
+      this.currentProgress += delta * 0.22;
+      this.isDirty = true;
+      this.idleCounter = 0;
+    } else {
+      this.currentProgress = this.targetProgress;
+      this.idleCounter++;
+      if (this.idleCounter > 10) this.isDirty = false;
+    }
+
+    if (this.isDirty && this.renderer && this.scene && this.camera) {
+      this.applyCameraAndLights();
+      this.renderer.render(this.scene, this.camera);
+    }
+
+    if (this.isDirty || Math.abs(this.targetProgress - this.currentProgress) > 0.0001) {
+      this.scheduleFrame();
+    }
+  };
+
+  private scheduleFrame() {
+    if (this.isDisposed || this.animId !== null) return;
+    this.animId = requestAnimationFrame(this.renderLoop);
+  }
 
   public init(
     container: HTMLDivElement,
@@ -41,12 +72,10 @@ export class ThreeMarketCorridorManager {
     const width = container.clientWidth || 1200;
     const height = container.clientHeight || 700;
 
-    // 1. Scene & Camera
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(54, width / height, 0.1, 90);
     this.camera.position.set(0, 1.58, 0);
 
-    // 2. High-Performance WebGL Renderer (DPR clamp to 1.5, PCF Shadows, ACES Tone Mapping)
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       powerPreference: 'high-performance',
@@ -62,7 +91,6 @@ export class ThreeMarketCorridorManager {
     container.innerHTML = '';
     container.appendChild(this.renderer.domElement);
 
-    // 3. Texture Packs, Environment & Stalls
     this.texPack = createMarketTexturePack();
     this.pTexPack = createProduceTexturePack();
     this.lights = createMarketEnvironment(this.scene, isDark, this.corridorLength, this.texPack);
@@ -75,31 +103,8 @@ export class ThreeMarketCorridorManager {
     );
     this.hitboxes = hitboxes;
     this.priceTags = priceTags;
-
-    // 4. Render on-demand loop with smooth camera easing
-    let idleCounter = 0;
-    const loop = () => {
-      if (this.isDisposed) return;
-
-      const delta = this.targetProgress - this.currentProgress;
-      if (Math.abs(delta) > 0.0001) {
-        this.currentProgress += delta * 0.22;
-        this.isDirty = true;
-        idleCounter = 0;
-      } else {
-        this.currentProgress = this.targetProgress;
-        idleCounter++;
-        if (idleCounter > 10) this.isDirty = false;
-      }
-
-      if (this.isDirty && this.renderer && this.scene && this.camera) {
-        this.applyCameraAndLights();
-        this.renderer.render(this.scene, this.camera);
-      }
-
-      this.animId = requestAnimationFrame(loop);
-    };
-    loop();
+    this.idleCounter = 0;
+    this.scheduleFrame();
   }
 
   private applyCameraAndLights() {
@@ -123,11 +128,14 @@ export class ThreeMarketCorridorManager {
   public updateWalk(walkProgress: number) {
     this.targetProgress = Math.max(0, Math.min(1, walkProgress));
     this.isDirty = true;
+    this.idleCounter = 0;
+    this.scheduleFrame();
   }
 
   public updatePriceTags(compartments: ThreeStallCompartment[]) {
+    const byId = new Map(compartments.map((c) => [c.id, c]));
     for (const tag of this.priceTags) {
-      const comp = compartments.find((c) => c.id === tag.compartmentId);
+      const comp = byId.get(tag.compartmentId);
       if (!comp) continue;
       const mat = tag.mesh.material;
       if (mat instanceof THREE.MeshStandardMaterial) {
@@ -137,6 +145,8 @@ export class ThreeMarketCorridorManager {
       }
     }
     this.isDirty = true;
+    this.idleCounter = 0;
+    this.scheduleFrame();
   }
 
   public handleResize(width: number, height: number) {
@@ -145,6 +155,8 @@ export class ThreeMarketCorridorManager {
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
     this.isDirty = true;
+    this.idleCounter = 0;
+    this.scheduleFrame();
   }
 
   public raycastHit(

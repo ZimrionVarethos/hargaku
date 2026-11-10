@@ -1,15 +1,14 @@
 'use client';
 
-import React from 'react';
+import type { RefObject } from 'react';
 import Image from 'next/image';
 
 interface Props {
-  canvasRef: React.RefObject<HTMLCanvasElement | null>;
+  canvasRef: RefObject<HTMLCanvasElement | null>;
   zoomFactor: number;
   wingLeftTranslateX: number;
   wingRightTranslateX: number;
   heroTextOpacity: number;
-  isInsideMarket: boolean;
   scrollProgress: number;
   onEnterMarket: () => void;
 }
@@ -20,7 +19,6 @@ export function LorongEntranceGate({
   wingLeftTranslateX,
   wingRightTranslateX,
   heroTextOpacity,
-  isInsideMarket,
   scrollProgress,
   onEnterMarket,
 }: Props) {
@@ -37,7 +35,6 @@ export function LorongEntranceGate({
         className="absolute inset-0 w-full h-full pointer-events-none z-10"
       />
 
-      {/* SVG Wave Ribbon Contour */}
       <svg
         aria-hidden="true"
         className="absolute inset-0 w-full h-full pointer-events-none z-10"
@@ -50,7 +47,6 @@ export function LorongEntranceGate({
         <path id="trWaveDark" d="M 842 0 C 898 72, 995 52, 1066 130" stroke="#132E20" strokeWidth="2.8" strokeOpacity="0.82" fill="none" />
       </svg>
 
-      {/* Left Market Wing (Zooms outward left) */}
       <div
         className="absolute bottom-0 left-0 w-[62%] sm:w-[52%] lg:w-[46%] max-w-[760px] z-0 transition-transform duration-100 ease-out"
         style={{
@@ -80,7 +76,6 @@ export function LorongEntranceGate({
         </div>
       </div>
 
-      {/* Right Market Wing (Zooms outward right) */}
       <div
         className="absolute bottom-0 right-0 w-[60%] sm:w-[50%] lg:w-[44%] max-w-[730px] z-0 transition-transform duration-100 ease-out"
         style={{
@@ -110,7 +105,6 @@ export function LorongEntranceGate({
         </div>
       </div>
 
-      {/* Center Welcome Tower */}
       <div
         className="relative z-20 max-w-xl mx-auto text-center flex flex-col items-center px-4 pt-16 transition-all duration-200"
         style={{
@@ -155,4 +149,3 @@ export function LorongEntranceGate({
     </div>
   );
 }
-

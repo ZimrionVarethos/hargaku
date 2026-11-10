@@ -1,6 +1,15 @@
 'use client';
 
-import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+  type ReactNode,
+} from 'react';
 import { AssistantMessage } from '@/types/assistant';
 import { useRegion } from '@/lib/store/region-store';
 import { sendAssistantMessage } from '@/lib/api/assistant.api';
@@ -18,7 +27,7 @@ interface AssistantContextType {
 
 const AssistantContext = createContext<AssistantContextType | undefined>(undefined);
 
-export function AssistantProvider({ children }: { children: React.ReactNode }) {
+export function AssistantProvider({ children }: { children: ReactNode }) {
   const { selectedRegion } = useRegion();
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -66,7 +75,6 @@ export function AssistantProvider({ children }: { children: React.ReactNode }) {
         );
         setMessages((prev) => [...prev, botReply]);
       } catch {
-        // Fallback in case of unexpected error
         setMessages((prev) => [
           ...prev,
           {
@@ -112,22 +120,21 @@ export function AssistantProvider({ children }: { children: React.ReactNode }) {
     ]);
   }, [selectedRegion]);
 
-  return (
-    <AssistantContext.Provider
-      value={{
-        isOpen,
-        openAssistant,
-        closeAssistant,
-        toggleAssistant,
-        messages,
-        isTyping,
-        sendMessage,
-        clearConversation,
-      }}
-    >
-      {children}
-    </AssistantContext.Provider>
+  const contextValue = useMemo<AssistantContextType>(
+    () => ({
+      isOpen,
+      openAssistant,
+      closeAssistant,
+      toggleAssistant,
+      messages,
+      isTyping,
+      sendMessage,
+      clearConversation,
+    }),
+    [isOpen, openAssistant, closeAssistant, toggleAssistant, messages, isTyping, sendMessage, clearConversation]
   );
+
+  return <AssistantContext.Provider value={contextValue}>{children}</AssistantContext.Provider>;
 }
 
 export function useAssistant() {

@@ -1,3 +1,6 @@
+import type { AdminMarket } from '@/lib/types/admin';
+import type { CommodityCategory, Market } from '@/types';
+
 export function formatRupiah(amount: number): string {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -18,4 +21,35 @@ export function formatDateWIB(dateString: string): string {
     month: 'short',
     year: 'numeric',
   }).format(date);
+}
+
+export function mapAdminCategoryToPublic(category: string): CommodityCategory {
+  switch (category) {
+    case 'BERAS':
+      return 'BERAS';
+    case 'CABAI_BAWANG':
+      return 'CABAI_BAWANG';
+    case 'DAGING':
+      return 'DAGING_TELUR';
+    case 'MINYAK':
+      return 'MINYAK_GULA';
+    case 'SAYUR':
+      return 'SAYURAN';
+    default:
+      return 'CABAI_BAWANG';
+  }
+}
+
+export function mapAdminMarketToPublic(m: AdminMarket): Market {
+  return {
+    id: m.id,
+    regionId: m.regionId,
+    name: m.name,
+    slug: m.slug,
+    city: m.city || 'Nasional',
+    district: m.district,
+    latitude: m.latitude,
+    longitude: m.longitude,
+    isActive: m.isActive,
+  };
 }

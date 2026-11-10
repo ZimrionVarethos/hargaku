@@ -1,12 +1,10 @@
 'use client';
 
-import React from 'react';
 import { MarketStallData } from '@/lib/data/market-stalls';
 
 interface Props {
   stalls: MarketStallData[];
   activeStallIndex: number;
-  walkMeters: number;
   onSelectStall: (index: number) => void;
   onToggleDrawer: () => void;
 }
@@ -14,14 +12,12 @@ interface Props {
 export function LorongBottomBar({
   stalls,
   activeStallIndex,
-  walkMeters,
   onSelectStall,
   onToggleDrawer,
 }: Props) {
   return (
     <div className="relative z-30 w-full bg-[rgba(19,46,32,0.92)] backdrop-blur-md border-t-2 border-[#132E20] py-2 px-3 sm:px-6 flex flex-wrap items-center justify-between gap-2 text-white shrink-0 shadow-lg">
-      
-      {/* Left: Previous Stall Button */}
+
       <button
         type="button"
         disabled={activeStallIndex === 0}
@@ -31,7 +27,6 @@ export function LorongBottomBar({
         &larr; Mundur
       </button>
 
-      {/* Center: Quick Stroll Category Pills */}
       <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-0.5 scrollbar-none">
         {stalls.map((stall, idx) => {
           const isActive = activeStallIndex === idx;
@@ -52,7 +47,6 @@ export function LorongBottomBar({
         })}
       </div>
 
-      {/* Right: Next Stall & Drawer Toggle */}
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -77,4 +71,3 @@ export function LorongBottomBar({
     </div>
   );
 }
-

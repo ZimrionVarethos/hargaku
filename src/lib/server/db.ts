@@ -26,7 +26,6 @@ export function getPgPool(): Pool | null {
     globalForPg.hargakuPgPool = undefined;
   });
 
-  // Always cache singleton Pool across requests in both dev and production
   globalForPg.hargakuPgPool = pool;
 
   return pool;

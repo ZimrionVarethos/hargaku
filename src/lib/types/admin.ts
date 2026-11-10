@@ -81,7 +81,7 @@ export interface AdminState {
   currentUser: AdminUserProfile;
   commodities: AdminCommodity[];
   markets: AdminMarket[];
-  dailyPrices: Record<string, DailyPriceRecord>; // key: `${marketId}_${commodityId}`
+  dailyPrices: Record<string, DailyPriceRecord>;
   reports: AdminReport[];
 }
 

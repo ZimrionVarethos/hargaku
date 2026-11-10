@@ -6,12 +6,6 @@ import type {
   AdminReport,
   CommodityCategory,
 } from '@/lib/types/admin';
-import {
-  INITIAL_COMMODITIES,
-  INITIAL_MARKETS,
-  INITIAL_DAILY_PRICES,
-  INITIAL_ADMIN_REPORTS,
-} from '@/lib/store/admin-seed';
 
 interface CommodityRow {
   id: string;
@@ -67,15 +61,8 @@ interface ReportRow {
   exif_sanitized: boolean;
 }
 
-export async function fetchBootstrapFromDb() {
-  const [comRes, mktRes, priceRes, repRes] = await Promise.all([
-    dbQuery<CommodityRow>('SELECT * FROM commodities ORDER BY name ASC'),
-    dbQuery<MarketRow>('SELECT * FROM markets ORDER BY name ASC'),
-    dbQuery<DailyPriceRow>('SELECT market_id, commodity_id, price, previous_price, recorded_date FROM daily_prices'),
-    dbQuery<ReportRow>('SELECT * FROM citizen_reports ORDER BY created_at DESC LIMIT 100'),
-  ]);
-
-  const commodities: AdminCommodity[] = comRes.rows.map((r) => ({
+function mapCommodityRow(r: CommodityRow): AdminCommodity {
+  return {
     id: r.id,
     name: r.name,
     slug: r.slug,
@@ -85,9 +72,11 @@ export async function fetchBootstrapFromDb() {
     tolerancePercentage: Number(r.tolerance_percentage),
     imageUrl: r.image_url || undefined,
     isActive: r.is_active,
-  }));
+  };
+}
 
-  const markets: AdminMarket[] = mktRes.rows.map((r) => ({
+function mapMarketRow(r: MarketRow): AdminMarket {
+  return {
     id: r.id,
     regionId: r.region_id,
     name: r.name,
@@ -100,10 +89,12 @@ export async function fetchBootstrapFromDb() {
     operatingHours: r.operating_hours,
     specialty: r.specialty,
     isActive: r.is_active,
-  }));
+  };
+}
 
+function mapDailyPriceRows(rows: DailyPriceRow[]): Record<string, DailyPriceRecord> {
   const dailyPrices: Record<string, DailyPriceRecord> = {};
-  for (const p of priceRes.rows) {
+  for (const p of rows) {
     dailyPrices[`${p.market_id}_${p.commodity_id}`] = {
       marketId: p.market_id,
       commodityId: p.commodity_id,
@@ -112,8 +103,11 @@ export async function fetchBootstrapFromDb() {
       recordedDate: p.recorded_date,
     };
   }
+  return dailyPrices;
+}
 
-  const reports: AdminReport[] = repRes.rows.map((r) => ({
+function mapReportRow(r: ReportRow): AdminReport {
+  return {
     id: r.id,
     commodityName: r.commodity_name,
     marketName: r.market_name,
@@ -130,9 +124,36 @@ export async function fetchBootstrapFromDb() {
     status: r.status as AdminReport['status'],
     anomalyReason: r.anomaly_reason || undefined,
     exifSanitized: r.exif_sanitized,
-  }));
+  };
+}
 
-  return { commodities, markets, dailyPrices, reports };
+export async function fetchMarketsFromDb(): Promise<AdminMarket[]> {
+  const res = await dbQuery<MarketRow>('SELECT * FROM markets ORDER BY name ASC');
+  return res.rows.map(mapMarketRow);
+}
+
+export async function fetchCatalogFromDb() {
+  const [comRes, mktRes, priceRes] = await Promise.all([
+    dbQuery<CommodityRow>('SELECT * FROM commodities ORDER BY name ASC'),
+    dbQuery<MarketRow>('SELECT * FROM markets ORDER BY name ASC'),
+    dbQuery<DailyPriceRow>('SELECT market_id, commodity_id, price, previous_price, recorded_date FROM daily_prices'),
+  ]);
+  return {
+    commodities: comRes.rows.map(mapCommodityRow),
+    markets: mktRes.rows.map(mapMarketRow),
+    dailyPrices: mapDailyPriceRows(priceRes.rows),
+  };
+}
+
+export async function fetchBootstrapFromDb() {
+  const [catalog, repRes] = await Promise.all([
+    fetchCatalogFromDb(),
+    dbQuery<ReportRow>('SELECT * FROM citizen_reports ORDER BY created_at DESC LIMIT 100'),
+  ]);
+  return {
+    ...catalog,
+    reports: repRes.rows.map(mapReportRow),
+  };
 }
 
 export async function upsertCommodityDb(c: AdminCommodity) {
@@ -154,8 +175,10 @@ export async function upsertCommodityDb(c: AdminCommodity) {
 }
 
 export async function deleteCommodityDb(id: string) {
-  await dbQuery('DELETE FROM daily_prices WHERE commodity_id = $1', [id]);
-  await dbQuery('DELETE FROM commodities WHERE id = $1', [id]);
+  await dbQuery(
+    'WITH del_prices AS (DELETE FROM daily_prices WHERE commodity_id = $1) DELETE FROM commodities WHERE id = $1',
+    [id]
+  );
 }
 
 export async function upsertMarketDb(m: AdminMarket) {
@@ -176,25 +199,17 @@ export async function upsertMarketDb(m: AdminMarket) {
        is_active = EXCLUDED.is_active,
        updated_at = NOW()`,
     [
-      m.id,
-      m.regionId || 'reg_jabar',
-      m.name,
-      m.slug,
-      m.city,
-      m.district,
-      m.address,
-      m.latitude,
-      m.longitude,
-      m.operatingHours,
-      m.specialty,
-      m.isActive,
+      m.id, m.regionId || 'reg_jabar', m.name, m.slug, m.city, m.district,
+      m.address, m.latitude, m.longitude, m.operatingHours, m.specialty, m.isActive,
     ]
   );
 }
 
 export async function deleteMarketDb(id: string) {
-  await dbQuery('DELETE FROM daily_prices WHERE market_id = $1', [id]);
-  await dbQuery('DELETE FROM markets WHERE id = $1', [id]);
+  await dbQuery(
+    'WITH del_prices AS (DELETE FROM daily_prices WHERE market_id = $1) DELETE FROM markets WHERE id = $1',
+    [id]
+  );
 }
 
 export async function upsertDailyPricesDb(
@@ -202,19 +217,24 @@ export async function upsertDailyPricesDb(
   recordedDate: string,
   entries: Array<{ commodityId: string; price: number }>
 ) {
-  for (const e of entries) {
-    await dbQuery(
-      `INSERT INTO daily_prices (market_id, commodity_id, price, previous_price, recorded_date, source_type, updated_at)
-       VALUES ($1, $2, $3, $3, $4, 'ADMIN_CHECKUP', NOW())
-       ON CONFLICT (market_id, commodity_id) DO UPDATE SET
-         previous_price = daily_prices.price,
-         price = EXCLUDED.price,
-         recorded_date = EXCLUDED.recorded_date,
-         source_type = 'ADMIN_CHECKUP',
-         updated_at = NOW()`,
-      [marketId, e.commodityId, e.price, recordedDate]
-    );
-  }
+  if (entries.length === 0) return;
+  await dbQuery(
+    `INSERT INTO daily_prices (market_id, commodity_id, price, previous_price, recorded_date, source_type, updated_at)
+     SELECT $1, u.commodity_id, u.price, u.price, $4, 'ADMIN_CHECKUP', NOW()
+     FROM UNNEST($2::text[], $3::int[]) AS u(commodity_id, price)
+     ON CONFLICT (market_id, commodity_id) DO UPDATE SET
+       previous_price = daily_prices.price,
+       price = EXCLUDED.price,
+       recorded_date = EXCLUDED.recorded_date,
+       source_type = 'ADMIN_CHECKUP',
+       updated_at = NOW()`,
+    [
+      marketId,
+      entries.map((e) => e.commodityId),
+      entries.map((e) => Math.round(e.price)),
+      recordedDate,
+    ]
+  );
 }
 
 export async function insertReportDb(r: AdminReport) {
@@ -223,22 +243,10 @@ export async function insertReportDb(r: AdminReport) {
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
      ON CONFLICT (id) DO NOTHING`,
     [
-      r.id,
-      r.commodityName,
-      r.marketName,
-      r.reportedPrice,
-      r.unit,
-      r.normalizedPricePerKg,
-      r.officialHapPrice,
-      r.cityAvgPrice,
-      r.diffPercent,
-      r.submittedAt,
-      r.hasPhoto,
-      r.photoUrl || null,
-      r.citizenNotes || null,
-      r.status,
-      r.anomalyReason || null,
-      r.exifSanitized,
+      r.id, r.commodityName, r.marketName, r.reportedPrice, r.unit,
+      r.normalizedPricePerKg, r.officialHapPrice, r.cityAvgPrice, r.diffPercent,
+      r.submittedAt, r.hasPhoto, r.photoUrl || null, r.citizenNotes || null,
+      r.status, r.anomalyReason || null, r.exifSanitized,
     ]
   );
 }
@@ -265,20 +273,5 @@ export async function appendReportNoteDb(id: string, note: string) {
      WHERE id = $1`,
     [id, note]
   );
-}
-
-export async function resetDefaultDataDb() {
-  await dbQuery('TRUNCATE daily_prices, citizen_reports, commodities, markets');
-  for (const c of INITIAL_COMMODITIES) await upsertCommodityDb(c);
-  for (const m of INITIAL_MARKETS) await upsertMarketDb(m);
-  const grouped: Record<string, Array<{ commodityId: string; price: number; date: string }>> = {};
-  for (const d of Object.values(INITIAL_DAILY_PRICES)) {
-    if (!grouped[d.marketId]) grouped[d.marketId] = [];
-    grouped[d.marketId].push({ commodityId: d.commodityId, price: d.price, date: d.recordedDate });
-  }
-  for (const [mId, list] of Object.entries(grouped)) {
-    await upsertDailyPricesDb(mId, list[0]?.date || '2026-10-23', list);
-  }
-  for (const r of INITIAL_ADMIN_REPORTS) await insertReportDb(r);
 }
 

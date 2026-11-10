@@ -9,7 +9,6 @@ import {
 
 console.log('Running Test Matrix for Admin Store State Reducer...');
 
-// Initial state
 const initialState = {
   currentUser: DEFAULT_ADMIN_USER,
   commodities: INITIAL_COMMODITIES,
@@ -34,7 +33,6 @@ const initialState = {
   ],
 };
 
-// TC-ADM-01: Tambah Komoditas Baru
 const newCommodity = {
   id: 'com_test_01',
   name: 'Buncis Super',
@@ -56,7 +54,6 @@ assert.equal(stateAfterAdd.commodities.length, initialState.commodities.length +
 assert.equal(stateAfterAdd.commodities[0].id, 'com_test_01');
 console.log('✓ TC-ADM-01 passed: ADD_COMMODITY successfully prepended');
 
-// TC-ADM-02: Edit Komoditas
 const stateAfterUpdate = adminStoreReducer(stateAfterAdd, {
   type: 'UPDATE_COMMODITY',
   payload: { id: 'com_test_01', hapHetPrice: 25000, name: 'Buncis Super Lembang' },
@@ -66,7 +63,6 @@ assert.equal(updated?.hapHetPrice, 25000);
 assert.equal(updated?.name, 'Buncis Super Lembang');
 console.log('✓ TC-ADM-02 passed: UPDATE_COMMODITY successfully applied partial patch');
 
-// TC-ADM-03: Hapus / Toggle Komoditas
 const stateAfterDelete = adminStoreReducer(stateAfterUpdate, {
   type: 'DELETE_COMMODITY',
   payload: 'com_test_01',
@@ -74,7 +70,6 @@ const stateAfterDelete = adminStoreReducer(stateAfterUpdate, {
 assert.equal(stateAfterDelete.commodities.length, initialState.commodities.length);
 console.log('✓ TC-ADM-03 passed: DELETE_COMMODITY successfully removed item');
 
-// TC-ADM-04: Tambah & Edit Pasar Tradisional
 const newMarket = {
   id: 'mkt_test_01',
   name: 'Pasar Taman Kencana',
@@ -103,7 +98,6 @@ assert.equal(
 );
 console.log('✓ TC-ADM-04 passed: ADD_MARKET and UPDATE_MARKET passed');
 
-// TC-ADM-05: Entri Harga Harian Batch
 const statePrices = adminStoreReducer(initialState, {
   type: 'UPDATE_DAILY_PRICES',
   payload: {
@@ -120,7 +114,6 @@ assert.equal(priceEntry?.price, 61000);
 assert.equal(priceEntry?.recordedDate, '2026-10-23');
 console.log('✓ TC-ADM-05 passed: UPDATE_DAILY_PRICES batch update recorded correctly');
 
-// TC-ADM-06: Moderasi Laporan (Approve & Reject)
 const stateApproved = adminStoreReducer(initialState, {
   type: 'APPROVE_REPORT',
   payload: 'REP-01',
@@ -134,7 +127,6 @@ const stateRejected = adminStoreReducer(initialState, {
 assert.equal(stateRejected.reports.find((r) => r.id === 'REP-01')?.status, 'REJECTED');
 console.log('✓ TC-ADM-06 passed: APPROVE_REPORT and REJECT_REPORT status changed');
 
-// TC-ADM-06B: Tambah Laporan Warga Baru (Real-time sync dari /lapor)
 const newReport = {
   id: 'REP-TEST-NEW',
   commodityName: 'Bawang Merah Brebes',
@@ -158,7 +150,6 @@ assert.equal(stateWithReport.reports.length, initialState.reports.length + 1);
 assert.equal(stateWithReport.reports[0].id, 'REP-TEST-NEW');
 console.log('✓ TC-ADM-06B passed: ADD_REPORT successfully queued report');
 
-// TC-ADM-07: Update Profil Admin
 const stateProfile = adminStoreReducer(initialState, {
   type: 'UPDATE_PROFILE',
   payload: { name: 'Super Admin', email: 'superadmin@hargaku.id' },
@@ -167,7 +158,6 @@ assert.equal(stateProfile.currentUser.name, 'Super Admin');
 assert.equal(stateProfile.currentUser.email, 'superadmin@hargaku.id');
 console.log('✓ TC-ADM-07 passed: UPDATE_PROFILE updated admin user details');
 
-// TC-ADM-08: SET_STATE with stale payload (missing currentUser from old localStorage)
 const stalePayload = {
   commodities: INITIAL_COMMODITIES,
   markets: INITIAL_MARKETS,

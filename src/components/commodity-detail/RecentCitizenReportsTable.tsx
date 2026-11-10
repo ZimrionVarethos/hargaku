@@ -44,7 +44,6 @@ const CITIZEN_REPORTS: ReportRow[] = [
 export function RecentCitizenReportsTable() {
   return (
     <div className="market-card p-6 sm:p-7 flex flex-col gap-6">
-      {/* Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h3 className="text-[16px] font-bold text-[var(--text-primary)] tracking-tight">
@@ -61,7 +60,6 @@ export function RecentCitizenReportsTable() {
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto border-t border-[var(--border-subtle)]">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -105,7 +103,6 @@ export function RecentCitizenReportsTable() {
         </table>
       </div>
 
-      {/* Ethics Note Footer */}
       <div className="pt-2 border-t border-[var(--border-subtle)] text-[12px] text-[var(--text-secondary)] leading-[18px]">
         <strong className="text-[var(--text-primary)] font-bold">Kode etik perlindungan pedagang:</strong> Nama toko dan identitas perseorangan pedagang tidak dicantumkan di platform publik. Seluruh data diverifikasi agregat oleh sistem dan relawan TPID demi transparansi pasar yang saling menghormati.
       </div>
