@@ -15,6 +15,7 @@
   <p>
     <a href="#sekilas">Sekilas</a> &middot;
     <a href="#system-flow">System Flow (Juri)</a> &middot;
+    <a href="#lorong-3d">Lorong 3D &amp; Suara</a> &middot;
     <a href="#mesin-3-lapis">Mesin 3 Lapis</a> &middot;
     <a href="#rute-halaman">Peta Rute &amp; API</a> &middot;
     <a href="#arsitektur-teknis">Arsitektur &amp; DB</a> &middot;
@@ -141,6 +142,69 @@ flowchart LR
         Laporan dengan selisih <code>&gt; 25%</code> dari rerata pasar otomatis ditandai <code>ANOMALY</code>. Moderator memverifikasi laporan di <code>/admin</code> (<code>APPROVED</code> / <code>REJECTED</code>), memperbarui matriks harga harian (<code>daily_prices</code>), dan mengelola API Key Gemini serta Token Mapbox dari tabel <code>system_settings</code> tanpa redeploy.
       </td>
       <td>Menjaga kredibilitas data lapangan bebas spam dan memastikan konfigurasi AI serta peta dinamis aman tersimpan di server.</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="lorong-3d">Pengalaman Interaktif: Lorong Pasar 3D &amp; Tata Suara Web Audio</h2>
+
+<p>
+  Beranda PasarKu menghadirkan simulasi belanja interaktif <strong>Lorong Pasar 3D WebGL</strong> (Three.js) yang memadukan rig tangan POV ganda, navigasi bebas 360&deg;, serta tata suara prosedural Web Audio API murni tanpa beban aset audio eksternal.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th width="30%" align="left">Fitur Lorong 3D</th>
+      <th width="40%" align="left">Mekanisme Interaksi</th>
+      <th width="30%" align="left">Kontrol &amp; Pintasan</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>POV Dua Tangan Interaktif</strong></td>
+      <td>
+        <strong>Tangan Kiri:</strong> Memegang keranjang anyaman bambu berkapasitas hingga 7 barang (mulai dalam kondisi kosong).<br />
+        <strong>Tangan Kanan:</strong> Meraih dan mengambil komoditas yang diklik di lapak ke dalam keranjang dengan animasi 3-fase (<em>reach</em>, <em>carry</em>, <em>drop</em>) sebelum membuka modal rincian harga.
+      </td>
+      <td>Klik lapak pedagang untuk mengambil barang ke keranjang.</td>
+    </tr>
+    <tr>
+      <td><strong>Keluarkan Komoditas dari Keranjang</strong></td>
+      <td>
+        Komoditas yang sudah terkumpul di keranjang dapat diklik langsung untuk dikeluarkan (animasi melayang keluar dan menyusut disertai efek suara <em>pop/whoosh</em>) tanpa memicu modal rincian harga.
+      </td>
+      <td>Klik item di dalam keranjang bambu.</td>
+    </tr>
+    <tr>
+      <td><strong>Pandangan Bebas 360&deg;</strong></td>
+      <td>
+        Kamera dapat diputar ke segala arah (kiri, kanan, atas, bawah, hingga 180&deg; ke pintu gerbang belakang) dengan kehalusan <em>Euler damping</em>. Papan komoditas gantung dibuat dua sisi agar nama dan ikon komoditas tetap terbaca tegak saat dilihat dari arah belakang.
+      </td>
+      <td>
+        <strong>Mouse / Touch:</strong> Seret kanvas secara horizontal/vertikal.<br />
+        <strong>Keyboard:</strong> <code>&larr;</code> / <code>Q</code> (hadap kiri), <code>&rarr;</code> / <code>E</code> (hadap kanan).<br />
+        <strong>Reset:</strong> Tombol <code>Hadap Depan</code> atau tekan <code>R</code>.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Navigasi Jalan Menyusuri Lorong</strong></td>
+      <td>
+        Melangkah menyusuri 20 lapak komoditas interaktif dengan kamera terkontrol mulus tanpa konflik antara scroll vertikal dan gestur rotasi pandangan.
+      </td>
+      <td>
+        <strong>Keyboard:</strong> <code>&uarr;</code> (langkah maju), <code>&darr;</code> (langkah mundur).<br />
+        <strong>Scroll / Wheel:</strong> Gulir vertikal mouse atau touchpad.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Tata Suara Web Audio API Prosedural</strong></td>
+      <td>
+        Sintesis audio prosedural tanpa file audio MP3/WAV: deru pasar hangat, langkah kaki ritmis saat jalan, petikan reaktif saat mengambil barang, dentum jatuhnya komoditas di keranjang, dan loop melodi gamelan pentatonis skala Pelog/Slendro yang otomatis berputar seketika saat masuk lorong.
+      </td>
+      <td>Tombol toggle suara HUD: <code>Bisu</code> &harr; <code>Suara Aktif</code>.</td>
     </tr>
   </tbody>
 </table>
