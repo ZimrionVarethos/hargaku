@@ -1,8 +1,7 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/banner-dark.png" />
-  <img src="docs/images/banner.png" alt="PasarKu — Alat Bantu Keputusan Harga Pangan Rakyat" width="100%" />
+  <img src="public/images/pasarku/banner.png" alt="PasarKu — Alat Bantu Keputusan Harga Pangan Rakyat" width="100%" />
 </picture>
 
 <br />
@@ -32,10 +31,9 @@
 
 Dibuat untuk kompetisi **Web In Action (MIA 2026)**. Pilot di **Kota Bogor** (13 pasar Perumda Pasar Pakuan Jaya), dirancang berkembang ke Jabodetabek, Jawa Barat, hingga nasional lintas 6 koridor pulau.
 
-<!-- Thumbnail video demo: ganti GANTI_LINK_DEMO dengan link YouTube/Drive -->
 <p align="center">
   <a href="GANTI_LINK_DEMO">
-    <img src="docs/images/demo-thumbnail.png" alt="Tonton demo PasarKu" width="720" />
+    <img src="public/images/pasarku/demo.png" alt="Tonton demo PasarKu" width="720" />
   </a>
 </p>
 
@@ -56,7 +54,7 @@ Dibuat untuk kompetisi **Web In Action (MIA 2026)**. Pilot di **Kota Bogor** (13
       <br /><sub><b>Beranda</b> · hero dan papan acuan cepat</sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/images/screenshots/lorong-3d.png" alt="Lorong Pasar 3D" />
+      <img src="docs/images/screenshots/lorong.png" alt="Lorong Pasar 3D" />
       <br /><sub><b>Lorong Pasar 3D</b> · POV dua tangan</sub>
     </td>
   </tr>
