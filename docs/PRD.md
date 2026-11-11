@@ -91,13 +91,14 @@ Tiga lapis pembanding harga yang digunakan:
 ### Modul 1: Landing Page, Lorong Pasar 3D Interaktif, & Edukasi Publik (Fase A)
 * Hero section dengan tajuk *"Cek Harga Sebelum ke Pasar"*, tombol *Masuk Lorong*, dan petunjuk scroll menuju panggung **Lorong Pasar 3D Full-Viewport**.
 * **Navigasi 5 Kategori Berurutan & Pencarian Langsung**: Bilah HUD atas menyediakan tombol `Gerbang Depan`, indikator meter langkah, dan kolom `Cari komoditas di lorong...` ber-autocomplete yang melompatkan kamera ke koordinat Z lapak 3D atau membuka daftar terfilter (`53` komoditas); bilah bawah menyediakan navigasi 5 zona berurutan (`Sayuran`, `Cabai & Bawang`, `Beras & Sembako`, `Daging & Telur`, `Ikan & Buah`).
-* Penjelasan 3 lapis harga secara visual dan bersahabat beserta CTA cepat ke Cek Harga Wajar.
+* **Papan Acuan 10 Komoditas & Tautan `Detail Papan`**: Beranda tetap menampilkan ringkasan tepat 10 komoditas utama (`Papan Acuan 10 Komoditas`), dilengkapi tombol **`Detail Papan`** untuk membuka halaman **Indeks Harga (`/indeks-harga`)** yang memuat seluruh bahan pangan yang tersedia.
 
-### Modul 2: Dashboard Harga & Tren Pasar (Fase A)
-* **Selector Daerah Dinamis**: Pilihan wilayah (kabupaten/kota) aktif di bagian header yang menyesuaikan data harga pasar lokal dengan acuan nasional.
-* Grid kartu komoditas dengan indikator tren pergerakan harian (naik/turun/stabil), sparkline 14 hari, tanggal pembaruan (*"Diperbarui: DD MMM YYYY"*), dan selisih terhadap HAP/HET acuan nasional terkalibrasi daerah.
-* Grafik tren pergerakan harga 7–30 hari terakhir untuk memantau siklus inflasi pangan.
-* Filter berdasarkan kategori pangan (Beras, Cabai/Bawang, Daging/Telur, Minyak/Gula).
+### Modul 2: Indeks Harga Lengkap (`/indeks-harga`) & Dashboard Tren Pasar (`/dashboard`)
+* **Halaman Indeks Harga (`/indeks-harga`)**: Merupakan tampilan rincian penuh dari tabel Papan Acuan Beranda yang memuat seluruh komoditas pangan (`53+` bahan pokok Perumda PPJ dan katalog Supabase) sesuai wilayah fase aktif, dilengkapi:
+  1. **Pencarian Instan (`Search`)** beserta tag kata kunci cepat dan pengatur urutan (`Urutan Papan`, `Harga Termurah`, `Harga Termahal`, `Nama A-Z`).
+  2. **Filter Kategori Pangan** (`Semua`, `Beras & Pokok`, `Cabai & Bawang`, `Sayuran`, `Daging & Telur`, `Minyak & Gula`, `Ikan & Buah`) serta pengalih tampilan **Tabel Papan** / **Kartu Ringkas**.
+  3. **Komparasi & Aksi Cepat**: Harga wilayah aktif, perbandingan acuan HAP/HET Nasional Bapanas resmi jika tersedia, modal detail komoditas, serta tombol cepat **`Cek Harga`** dan **`Tanya PUNTEN`** pada tiap komoditas.
+* **Dashboard Tren (`/dashboard`)**: Menyajikan grid kartu komoditas utama ber-sparkline 14 hari, grafik tren pergerakan harga (`7–30` hari), serta tombol `Mode Ringan` untuk pemantauan siklus inflasi harian.
 
 ### Modul 3: Cek Harga Wajar & Komparasi AI Terpadu (`/cek-harga`)
 * Menggabungkan fitur **Cek Harga Wajar** dan **Tanya PUNTEN AI** ke dalam satu halaman bergaya **"Kartu Kasir Sederhana"** di `/cek-harga` (`/rekomendasi-ai` diarahkan ke `/cek-harga#punten-panel`) yang dirancang ramah pengguna awam non-teknis tanpa istilah birokrasi di permukaan:

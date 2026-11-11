@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ChatCircleDots, Moon, Sun } from '@phosphor-icons/react';
 import { useAssistant } from '@/lib/store/assistant-store';
 import { useTheme } from '@/lib/store/theme-store';
@@ -11,6 +11,7 @@ import { RegionPhaseSwitcher } from './RegionPhaseSwitcher';
 
 const NAV_LINKS = [
   { href: '/', label: 'Beranda' },
+  { href: '/indeks-harga', label: 'Indeks Harga' },
   { href: '/cek-harga', label: 'Cek Harga' },
   { href: '/peta', label: 'Peta' },
   { href: '/lapor', label: 'Lapor' },
@@ -21,13 +22,18 @@ export function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   const handleQuickSearch = () => {
-    const input = document.getElementById('heroSearchInput') || document.querySelector('input[type="text"]');
+    const input =
+      document.getElementById('indeksSearchInput') ||
+      document.getElementById('heroSearchInput');
     if (input) {
       input.focus();
       input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
     }
+    router.push('/indeks-harga?focus=search');
   };
 
   return (
@@ -59,7 +65,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
+                className={`px-2.5 xl:px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
                   isActive
                     ? 'text-[var(--accent-chili)] hover:bg-[var(--bg-muted)]'
                     : 'text-[var(--text-primary)] hover:bg-[var(--bg-muted)]'
