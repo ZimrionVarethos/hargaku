@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { ChatCircleDots, MagnifyingGlass, Moon, Sun } from '@phosphor-icons/react';
-import { useAssistant } from '@/lib/store/assistant-store';
+import { MagnifyingGlass, Moon, Sun } from '@phosphor-icons/react';
 import { useTheme } from '@/lib/store/theme-store';
 import { RegionPhaseSwitcher } from './RegionPhaseSwitcher';
 import { GlobalSearchModal } from './GlobalSearchModal';
@@ -19,7 +18,6 @@ const NAV_LINKS = [
 ];
 
 export function Navbar() {
-  const { openAssistant } = useAssistant();
   const { theme, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -105,15 +103,6 @@ export function Navbar() {
             ) : (
               <Moon size={18} weight="bold" className="text-[var(--text-primary)]" aria-hidden="true" />
             )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => openAssistant()}
-            className="market-btn-primary px-2.5 sm:px-3.5 py-1.5 text-xs min-h-[38px] sm:min-h-[40px] inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-          >
-            <ChatCircleDots size={15} weight="bold" />
-            <span>Tanya PUNTEN</span>
           </button>
 
           <button
