@@ -22,6 +22,7 @@ export interface StallHitboxMesh extends THREE.Mesh {
   userData: {
     compartmentId: number;
     commodityId: number;
+    produceType: string;
     name: string;
   };
 }
@@ -146,7 +147,12 @@ export function createMarketStalls(
     const hitGeo = new THREE.BoxGeometry(1.6, 2.55, Math.max(0.5, depth - 0.16));
     const hitbox = new THREE.Mesh(hitGeo, hitMat);
     hitbox.position.set(isL ? 1.75 : -1.75, 1.25, posZ);
-    hitbox.userData = { compartmentId: c.id, commodityId: c.commodityId, name: c.name };
+    hitbox.userData = {
+      compartmentId: c.id,
+      commodityId: c.commodityId,
+      produceType: c.produceType,
+      name: c.name,
+    };
     stallsGroup.add(hitbox);
     hitboxes.push(hitbox as unknown as StallHitboxMesh);
   });
