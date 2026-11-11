@@ -8,6 +8,7 @@ import { useRegion } from '@/lib/store/region-store';
 import { useLiveCatalog } from '@/lib/store/use-live-catalog';
 import { findMatchingCommodity } from '@/lib/market-insights';
 import { CommoditySvg } from '@/lib/data/market-svgs';
+import { BatikMeshBackground } from '@/components/ornament/BatikMeshBackground';
 
 const QUICK_COMMODITY_IDS = [2, 3, 8, 21, 16, 17, 43, 44, 46, 30];
 
@@ -72,16 +73,15 @@ export function PasarKuSorotanSection() {
   };
 
   return (
-    <section id="sorotanSection" className="border-b-2 border-[var(--border-ink)] py-12 bg-[var(--bg-paper)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section
+      id="sorotanSection"
+      className="relative isolate overflow-hidden scroll-mt-16 pt-14 pb-10 bg-[var(--bg-paper)]"
+    >
+      <BatikMeshBackground />
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-5 space-y-5">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border border-[var(--border-ink)] bg-[var(--bg-muted)] text-[var(--accent-chili)] mb-3">
-                <span>ALAT BANTU KEPUTUSAN PEMBELI</span>
-                <span className="text-[var(--text-muted)]">&bull;</span>
-                <span>{selectedRegion.phaseLabel || 'Fase 1 · Kota Bogor'}</span>
-              </div>
               <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
                 Acuan Nasional vs {selectedRegion.name}
               </h2>
@@ -138,12 +138,12 @@ export function PasarKuSorotanSection() {
                   href="/cek-harga"
                   className="market-btn-secondary px-3 py-1.5 text-xs font-bold whitespace-nowrap no-underline"
                 >
-                  Cek Harga &rarr;
+                  Cek Harga 
                 </Link>
               </div>
             </div>
 
-            <div className="text-xs text-[var(--text-muted)] leading-relaxed">
+            <div className="text-xs text-[var(--text-secondary)] leading-relaxed">
               Skala bertahap: Fase 1 Kota Bogor &rarr; Fase 2 Jabodetabek &rarr; Fase 3 Jawa Barat &rarr; Fase 4 Nasional (21 Provinsi). Data rujukan: Bapanas RI, PIHPS BI, &amp; Perumda PPJ.
             </div>
           </div>

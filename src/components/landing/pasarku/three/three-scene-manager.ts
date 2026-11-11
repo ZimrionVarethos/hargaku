@@ -4,11 +4,14 @@ import { createProduceTexturePack, ProduceTexturePack } from './three-produce-te
 import { createMarketEnvironment, MarketEnvironmentRig } from './three-environment';
 import {
   createMarketStalls,
-  createPriceTagTexture,
+  MarketStallsHandle,
   ThreeStallCompartment,
   StallHitboxMesh,
   StallPriceTagHandle,
 } from './three-stalls';
+import { createMarketVendors, MarketVendorsHandle } from './three-vendors';
+import { createFirstPersonRig, FirstPersonRigHandle } from './three-first-person';
+import { disposeMarketCorridorScene, refreshPriceTagTextures } from './three-scene-resources';
 
 export class ThreeMarketCorridorManager {
   private renderer: THREE.WebGLRenderer | null = null;
@@ -17,6 +20,9 @@ export class ThreeMarketCorridorManager {
   private texPack: MarketTexturePack | null = null;
   private pTexPack: ProduceTexturePack | null = null;
   private lights: MarketEnvironmentRig | null = null;
+  private stalls: MarketStallsHandle | null = null;
+  private vendors: MarketVendorsHandle | null = null;
+  private firstPerson: FirstPersonRigHandle | null = null;
   private raycaster = new THREE.Raycaster();
   private pointer = new THREE.Vector2();
   private hitboxes: StallHitboxMesh[] = [];
@@ -25,31 +31,71 @@ export class ThreeMarketCorridorManager {
   private animId: number | null = null;
   private isDisposed = false;
   private isDirty = true;
+  private isActive = false;
+  private isHidden = false;
+  private reducedMotion = false;
   private idleCounter = 0;
   private currentProgress = 0;
   private targetProgress = 0;
+  private lastIdleFrameMs = 0;
+  private startTimeMs = 0;
+  private motionQuery: MediaQueryList | null = null;
 
-  private readonly renderLoop = () => {
+  private readonly handleMotionChange = (e: MediaQueryListEvent) => {
+    this.reducedMotion = e.matches;
+    this.vendors?.setReducedMotion(e.matches);
+    this.firstPerson?.setReducedMotion(e.matches);
+    this.isDirty = true;
+    this.idleCounter = 0;
+    this.scheduleFrame();
+  };
+
+  private readonly handleVisibilityChange = () => {
+    this.isHidden = typeof document !== 'undefined' && document.hidden;
+    if (!this.isHidden && this.isActive) {
+      this.isDirty = true;
+      this.scheduleFrame();
+    }
+  };
+
+  private readonly renderLoop = (now: number) => {
     this.animId = null;
     if (this.isDisposed) return;
 
     const delta = this.targetProgress - this.currentProgress;
-    if (Math.abs(delta) > 0.0001) {
+    const isWalking = Math.abs(delta) > 0.0001;
+    if (isWalking) {
       this.currentProgress += delta * 0.22;
       this.isDirty = true;
       this.idleCounter = 0;
     } else {
-      this.currentProgress = this.targetProgress;
-      this.idleCounter++;
-      if (this.idleCounter > 10) this.isDirty = false;
+      if (this.currentProgress !== this.targetProgress) {
+        this.currentProgress = this.targetProgress;
+        this.isDirty = true;
+        this.idleCounter = 0;
+      }
+      if (this.idleCounter < 18) {
+        this.idleCounter++;
+        this.isDirty = true;
+      }
+    }
+
+    const canAnimateIdle = this.isActive && !this.reducedMotion && !this.isHidden;
+    if (!this.isDirty && canAnimateIdle && now - this.lastIdleFrameMs >= 33.3) {
+      this.isDirty = true;
+      this.lastIdleFrameMs = now;
     }
 
     if (this.isDirty && this.renderer && this.scene && this.camera) {
-      this.applyCameraAndLights();
+      const timeSec = (now - this.startTimeMs) * 0.001;
+      const curZ = this.applyCameraAndLights();
+      this.vendors?.update(timeSec, curZ);
+      this.firstPerson?.update(this.currentProgress, timeSec, this.camera.aspect);
       this.renderer.render(this.scene, this.camera);
+      this.isDirty = false;
     }
 
-    if (this.isDirty || Math.abs(this.targetProgress - this.currentProgress) > 0.0001) {
+    if (isWalking || this.idleCounter < 18 || canAnimateIdle) {
       this.scheduleFrame();
     }
   };
@@ -66,21 +112,37 @@ export class ThreeMarketCorridorManager {
   ) {
     this.isDisposed = false;
     this.isDirty = true;
+    this.idleCounter = 0;
     this.currentProgress = 0;
     this.targetProgress = 0;
+    this.startTimeMs = performance.now();
+    this.lastIdleFrameMs = this.startTimeMs;
+    this.isHidden = typeof document !== 'undefined' && document.hidden;
 
     const width = container.clientWidth || 1200;
     const height = container.clientHeight || 700;
 
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      this.motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      this.reducedMotion = this.motionQuery.matches;
+      this.motionQuery.addEventListener('change', this.handleMotionChange);
+    }
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }
+
+    const concurrency = typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 8 : 8;
+    const isMobileHardware =
+      typeof window !== 'undefined' &&
+      (window.innerWidth <= 900 || window.matchMedia?.('(pointer: coarse)')?.matches === true);
+    const isLowEnd = concurrency <= 4 && isMobileHardware;
+
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(54, width / height, 0.1, 90);
     this.camera.position.set(0, 1.58, 0);
+    this.scene.add(this.camera);
 
-    this.renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      powerPreference: 'high-performance',
-      alpha: false,
-    });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', alpha: false });
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -94,24 +156,27 @@ export class ThreeMarketCorridorManager {
     this.texPack = createMarketTexturePack();
     this.pTexPack = createProduceTexturePack();
     this.lights = createMarketEnvironment(this.scene, isDark, this.corridorLength, this.texPack);
-    const { hitboxes, priceTags } = createMarketStalls(
-      this.scene,
-      isDark,
-      compartments,
-      this.texPack,
-      this.pTexPack
-    );
-    this.hitboxes = hitboxes;
-    this.priceTags = priceTags;
-    this.idleCounter = 0;
+    this.stalls = createMarketStalls(this.scene, isDark, compartments, this.texPack, this.pTexPack);
+    this.hitboxes = this.stalls.hitboxes;
+    this.priceTags = this.stalls.priceTags;
+
+    this.vendors = createMarketVendors(this.scene, isDark, compartments, {
+      step: isLowEnd ? 2 : 1,
+      reducedMotion: this.reducedMotion,
+    });
+    this.firstPerson = createFirstPersonRig(this.camera, isDark, {
+      showLeftHand: !isLowEnd,
+      reducedMotion: this.reducedMotion,
+    });
+    this.firstPerson.setVisible(this.isActive);
     this.scheduleFrame();
   }
 
-  private applyCameraAndLights() {
-    if (!this.camera) return;
+  private applyCameraAndLights(): number {
+    if (!this.camera) return 0;
     const curZ = this.currentProgress * (this.corridorLength - 4.0);
-    const bobY = Math.sin(this.currentProgress * 32 * Math.PI) * 0.035;
-    const bobX = Math.sin(this.currentProgress * 16 * Math.PI) * 0.025;
+    const bobY = this.reducedMotion ? 0 : Math.sin(this.currentProgress * 32 * Math.PI) * 0.035;
+    const bobX = this.reducedMotion ? 0 : Math.sin(this.currentProgress * 16 * Math.PI) * 0.025;
 
     this.camera.position.set(bobX, 1.58 + bobY, curZ);
     this.camera.lookAt(0, 1.52, curZ + 12);
@@ -123,6 +188,27 @@ export class ThreeMarketCorridorManager {
       this.lights.dirLight.target.position.set(0, 0, curZ + 10);
       this.lights.dirLight.target.updateMatrixWorld();
     }
+    return curZ;
+  }
+
+  public setActive(active: boolean) {
+    if (this.isActive === active) return;
+    this.isActive = active;
+    this.firstPerson?.setVisible(active);
+    this.isDirty = true;
+    this.idleCounter = 0;
+    if (active) this.scheduleFrame();
+  }
+
+  public setTheme(isDark: boolean) {
+    if (this.renderer) this.renderer.toneMappingExposure = isDark ? 0.95 : 1.15;
+    this.lights?.setTheme(isDark);
+    this.stalls?.setTheme(isDark);
+    this.vendors?.setTheme(isDark);
+    this.firstPerson?.setTheme(isDark);
+    this.isDirty = true;
+    this.idleCounter = 0;
+    this.scheduleFrame();
   }
 
   public updateWalk(walkProgress: number) {
@@ -133,24 +219,14 @@ export class ThreeMarketCorridorManager {
   }
 
   public updatePriceTags(compartments: ThreeStallCompartment[]) {
-    const byId = new Map(compartments.map((c) => [c.id, c]));
-    for (const tag of this.priceTags) {
-      const comp = byId.get(tag.compartmentId);
-      if (!comp) continue;
-      const mat = tag.mesh.material;
-      if (mat instanceof THREE.MeshStandardMaterial) {
-        if (mat.map) mat.map.dispose();
-        mat.map = createPriceTagTexture(tag.label, comp.priceText);
-        mat.needsUpdate = true;
-      }
-    }
+    refreshPriceTagTextures(this.priceTags, compartments);
     this.isDirty = true;
     this.idleCounter = 0;
     this.scheduleFrame();
   }
 
   public handleResize(width: number, height: number) {
-    if (!this.camera || !this.renderer) return;
+    if (!this.camera || !this.renderer || width <= 0 || height <= 0) return;
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
@@ -167,53 +243,37 @@ export class ThreeMarketCorridorManager {
     if (!this.camera || this.hitboxes.length === 0) return null;
     this.pointer.x = ((clientX - containerRect.left) / containerRect.width) * 2 - 1;
     this.pointer.y = -((clientY - containerRect.top) / containerRect.height) * 2 + 1;
-
     this.raycaster.setFromCamera(this.pointer, this.camera);
     const intersects = this.raycaster.intersectObjects(this.hitboxes);
-
     if (intersects.length > 0) {
       const hit = intersects[0].object as StallHitboxMesh;
-      return {
-        compartmentId: hit.userData.compartmentId,
-        commodityId: hit.userData.commodityId,
-      };
+      return { compartmentId: hit.userData.compartmentId, commodityId: hit.userData.commodityId };
     }
     return null;
   }
 
   public destroy() {
     this.isDisposed = true;
-    if (this.animId !== null) {
-      cancelAnimationFrame(this.animId);
-      this.animId = null;
+    if (this.animId !== null) cancelAnimationFrame(this.animId);
+    this.animId = null;
+    this.motionQuery?.removeEventListener('change', this.handleMotionChange);
+    this.motionQuery = null;
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     }
-    if (this.scene) {
-      this.scene.traverse((obj) => {
-        if (obj instanceof THREE.Mesh || obj instanceof THREE.InstancedMesh) {
-          if (obj.geometry) obj.geometry.dispose();
-          if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose());
-          else if (obj.material) obj.material.dispose();
-        }
-      });
-    }
-    if (this.texPack) {
-      this.texPack.dispose();
-      this.texPack = null;
-    }
-    if (this.pTexPack) {
-      this.pTexPack.dispose();
-      this.pTexPack = null;
-    }
-    if (this.renderer) {
-      this.renderer.dispose();
-      if (this.renderer.domElement.parentElement) {
-        this.renderer.domElement.parentElement.removeChild(this.renderer.domElement);
-      }
-      this.renderer = null;
-    }
+    this.vendors?.dispose();
+    this.firstPerson?.dispose();
+    this.stalls?.dispose();
+    disposeMarketCorridorScene(this.scene, this.renderer, this.texPack, this.pTexPack);
+    this.texPack = null;
+    this.pTexPack = null;
+    this.renderer = null;
     this.scene = null;
     this.camera = null;
     this.lights = null;
+    this.stalls = null;
+    this.vendors = null;
+    this.firstPerson = null;
     this.hitboxes = [];
     this.priceTags = [];
   }

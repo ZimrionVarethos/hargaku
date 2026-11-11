@@ -10,6 +10,7 @@ export interface ProduceTexturePack {
   cabbageTex: THREE.CanvasTexture;
   meatTex: THREE.CanvasTexture;
   moundTex: THREE.CanvasTexture;
+  watermelonTex: THREE.CanvasTexture;
   dispose: () => void;
 }
 
@@ -144,6 +145,14 @@ export function createProduceTexturePack(): ProduceTexturePack {
     mndctx.fill();
   }
 
+  const { c: wmc, ctx: wmctx } = makeCanvas(128, 64);
+  wmctx.fillStyle = '#4ADE80';
+  wmctx.fillRect(0, 0, 128, 64);
+  wmctx.fillStyle = '#14532D';
+  for (let x = 4; x < 128; x += 16) {
+    wmctx.fillRect(x, 0, 7, 64);
+  }
+
   return {
     fishTex: reg(fc),
     chiliTex: reg(cc),
@@ -154,6 +163,7 @@ export function createProduceTexturePack(): ProduceTexturePack {
     cabbageTex: reg(cbc),
     meatTex: reg(mc),
     moundTex: reg(mndc, 2, 5),
+    watermelonTex: reg(wmc),
     dispose: () => all.forEach((t) => t.dispose()),
   };
 }

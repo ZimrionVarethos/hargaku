@@ -62,12 +62,16 @@ Dokumen ini adalah buku catatan "Jebakan Batman" (**Pitfall Vault**) proyek **Ha
 
 ## 5. UI Layout, Overflow Clipping & State Persistence
 
-### 5.1. Overflow Clipping & Stroke Potong pada Tabel Responsif
-- **Gejala**: Angka lingkaran nomor peringkat atau tombol aksi di tabel terpotong sebagian di sisi kiri atau kanan saat dibungkus kontainer `overflow-x-auto`.
-- **Penyebab**: Penggunaan `outline outline-1` bersudut lengkung yang digambar di luar bounding box, serta ketiadaan padding tepi (`pr` / `pl`).
+### 5.1. Overflow Clipping, Tooltip Grafik Terpotong, & Stroke Tabel Responsif
+- **Gejala**:
+  1. Angka lingkaran nomor peringkat atau tombol aksi di tabel terpotong sebagian di sisi kiri atau kanan saat dibungkus kontainer `overflow-x-auto`.
+  2. Tooltip harga `-top-12` pada bilah tertinggi grafik komparasi terpotong di batas atas dan sisi kiri/kanan karena dibungkus wadah `overflow-x-auto`.
+- **Penyebab**:
+  1. Penggunaan `outline outline-1` bersudut lengkung yang digambar di luar bounding box, serta ketiadaan padding tepi (`pr` / `pl`).
+  2. Dalam spesifikasi CSS, menyetel `overflow-x: auto` otomatis memaksa `overflow-y` menjadi `auto`/`hidden` (tidak bisa tetap `visible`), sehingga elemen anak dengan koordinat negatif di luar box atas atau kiri terpotong habis.
 - **Solusi Terverifikasi**:
-  * Gunakan `border border-[#...]` alih-alih `outline`.
-  * Berikan padding horizontal yang cukup (`pl-3.5 sm:pl-4` di kolom pertama dan `pr-6` di kolom terakhir/aksi).
+  * Gunakan `border border-[#...]` alih-alih `outline`, dan berikan padding horizontal yang cukup (`pl-3.5 sm:pl-4` dan `pr-6`).
+  * Untuk grafik bilah interaktif: tampilkan ringkasan komoditas & harga aktif di **luar** wadah `overflow-x-auto`, sisakan ruang *headroom* eksplisit (`pt-16`) di atas area tinggi bilah, pasang tooltip tepat di atas bilah aktif (`bottom-full mb-2`) dengan perataan tepi (`left-0` untuk indeks awal, `right-0` untuk indeks akhir), dan gunakan trek `min-w-full w-max` agar garis `Rerata` ikut merentang penuh saat digulir.
 
 ### 5.2. Persistensi Konsultasi AI & Kompatibilitas SSR Next.js + Supabase Pooler
 - **Gejala A (State AI Terputus)**: Riwayat tanya jawab AI hilang saat pengguna berpindah dari `/rekomendasi-ai` ke `/cek-harga` atau membuka laci `AssistantDrawer`.

@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useMemo, useRef } from 'react';
-import { MapPin, Train } from '@phosphor-icons/react';
+import { CaretDown, MapPin, Train } from '@phosphor-icons/react';
 import { BOGOR_MARKETS } from '@/lib/data/bogor-markets';
 import { computeMarketInsights } from '@/lib/market-insights';
 import { useLiveCatalog } from '@/lib/store/use-live-catalog';
 import { Bogor3DMapCanvas } from './Bogor3DMapCanvas';
 import { BogorMarketDetailModal } from './BogorMarketDetailModal';
+import { BatikMeshBackground } from '@/components/ornament/BatikMeshBackground';
 
 const MARKET_AREAS = [
   'SEMUA',
@@ -78,19 +79,15 @@ export function PasarKuUnitPasarSection() {
   };
 
   return (
-    <section
-      id="unitPasarSection"
-      className="py-12 border-b-2 border-[var(--border-ink)] bg-[var(--bg-paper)]"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <div className="inline-block px-3 py-1 rounded-full text-xs font-bold border border-[var(--border-ink)] bg-[var(--bg-muted)] text-[var(--accent-chili)] mb-2">
-              PETA 3D &amp; LAPORAN PER PASAR
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
-              Peta 3D 13 Unit Pasar Rakyat
-            </h2>
+    <section id="unitPasarSection" className="scroll-mt-20 bg-[var(--bg-paper)]">
+      <div className="relative isolate overflow-hidden pt-8 pb-12">
+        <BatikMeshBackground />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
+                Peta 3D 13 Unit Pasar Rakyat
+              </h2>
             <p className="text-sm text-[var(--text-secondary)] mt-1">
               Klik unit pasar di peta atau daftar cepat untuk melihat laporan barang yang sedang mahal, kelangkaan stok pedagang, dan posisi pasar dekat Stasiun Bogor.
             </p>
@@ -103,18 +100,26 @@ export function PasarKuUnitPasarSection() {
             >
               Wilayah Kecamatan:
             </label>
-            <select
-              id="areaFilter"
-              value={selectedArea}
-              onChange={(e) => handleSelectArea(e.target.value)}
-              className="px-3 py-2 rounded-xl border-2 border-[var(--border-ink)] bg-[var(--bg-card)] text-xs font-bold text-[var(--text-primary)] focus:outline-none min-h-[40px]"
-            >
-              {MARKET_AREAS.map((area) => (
-                <option key={area} value={area}>
-                  {area === 'SEMUA' ? 'Semua Wilayah (13 Unit)' : area}
-                </option>
-              ))}
-            </select>
+            <div className="relative inline-flex">
+              <select
+                id="areaFilter"
+                value={selectedArea}
+                onChange={(e) => handleSelectArea(e.target.value)}
+                className="appearance-none min-h-[40px] pl-3.5 pr-9 py-2 rounded-xl border-2 border-[var(--border-ink)] bg-[var(--bg-card)] text-xs font-bold text-[var(--text-primary)] shadow-[var(--shadow-hard-sm)] cursor-pointer transition-colors hover:bg-[var(--bg-muted)]"
+              >
+                {MARKET_AREAS.map((area) => (
+                  <option key={area} value={area}>
+                    {area === 'SEMUA' ? 'Semua Wilayah (13 Unit)' : area}
+                  </option>
+                ))}
+              </select>
+              <CaretDown
+                size={14}
+                weight="bold"
+                aria-hidden="true"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-primary)] pointer-events-none"
+              />
+            </div>
           </div>
         </div>
 
@@ -130,7 +135,7 @@ export function PasarKuUnitPasarSection() {
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
+          <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
             <span className="inline-flex items-center gap-1.5 font-medium">
               <MapPin size={14} weight="bold" className="text-[var(--accent-chili)]" aria-hidden="true" />
               <span>Indeks Cepat ({visibleMarkets.length} Unit): klik untuk melihat temuan harga &amp; stok tiap pasar</span>
@@ -176,6 +181,7 @@ export function PasarKuUnitPasarSection() {
               );
             })}
           </div>
+        </div>
         </div>
       </div>
 

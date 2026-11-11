@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { MarketTexturePack } from './three-pbr-textures';
 import { ProduceTexturePack } from './three-produce-textures';
 import { createInstancedMarketProduce } from './three-produce';
-import { createMarketBanners } from './three-banners';
+import { createMarketBanners, MarketBannersHandle } from './three-banners';
 
 export interface ThreeStallCompartment {
   id: number;
@@ -32,13 +32,22 @@ export interface StallPriceTagHandle {
   mesh: THREE.Mesh;
 }
 
+export interface MarketStallsHandle {
+  stallsGroup: THREE.Group;
+  hitboxes: StallHitboxMesh[];
+  priceTags: StallPriceTagHandle[];
+  bannersHandle: MarketBannersHandle;
+  setTheme: (isDark: boolean) => void;
+  dispose: () => void;
+}
+
 export function createMarketStalls(
   scene: THREE.Scene,
   isDark: boolean,
   compartments: ThreeStallCompartment[],
   tex: MarketTexturePack,
   pTex: ProduceTexturePack
-): { stallsGroup: THREE.Group; hitboxes: StallHitboxMesh[]; priceTags: StallPriceTagHandle[] } {
+): MarketStallsHandle {
   const stallsGroup = new THREE.Group();
   stallsGroup.name = 'market-stalls';
   const hitboxes: StallHitboxMesh[] = [];
@@ -150,9 +159,24 @@ export function createMarketStalls(
   scene.add(stallsGroup);
 
   createInstancedMarketProduce(scene, compartments, tex, pTex);
-  createMarketBanners(scene, isDark, compartments);
+  const bannersHandle = createMarketBanners(scene, isDark, compartments);
 
-  return { stallsGroup, hitboxes, priceTags };
+  const setTheme = (dark: boolean) => {
+    woodBaseMat.color.setHex(dark ? 0x22160d : 0x5a3418);
+    woodPlankMat.color.setHex(dark ? 0x2e1e12 : 0x6e4321);
+    woodDividerMat.color.setHex(dark ? 0x160e08 : 0x381f0d);
+    bannersHandle.setTheme(dark);
+  };
+
+  const dispose = () => {
+    bannersHandle.dispose();
+    for (const tag of priceTags) {
+      const mat = tag.mesh.material;
+      if (mat instanceof THREE.MeshStandardMaterial && mat.map) mat.map.dispose();
+    }
+  };
+
+  return { stallsGroup, hitboxes, priceTags, bannersHandle, setTheme, dispose };
 }
 
 export function createPriceTagTexture(label: string, priceText: string): THREE.CanvasTexture {

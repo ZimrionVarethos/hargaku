@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: 'PasarKu Bogor: Harga Pasar, Lebih Dekat',
   description:
     'Platform digital untuk menjelajahi, membandingkan, dan memantau harga komoditas pasar secara real-time berdasarkan publikasi resmi Perumda Pasar Pakuan Jaya Kota Bogor.',
+  icons: {
+    icon: '/images/pasarku/logo-nav.webp',
+  },
 };
 
 export default function RootLayout({
