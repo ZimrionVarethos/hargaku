@@ -227,7 +227,7 @@ flowchart LR
     <tr>
       <td><code>/</code></td>
       <td><strong>Beranda PasarKu</strong></td>
-      <td>Lorong Pasar 3D interaktif, Papan Acuan 10 Komoditas + tombol <code>Detail Papan</code>, serta Peta 3D 13 Unit Pasar Kota Bogor.</td>
+      <td>Lorong Pasar 3D interaktif, Papan Acuan 10 Komoditas + tombol <code>Detail Papan</code>, Tanya Jawab singkat (3 pertanyaan), serta Peta 3D 13 Unit Pasar.</td>
     </tr>
     <tr>
       <td><code>/indeks-harga</code></td>

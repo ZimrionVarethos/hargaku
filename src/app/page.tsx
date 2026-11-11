@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { PasarKuLorongHero } from '@/components/landing/pasarku/PasarKuLorongHero';
 import { PasarKuSorotanSection } from '@/components/landing/pasarku/PasarKuSorotanSection';
-import { PasarKuAnalitikSection } from '@/components/landing/pasarku/PasarKuAnalitikSection';
+import { PasarKuQnaSection } from '@/components/landing/pasarku/PasarKuQnaSection';
 import { PasarKuUnitPasarSection } from '@/components/landing/pasarku/PasarKuUnitPasarSection';
 import { PasarKuCommodityModal } from '@/components/landing/pasarku/PasarKuCommodityModal';
 import { KawungBand } from '@/components/ornament/KawungBand';
@@ -23,7 +23,7 @@ export default function HomePage() {
 
       <CacingWaveDivider topColor="var(--bg-paper)" bottomColor="var(--bg-muted)" />
 
-      <PasarKuAnalitikSection />
+      <PasarKuQnaSection />
 
       <CacingWaveDivider topColor="var(--bg-muted)" bottomColor="var(--bg-paper)" flip />
 
