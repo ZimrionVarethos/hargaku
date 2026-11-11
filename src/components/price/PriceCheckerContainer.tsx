@@ -8,7 +8,8 @@ import { resolveCanonicalMarket } from '@/lib/market-insights';
 import { useRegion } from '@/lib/store/region-store';
 import { useLiveCatalog } from '@/lib/store/use-live-catalog';
 import { useAssistant } from '@/lib/store/assistant-store';
-import { PriceCheckForm, TAKARAN_UNITS, type PriceQuickPreset } from './PriceCheckForm';
+import { PriceCheckForm } from './PriceCheckForm';
+import { TAKARAN_UNITS, type PriceQuickPreset } from './price-check-presets';
 import { PriceEvaluationResultCard } from './PriceEvaluationResultCard';
 import { PriceMethodologyCard } from './PriceMethodologyCard';
 import { PriceInsufficientDataCard } from './PriceInsufficientDataCard';
@@ -204,16 +205,15 @@ export function PriceCheckerContainer({
   const handleAskPuntenForOffer = () => {
     if (!selectedCommodity || !result) return;
     const location = selectedMarket?.name || result.regionName || 'pasar rakyat';
-    const prompt = `Saya ditawari ${selectedCommodity.name} ${takaranAmount} ${selectedUnitShort} seharga ${rawPriceInput} (setara Rp ${result.offeredPrice.toLocaleString('id-ID')}/${selectedCommodity.unit}, status: ${result.statusLabel}) di ${location}. Bandingkan dengan Bapanas, PIHPS daerah, dan laporan warga, lalu kasih tips tawar terbaik.`;
+    const unit = TAKARAN_UNITS.find((u) => u.id === selectedUnitId);
+    const portionDesc = `${takaranAmount} ${unit?.shortLabel || 'kg'}`;
+    const prompt = `Saya ditawari ${selectedCommodity.name} ${portionDesc} seharga ${rawPriceInput} (status: ${result.statusLabel}) di ${location}. Harga pasar wajarnya sekitar Rp ${result.comparisonPrice.toLocaleString('id-ID')}/${selectedCommodity.unit}. Kasih saran tawar yang pas dan cek apakah ada pasar lebih murah di sekitar sini.`;
     document.getElementById('punten-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     void sendMessage(prompt);
   };
 
-  const selectedUnitShort =
-    TAKARAN_UNITS.find((u) => u.id === selectedUnitId)?.shortLabel || 'kg';
-
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div className="lg:col-span-5">
           <PriceCheckForm
@@ -244,6 +244,11 @@ export function PriceCheckerContainer({
             standardUnit={selectedCommodity?.unit || 'kg'}
             activePresetId={activePresetId}
             onApplyPreset={handleApplyPreset}
+            onSelectPortion={(amount, unitId) => {
+              setActivePresetId(null);
+              setTakaranAmount(amount);
+              setSelectedUnitId(unitId);
+            }}
             onSubmit={handleSubmit}
             loading={loading}
           />
@@ -256,13 +261,13 @@ export function PriceCheckerContainer({
               commodity={selectedCommodity}
               market={selectedMarket}
               takaranAmount={takaranAmount}
-              takaranUnitShort={selectedUnitShort}
+              selectedUnitId={selectedUnitId}
               rawPriceInput={rawPriceInput}
               onAskPunten={handleAskPuntenForOffer}
             />
           ) : loading ? (
             <div className="market-card bg-[var(--bg-card)] p-6 sm:p-7 flex items-center justify-center text-[var(--text-muted)] text-[13px] min-h-[280px]">
-              Memuat hasil evaluasi kewajaran...
+              Sedang memeriksa harga...
             </div>
           ) : (
             <PriceInsufficientDataCard

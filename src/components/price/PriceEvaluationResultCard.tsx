@@ -1,16 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { PriceCheckResult, CommoditySummary, Market } from '@/types';
 import {
-  ArrowRight,
-  ChatCircleDots,
-  MegaphoneSimple,
-  CheckCircle,
-  Warning,
   ArrowDown,
+  ArrowRight,
+  CaretDown,
+  CaretUp,
+  ChatCircleDots,
+  CheckCircle,
+  MegaphoneSimple,
+  Package,
+  Train,
+  Warning,
 } from '@phosphor-icons/react';
 import { useAssistant } from '@/lib/store/assistant-store';
+import { TAKARAN_UNITS, formatPortionLabel } from './price-check-presets';
 import { PriceMarketContextBox } from './PriceMarketContextBox';
 
 interface Props {
@@ -18,7 +24,7 @@ interface Props {
   commodity: CommoditySummary;
   market?: Market;
   takaranAmount: number;
-  takaranUnitShort: string;
+  selectedUnitId: string;
   rawPriceInput: string;
   onAskPunten?: () => void;
 }
@@ -28,30 +34,41 @@ export function PriceEvaluationResultCard({
   commodity,
   market,
   takaranAmount,
-  takaranUnitShort,
+  selectedUnitId,
   rawPriceInput,
   onAskPunten,
 }: Props) {
   const { openAssistant } = useAssistant();
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
+  const unit = TAKARAN_UNITS.find((u) => u.id === selectedUnitId) || TAKARAN_UNITS[0];
+  const portionRatio = (takaranAmount * unit.gramMultiplier) / 1000;
+  const portionLabel = formatPortionLabel(takaranAmount, selectedUnitId);
+
+  const rawNumeric = parseInt(rawPriceInput.replace(/\D/g, ''), 10) || 0;
+  const offeredForPortion =
+    rawNumeric > 0 ? rawNumeric : Math.round(result.offeredPrice * portionRatio);
+  const fairForPortion = Math.round((result.comparisonPrice * portionRatio) / 100) * 100;
+  const portionDiff = offeredForPortion - fairForPortion;
 
   const handleAskClick = () => {
     if (onAskPunten) {
       onAskPunten();
       return;
     }
-    const location = market?.name || result.regionName || 'pasar rakyat';
+    const location = market?.name || result.regionName || 'pasar';
     openAssistant(
-      `Saya ditawari ${commodity.name} seharga Rp ${result.offeredPrice.toLocaleString('id-ID')}/${commodity.unit} (${result.statusLabel}) di ${location}. Bandingkan dengan Acuan Nasional Bapanas, PIHPS daerah, dan laporan warga.`
+      `Saya ditawari ${commodity.name} (${portionLabel}) seharga Rp ${offeredForPortion.toLocaleString('id-ID')} di ${location}. Normalnya Rp ${fairForPortion.toLocaleString('id-ID')}. Kasih tips tawar paling pas!`
     );
   };
 
   let badgeStyle = 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border-[var(--forest-ink)]';
-  let adviceBoxStyle = 'bg-[var(--forest-surface)]/50 border-[var(--forest-ink)]/40 text-[var(--text-primary)]';
+  let adviceBoxStyle = 'bg-[var(--forest-surface)]/45 border-[var(--forest-ink)]/40 text-[var(--text-primary)]';
   let StatusIcon = CheckCircle;
 
   if (result.status === 'SLIGHTLY_EXPENSIVE') {
     badgeStyle = 'bg-[var(--ochre-surface)] text-[var(--warning-ink)] border-[var(--warning-ink)]';
-    adviceBoxStyle = 'bg-[var(--ochre-surface)] border-[var(--warning-ink)]/50 text-[var(--warning-ink)]';
+    adviceBoxStyle = 'bg-[var(--ochre-surface)] border-[var(--warning-ink)]/45 text-[var(--warning-ink)]';
     StatusIcon = Warning;
   } else if (result.status === 'OVERPRICED') {
     badgeStyle = 'bg-[var(--accent-chili-soft)] text-[var(--accent-chili)] border-[var(--accent-chili)]';
@@ -59,61 +76,35 @@ export function PriceEvaluationResultCard({
     StatusIcon = Warning;
   } else if (result.status === 'MUCH_CHEAPER') {
     badgeStyle = 'bg-[#EEF773] text-[#102B03] border-[var(--border-ink)]';
-    adviceBoxStyle = 'bg-[var(--forest-surface)] border-[var(--forest-ink)]/50 text-[var(--forest-ink)]';
+    adviceBoxStyle = 'bg-[var(--forest-surface)]/45 border-[var(--forest-ink)]/45 text-[var(--text-primary)]';
     StatusIcon = ArrowDown;
   }
 
-  const diffNominal = Math.abs(result.offeredPrice - result.comparisonPrice);
-  const diffSummary =
-    result.diffPercentage > 0
-      ? `Rp ${diffNominal.toLocaleString('id-ID')}/${commodity.unit} di atas patokan pasar saat ini.`
-      : result.diffPercentage < 0
-      ? `Rp ${diffNominal.toLocaleString('id-ID')}/${commodity.unit} lebih hemat dari patokan pasar saat ini.`
-      : `Sama persis dengan patokan harga pasar saat ini.`;
+  let headlineText = `Harga pas untuk ${portionLabel} ini!`;
+  let adviceText = `Aman dibeli. Harga ini sudah sejalan dengan harga pasar hari ini.`;
+
+  if (result.status === 'OVERPRICED' || result.status === 'SLIGHTLY_EXPENSIVE') {
+    headlineText =
+      portionDiff > 0
+        ? `Lebih mahal sekitar Rp ${portionDiff.toLocaleString('id-ID')} untuk ${portionLabel} ini.`
+        : `Lebih tinggi dari kisaran pasar hari ini.`;
+    adviceText = `Coba tawar ke kisaran Rp ${fairForPortion.toLocaleString('id-ID')} untuk ${portionLabel} ya, atau cek lapak sebelah.`;
+  } else if (result.status === 'MUCH_CHEAPER') {
+    headlineText = `Lebih hemat sekitar Rp ${Math.abs(portionDiff).toLocaleString('id-ID')} untuk ${portionLabel} ini.`;
+    adviceText = `Harganya miring banget. Pastikan barang masih segar dan timbangannya pas ya.`;
+  }
 
   const nationalHap = result.layers.lapis1NationalHap ?? result.layers.lapis1HapHet;
   const pihpsLocal = result.layers.lapis2PihpsCityAvg ?? result.layers.lapis2OfficialAvg;
 
-  const sourcePrices = [
-    nationalHap,
-    pihpsLocal,
-    result.layers.lapis3CitizenMedian,
-  ].filter((v) => v > 0);
-  const lowestBenchmark = sourcePrices.length > 0 ? Math.min(...sourcePrices) : pihpsLocal;
-
   const comparisonRows = [
-    {
-      label: 'Tawaran Penjual',
-      sub: `${rawPriceInput || 'Rp 0'} (${takaranAmount} ${takaranUnitShort})`,
-      price: result.offeredPrice,
-      isHighlight: false,
-      tag: '',
-    },
-    {
-      label: 'Acuan Nasional Bapanas (HAP/HET)',
-      sub: 'Batas acuan resmi pemerintah',
-      price: nationalHap,
-      isHighlight: nationalHap === lowestBenchmark,
-      tag: nationalHap === lowestBenchmark ? 'Terendah' : '',
-    },
-    {
-      label: `Acuan Daerah (${result.regionName || 'Lokal'}) · PIHPS`,
-      sub:
-        result.layers.nationalVsLocalDiffPct !== undefined && result.layers.nationalVsLocalDiffPct !== 0
-          ? `${result.layers.nationalVsLocalDiffPct > 0 ? `+${result.layers.nationalVsLocalDiffPct}%` : `${result.layers.nationalVsLocalDiffPct}%`} dari nasional`
-          : 'Rerata survei pasar resmi',
-      price: pihpsLocal,
-      isHighlight: pihpsLocal === lowestBenchmark,
-      tag: pihpsLocal === lowestBenchmark ? 'Terendah' : '',
-    },
-    {
-      label: `Laporan Warga (${market?.name || 'Wilayah'})`,
-      sub: result.confidenceLevel === 'HIGH' ? 'Data terverifikasi aktif' : 'Mengikuti patokan pasar terdekat',
-      price: result.layers.lapis3CitizenMedian,
-      isHighlight: result.layers.lapis3CitizenMedian === lowestBenchmark,
-      tag: result.layers.lapis3CitizenMedian === lowestBenchmark ? 'Terendah' : '',
-    },
+    { label: 'Harga Tawaran Penjual', price: result.offeredPrice },
+    { label: 'Patokan Pemerintah (Bapanas)', price: nationalHap },
+    { label: `Rata-Rata Pasar Sekitar (${result.regionName || 'Daerah'})`, price: pihpsLocal },
+    { label: `Data Warga (${market?.name || 'Wilayah'})`, price: result.layers.lapis3CitizenMedian },
   ];
+
+  const hasShortages = (result.marketContext?.shortageAlerts?.length || 0) > 0;
 
   return (
     <div className="market-card p-5 sm:p-6 bg-[var(--bg-card)] flex flex-col justify-between gap-4">
@@ -121,73 +112,75 @@ export function PriceEvaluationResultCard({
         <div className="space-y-2 pb-3 border-b border-[var(--border-subtle)]">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
-              Putusan Harga &bull; {result.regionName || market?.city || 'Daerah'}
+              Hasil Cek &bull; {market?.name || result.regionName || 'Pasar Rakyat'}
             </span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[var(--bg-muted)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
-              {result.confidenceLevel === 'HIGH' ? 'Kepercayaan Tinggi' : 'Acuan Wilayah'}
-            </span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {result.marketContext?.nearStation && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-[var(--accent-chili-soft)] text-[var(--accent-chili)]">
+                  <Train size={11} weight="bold" />
+                  <span>Dekat Stasiun</span>
+                </span>
+              )}
+              {hasShortages && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-[var(--ochre-surface)] text-[var(--warning-ink)]">
+                  <Package size={11} weight="bold" />
+                  <span>Info Stok Terbatas</span>
+                </span>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <h3 className="inline-flex items-center gap-2 text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-tight leading-none">
-              <StatusIcon size={26} weight="bold" className="shrink-0" />
+          <div className="flex items-center gap-2.5 flex-wrap pt-0.5">
+            <h3 className="inline-flex items-center gap-2 text-[26px] sm:text-[32px] font-bold text-[var(--text-primary)] tracking-tight leading-none">
+              <StatusIcon size={28} weight="bold" className="shrink-0" />
               <span>{result.statusLabel}</span>
             </h3>
-
             <span className={`text-[11px] font-bold px-2.5 py-1 rounded-md border font-mono-num ${badgeStyle}`}>
-              {result.diffPercentage > 0 ? `+${result.diffPercentage}%` : `${result.diffPercentage}%`} vs Patokan
+              {result.diffPercentage > 0 ? `+${result.diffPercentage}%` : `${result.diffPercentage}%`}
             </span>
           </div>
 
-          <p className="text-[13px] text-[var(--text-secondary)] leading-snug">
-            {diffSummary}
+          <p className="text-[15px] sm:text-[16px] font-bold text-[var(--text-primary)] leading-snug pt-0.5">
+            {headlineText}
+          </p>
+          <p className="text-[12px] sm:text-[13px] text-[var(--text-secondary)] font-mono-num">
+            Harga pasar normal untuk {portionLabel}: <strong>Rp {fairForPortion.toLocaleString('id-ID')}</strong>{' '}
+            (atau Rp {result.comparisonPrice.toLocaleString('id-ID')}/{commodity.unit}).
           </p>
         </div>
 
-        <div className={`p-3.5 rounded-xl border text-[12px] leading-relaxed ${adviceBoxStyle}`}>
-          <span className="font-bold block mb-0.5">Saran Belanja:</span>
-          {result.advice}
+        <div className={`p-3.5 rounded-xl border text-[13px] leading-relaxed ${adviceBoxStyle}`}>
+          <span className="font-bold block mb-0.5">Saran Buat Kamu:</span>
+          {adviceText}
         </div>
 
-        <div className="space-y-1.5">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-            Komparasi 4 Sumber Harga (/{commodity.unit})
-          </div>
-          <div className="rounded-xl border border-[var(--border-ink)] bg-[var(--bg-paper)] divide-y divide-[var(--border-subtle)] overflow-hidden">
-            {comparisonRows.map((row) => (
-              <div
-                key={row.label}
-                className={`px-3.5 py-2.5 flex items-center justify-between gap-3 ${
-                  row.isHighlight ? 'bg-[var(--forest-surface)]/45' : ''
-                }`}
-              >
-                <div className="min-w-0">
-                  <div className="text-[12px] font-bold text-[var(--text-primary)] truncate">
-                    {row.label}
-                  </div>
-                  <div className="text-[11px] text-[var(--text-muted)] truncate">
-                    {row.sub}
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <div className="text-[13px] font-bold text-[var(--text-primary)] font-mono-num">
-                    Rp {row.price.toLocaleString('id-ID')}
-                  </div>
-                  {row.tag && (
-                    <span className="text-[10px] font-bold text-[var(--forest-ink)] uppercase">
-                      {row.tag}
+        <div className="border border-[var(--border-subtle)] rounded-xl overflow-hidden bg-[var(--bg-paper)]">
+          <button
+            type="button"
+            onClick={() => setDetailsOpen((prev) => !prev)}
+            aria-expanded={detailsOpen}
+            className="w-full px-3.5 py-2.5 flex items-center justify-between gap-2 text-[12px] font-bold text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors cursor-pointer"
+          >
+            <span>Lihat rincian harga resmi &amp; pasar lain (/{commodity.unit})</span>
+            {detailsOpen ? <CaretUp size={14} weight="bold" /> : <CaretDown size={14} weight="bold" />}
+          </button>
+
+          {detailsOpen && (
+            <div className="px-3.5 pb-3.5 pt-1 border-t border-[var(--border-subtle)] space-y-3">
+              <div className="divide-y divide-[var(--border-subtle)] text-[12px]">
+                {comparisonRows.map((row) => (
+                  <div key={row.label} className="py-2 flex items-center justify-between gap-3">
+                    <span className="text-[var(--text-secondary)]">{row.label}</span>
+                    <span className="font-bold text-[var(--text-primary)] font-mono-num shrink-0">
+                      Rp {row.price.toLocaleString('id-ID')}
                     </span>
-                  )}
-                </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+              <PriceMarketContextBox marketContext={result.marketContext} />
+            </div>
+          )}
         </div>
-
-        <PriceMarketContextBox
-          marketContext={result.marketContext}
-          positioningNote={result.positioningNote}
-        />
       </div>
 
       <div className="flex flex-col gap-2 pt-1">
@@ -206,14 +199,14 @@ export function PriceEvaluationResultCard({
             className="market-btn-secondary inline-flex items-center justify-center gap-1.5 py-2 px-3 text-[12px] font-semibold"
           >
             <MegaphoneSimple size={14} weight="bold" />
-            <span>Lapor Harga / Stok</span>
+            <span>Laporkan Harga Ini</span>
           </Link>
 
           <Link
             href={`/komoditas/${commodity.slug}`}
             className="market-btn-secondary inline-flex items-center justify-center gap-1.5 py-2 px-3 text-[12px] font-semibold"
           >
-            <span>Grafik &amp; Pasar Lain</span>
+            <span>Bandingkan Pasar Lain</span>
             <ArrowRight size={13} weight="bold" />
           </Link>
         </div>

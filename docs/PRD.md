@@ -100,10 +100,10 @@ Tiga lapis pembanding harga yang digunakan:
 * Filter berdasarkan kategori pangan (Beras, Cabai/Bawang, Daging/Telur, Minyak/Gula).
 
 ### Modul 3: Cek Harga Wajar & Komparasi AI Terpadu (`/cek-harga`)
-* Menggabungkan fitur **Cek Harga Wajar** dan **Komparasi AI Multi-Sumber** ke dalam satu halaman ringkas `/cek-harga` (`/rekomendasi-ai` diarahkan ke `/cek-harga#punten-panel`) dengan panduan visual 3 langkah agar langsung dipahami pembeli awam:
-  1. Pilih **Komoditas & Pasar Tujuan** atau ketuk **Contoh Cepat** (`1-click preset`).
-  2. Isi **Jumlah & Satuan Jelas** (`kg`, `500g`, `250g`, `ons`, `liter`, `ikat`) serta **Harga Tawaran Penjual**, disertai pratinjau penyetaraan otomatis (`/kg` atau `/liter`).
-  3. Terima **Putusan Harga & Komparasi 4 Sumber** seketika: membandingkan **Harga Tawaran**, **Acuan Nasional HAP/HET Bapanas**, **Acuan Daerah · PIHPS BI**, serta **Pasar Termurah & Laporan Warga Setempat** lengkap dengan saran tawar aman, info kelangkaan pasar, dan tombol langsung **`Tanya PUNTEN AI`**.
+* Menggabungkan fitur **Cek Harga Wajar** dan **Tanya PUNTEN AI** ke dalam satu halaman bergaya **"Kartu Kasir Sederhana"** di `/cek-harga` (`/rekomendasi-ai` diarahkan ke `/cek-harga#punten-panel`) yang dirancang ramah pengguna awam non-teknis tanpa istilah birokrasi di permukaan:
+  1. Pilih **Barang & Pasar Tujuan**, atau ketuk **Contoh Cepat** (`Cabai 1/4 kg · Rp 18rb`, `Beras 5 kg · Rp 75rb`, `Telur 1 kg · Rp 30rb`).
+  2. Pilih takaran populer bahasa sehari-hari (**`1 kg`**, **`1/2 kg`**, **`1/4 kg`**, **`1 ons`**) atau buka pengaturan jumlah khusus (`kg`, `500g`, `250g`, `ons`, `liter`, `ikat`), lalu isi **Harga Tawaran Penjual**.
+  3. Terima **Putusan Kasir Instan** dalam nominal Rupiah sesuai takaran yang dibeli (misalnya *"Lebih mahal sekitar Rp 4.200 untuk 1/4 kg ini"* beserta target harga tawar aman), sementara rincian komparasi 4 sumber resmi (**Patokan Pemerintah / Bapanas**, **Rata-Rata Pasar Sekitar / PIHPS**, **Laporan Warga**, dan **Info Lapangan**) tersimpan rapi di balik lipatan (**"Lihat rincian harga resmi & pasar lain"**).
 * **Tingkat Kepercayaan & Pembanding**:
   * Prioritas 1: **Median laporan warga terverifikasi** di pasar terpilih (`>= 2` laporan harga `APPROVED`), atau fallback median wilayah ➔ Tingkat Kepercayaan: **Tinggi**.
   * Prioritas 2: **Survei harian pasar terpilih** / rerata resmi PIHPS & Perumda PPJ ➔ Tingkat Kepercayaan: **Sedang**.
@@ -113,7 +113,7 @@ Tiga lapis pembanding harga yang digunakan:
   * Deviasi `[+10% s.d. +25%]`: **Agak Mahal** (Amber — di atas acuan wajar).
   * Deviasi `> +25%`: **Terlalu Mahal** (Merah Chili — melampaui toleransi wajar).
   * Deviasi `< -15%`: **Jauh Lebih Murah** (Lime/Hijau terang — cek kesegaran mutu & timbangan).
-* **Panel Tanya PUNTEN AI Terintegrasi**: Berada langsung di halaman `/cek-harga` bersama **Maskot 3D PUNTEN AI** yang bereaksi terhadap status hasil cek maupun respons AI.
+* **Asisten PUNTEN 3D Ringkas (`#punten-panel`)**: Berada langsung di bawah kalkulator tanpa pengulangan kartu data, memadukan **Maskot 3D PUNTEN AI** reaktif dan kolom obrolan santai (tombol **`Minta Tips Nawar ke PUNTEN`**) serta 1 baris keterangan warna status + pelengkap PIHPS di dasar halaman.
 
 ### Modul 4: Halaman Tentang & Sumber Data (Fase A)
 * Pernyataan transparansi metodologi data dan penegasan posisi bahwa **PasarKu melengkapi PIHPS BI dan Panel Harga Bapanas**, bukan menggantikan fungsi pemantauannya.
