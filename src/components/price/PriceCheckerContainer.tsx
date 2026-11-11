@@ -1,16 +1,18 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback, type FormEvent } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef, type FormEvent } from 'react';
 import { CommoditySummary, Market, PriceCheckResult } from '@/types';
 import { submitPriceCheck } from '@/lib/api/price-check.api';
 import { filterMarketsForRegion } from '@/lib/mock/markets.data';
 import { resolveCanonicalMarket } from '@/lib/market-insights';
 import { useRegion } from '@/lib/store/region-store';
 import { useLiveCatalog } from '@/lib/store/use-live-catalog';
-import { PriceCheckForm, TAKARAN_UNITS } from './PriceCheckForm';
+import { useAssistant } from '@/lib/store/assistant-store';
+import { PriceCheckForm, TAKARAN_UNITS, type PriceQuickPreset } from './PriceCheckForm';
 import { PriceEvaluationResultCard } from './PriceEvaluationResultCard';
 import { PriceMethodologyCard } from './PriceMethodologyCard';
 import { PriceInsufficientDataCard } from './PriceInsufficientDataCard';
+import { PuntenIntegratedPanel } from './PuntenIntegratedPanel';
 
 interface Props {
   initialCommodities: CommoditySummary[];
@@ -27,6 +29,7 @@ export function PriceCheckerContainer({
 }: Props) {
   const { selectedRegion, regionMarkets } = useRegion();
   const { commodities: liveCommodities, markets: liveMarkets } = useLiveCatalog();
+  const { sendMessage } = useAssistant();
 
   const currentCommodities =
     liveCommodities.length > 0 ? liveCommodities : initialCommodities;
@@ -42,6 +45,24 @@ export function PriceCheckerContainer({
     return cabaiRawit ? cabaiRawit.id : initialCommodities[0]?.id || '';
   });
 
+  const targetSlugRef = useRef<string>(
+    initialCommodities.find((c) => c.id === selectedCommodityId || c.slug === initialCommoditySlug)?.slug ||
+      initialCommoditySlug ||
+      'cabai-rawit-merah'
+  );
+
+  useEffect(() => {
+    if (currentCommodities.length === 0) return;
+    if (currentCommodities.some((c) => c.id === selectedCommodityId)) return;
+    const matched =
+      currentCommodities.find((c) => c.slug === targetSlugRef.current || c.id === targetSlugRef.current) ||
+      currentCommodities[0];
+    if (matched) {
+      targetSlugRef.current = matched.slug;
+      setSelectedCommodityId(matched.id);
+    }
+  }, [currentCommodities, selectedCommodityId]);
+
   const liveRegionMarkets = useMemo(() => {
     const source = liveMarkets.length > 0 ? liveMarkets : initialMarkets;
     return filterMarketsForRegion(source, selectedRegion.id);
@@ -54,8 +75,11 @@ export function PriceCheckerContainer({
       ? regionMarkets
       : initialMarkets;
 
-  const [takaranAmount, setTakaranAmount] = useState<number>(2);
-  const [selectedUnitId, setSelectedUnitId] = useState<string>('ons');
+  const [takaranAmount, setTakaranAmount] = useState<number>(1);
+  const [selectedUnitId, setSelectedUnitId] = useState<string>('quarter');
+  const [activePresetId, setActivePresetId] = useState<string | null>(
+    initialCommoditySlug ? null : 'preset_cabai'
+  );
   const [selectedMarketId, setSelectedMarketId] = useState<string>(() => {
     const resolved = resolveCanonicalMarket(activeMarkets, initialMarketId);
     return resolved?.id || activeMarkets[0]?.id || '';
@@ -74,7 +98,7 @@ export function PriceCheckerContainer({
     }
   }, [activeMarkets, selectedMarketId, initialMarketId]);
 
-  const [rawPriceInput, setRawPriceInput] = useState<string>('Rp 15.000');
+  const [rawPriceInput, setRawPriceInput] = useState<string>('Rp 18.000');
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<PriceCheckResult | null>(null);
 
@@ -94,9 +118,12 @@ export function PriceCheckerContainer({
   const selectedCommodity = useMemo(() => {
     return (
       currentCommodities.find((c) => c.id === selectedCommodityId) ||
+      currentCommodities.find((c) => c.slug === targetSlugRef.current) ||
       currentCommodities[0]
     );
   }, [currentCommodities, selectedCommodityId]);
+
+  const effectiveCommodityId = selectedCommodity?.id || selectedCommodityId;
 
   const selectedMarket = useMemo(() => {
     return (
@@ -106,6 +133,7 @@ export function PriceCheckerContainer({
   }, [activeMarkets, initialMarkets, selectedMarketId]);
 
   const handlePriceChange = (val: string) => {
+    setActivePresetId(null);
     const num = parseInt(val.replace(/\D/g, ''), 10);
     if (isNaN(num)) {
       setRawPriceInput('');
@@ -114,12 +142,31 @@ export function PriceCheckerContainer({
     }
   };
 
+  const handleApplyPreset = (preset: PriceQuickPreset) => {
+    let matched = currentCommodities.find((c) =>
+      preset.slugHints.some((hint) => c.slug === hint || c.id === hint)
+    );
+    if (!matched) {
+      matched = currentCommodities.find((c) =>
+        preset.slugHints.some((hint) => c.slug.includes(hint) || c.name.toLowerCase().includes(hint))
+      );
+    }
+    if (matched) {
+      targetSlugRef.current = matched.slug;
+      setSelectedCommodityId(matched.id);
+    }
+    setTakaranAmount(preset.amount);
+    setSelectedUnitId(preset.unitId);
+    setRawPriceInput(`Rp ${preset.price.toLocaleString('id-ID')}`);
+    setActivePresetId(preset.id);
+  };
+
   const executeEvaluation = useCallback(async () => {
-    if (!selectedCommodityId || normalizedPricePerKg <= 0) return;
+    if (!effectiveCommodityId || normalizedPricePerKg <= 0) return;
     setLoading(true);
     try {
       const res = await submitPriceCheck({
-        commodityId: selectedCommodityId,
+        commodityId: effectiveCommodityId,
         marketId: selectedMarketId,
         regionSlug: selectedRegion.slug,
         offeredPrice: normalizedPricePerKg,
@@ -133,7 +180,7 @@ export function PriceCheckerContainer({
       setLoading(false);
     }
   }, [
-    selectedCommodityId,
+    effectiveCommodityId,
     normalizedPricePerKg,
     selectedMarketId,
     selectedRegion.slug,
@@ -143,7 +190,10 @@ export function PriceCheckerContainer({
   ]);
 
   useEffect(() => {
-    void executeEvaluation();
+    const timer = window.setTimeout(() => {
+      void executeEvaluation();
+    }, 150);
+    return () => window.clearTimeout(timer);
   }, [executeEvaluation]);
 
   const handleSubmit = (e: FormEvent) => {
@@ -151,55 +201,85 @@ export function PriceCheckerContainer({
     void executeEvaluation();
   };
 
-  const selectedUnitLabel =
-    TAKARAN_UNITS.find((u) => u.id === selectedUnitId)?.label || 'Ons';
+  const handleAskPuntenForOffer = () => {
+    if (!selectedCommodity || !result) return;
+    const location = selectedMarket?.name || result.regionName || 'pasar rakyat';
+    const prompt = `Saya ditawari ${selectedCommodity.name} ${takaranAmount} ${selectedUnitShort} seharga ${rawPriceInput} (setara Rp ${result.offeredPrice.toLocaleString('id-ID')}/${selectedCommodity.unit}, status: ${result.statusLabel}) di ${location}. Bandingkan dengan Bapanas, PIHPS daerah, dan laporan warga, lalu kasih tips tawar terbaik.`;
+    document.getElementById('punten-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    void sendMessage(prompt);
+  };
+
+  const selectedUnitShort =
+    TAKARAN_UNITS.find((u) => u.id === selectedUnitId)?.shortLabel || 'kg';
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        <PriceCheckForm
-          commodities={currentCommodities}
-          markets={activeMarkets}
-          selectedCommodityId={selectedCommodityId}
-          onCommodityChange={setSelectedCommodityId}
-          takaranAmount={takaranAmount}
-          onTakaranAmountChange={setTakaranAmount}
-          selectedUnitId={selectedUnitId}
-          onUnitChange={setSelectedUnitId}
-          selectedMarketId={selectedMarketId}
-          onMarketChange={setSelectedMarketId}
-          rawPriceInput={rawPriceInput}
-          onPriceInputChange={handlePriceChange}
-          normalizedPricePerKg={normalizedPricePerKg}
-          standardUnit={selectedCommodity?.unit || 'kg'}
-          onSubmit={handleSubmit}
-          loading={loading}
-        />
-
-        {result && selectedCommodity ? (
-          <PriceEvaluationResultCard
-            result={result}
-            commodity={selectedCommodity}
-            market={selectedMarket}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="lg:col-span-5">
+          <PriceCheckForm
+            commodities={currentCommodities}
+            markets={activeMarkets}
+            selectedCommodityId={effectiveCommodityId}
+            onCommodityChange={(id) => {
+              setActivePresetId(null);
+              const found = currentCommodities.find((c) => c.id === id || c.slug === id);
+              if (found) targetSlugRef.current = found.slug;
+              setSelectedCommodityId(id);
+            }}
             takaranAmount={takaranAmount}
-            takaranUnitLabel={selectedUnitLabel}
+            onTakaranAmountChange={(amt) => {
+              setActivePresetId(null);
+              setTakaranAmount(amt);
+            }}
+            selectedUnitId={selectedUnitId}
+            onUnitChange={(unitId) => {
+              setActivePresetId(null);
+              setSelectedUnitId(unitId);
+            }}
+            selectedMarketId={selectedMarketId}
+            onMarketChange={setSelectedMarketId}
             rawPriceInput={rawPriceInput}
+            onPriceInputChange={handlePriceChange}
+            normalizedPricePerKg={normalizedPricePerKg}
+            standardUnit={selectedCommodity?.unit || 'kg'}
+            activePresetId={activePresetId}
+            onApplyPreset={handleApplyPreset}
+            onSubmit={handleSubmit}
+            loading={loading}
           />
-        ) : loading ? (
-          <div className="market-card bg-[var(--bg-card)] p-6 sm:p-7 flex items-center justify-center text-[var(--text-muted)] text-[13px] min-h-[260px]">
-            Memuat hasil evaluasi kewajaran...
-          </div>
-        ) : (
-          <PriceInsufficientDataCard
-            commodityName={selectedCommodity?.name}
-            marketName={selectedMarket?.name}
-          />
-        )}
+        </div>
+
+        <div className="lg:col-span-7">
+          {result && selectedCommodity ? (
+            <PriceEvaluationResultCard
+              result={result}
+              commodity={selectedCommodity}
+              market={selectedMarket}
+              takaranAmount={takaranAmount}
+              takaranUnitShort={selectedUnitShort}
+              rawPriceInput={rawPriceInput}
+              onAskPunten={handleAskPuntenForOffer}
+            />
+          ) : loading ? (
+            <div className="market-card bg-[var(--bg-card)] p-6 sm:p-7 flex items-center justify-center text-[var(--text-muted)] text-[13px] min-h-[280px]">
+              Memuat hasil evaluasi kewajaran...
+            </div>
+          ) : (
+            <PriceInsufficientDataCard
+              commodityName={selectedCommodity?.name}
+              marketName={selectedMarket?.name}
+            />
+          )}
+        </div>
       </div>
 
-      <div className="w-full">
-        <PriceMethodologyCard />
-      </div>
+      <PuntenIntegratedPanel
+        commodity={selectedCommodity}
+        market={selectedMarket}
+        result={result}
+      />
+
+      <PriceMethodologyCard />
     </div>
   );
 }

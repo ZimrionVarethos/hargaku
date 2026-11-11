@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowSquareOut, Scales, Tag } from '@phosphor-icons/react';
 import { AssistantMessage } from '@/types/assistant';
 import { MarkdownMessage } from './MarkdownMessage';
+import { PuntenMascotAvatar } from './PuntenMascotAvatar';
 
 interface Props {
   message: AssistantMessage;
@@ -31,14 +32,12 @@ export function AiMessageBubble({ message, onNavigate }: Props) {
       <div className="max-w-[94%] rounded-2xl rounded-tl-xs p-3.5 sm:p-4 bg-[var(--bg-card)] border-2 border-[var(--border-ink)] text-[var(--text-primary)] shadow-[2px_2px_0px_var(--border-ink)] space-y-3">
         <div className="flex items-center justify-between gap-2 pb-2 border-b border-[var(--border-subtle)]">
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-lg bg-[#EEF773] border border-[#132E20] text-[#132E20] text-[11px] font-bold flex items-center justify-center shrink-0">
-              P
-            </span>
+            <PuntenMascotAvatar size={26} mood="normal" />
             <span className="text-[12px] font-bold text-[var(--text-primary)]">PUNTEN</span>
             <span
               className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                 message.provider === 'gemini'
-                  ? 'bg-[#E2EFE6] text-[#132E20] border-[#245034]/40'
+                  ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border-[var(--forest-ink)]/35'
                   : 'bg-[var(--bg-muted)] text-[var(--text-secondary)] border-[var(--border-subtle)]'
               }`}
             >
@@ -73,7 +72,7 @@ export function AiMessageBubble({ message, onNavigate }: Props) {
                       key={src.sourceName}
                       className={`flex items-center justify-between gap-2 text-[11px] px-2.5 py-1 rounded-lg ${
                         src.isLowest
-                          ? 'bg-[#E2EFE6] text-[#132E20] font-bold border border-[#245034]/35'
+                          ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] font-bold border border-[var(--forest-ink)]/35'
                           : 'text-[var(--text-secondary)]'
                       }`}
                     >

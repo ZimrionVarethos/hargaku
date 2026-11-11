@@ -99,20 +99,21 @@ Tiga lapis pembanding harga yang digunakan:
 * Grafik tren pergerakan harga 7–30 hari terakhir untuk memantau siklus inflasi pangan.
 * Filter berdasarkan kategori pangan (Beras, Cabai/Bawang, Daging/Telur, Minyak/Gula).
 
-### Modul 3: Cek Harga Wajar & Keputusan Belanja (Fitur Inti — Pelengkap PIHPS)
-* Form input belanja di depan lapak: Pilih Komoditas ➔ Masukkan **Jumlah & Satuan** (`ons`, `1/4 kg`, `1/2 kg`, `kg`, `liter`, `ikat`, `butir`) ➔ Pilih **Pasar Tradisional** ➔ Masukkan **Harga Penawaran Pedagang**.
-* **Pembanding Berbasis Konteks Lokal & Nasional**:
-  * **Acuan Nasional (HAP/HET Bapanas)** & **Acuan Daerah Setempat (Kota Bogor / Wilayah Aktif)** ditampilkan berdampingan agar pembeli melihat perbandingan skala nasional dan lokal sekaligus.
+### Modul 3: Cek Harga Wajar & Komparasi AI Terpadu (`/cek-harga`)
+* Menggabungkan fitur **Cek Harga Wajar** dan **Komparasi AI Multi-Sumber** ke dalam satu halaman ringkas `/cek-harga` (`/rekomendasi-ai` diarahkan ke `/cek-harga#punten-panel`) dengan panduan visual 3 langkah agar langsung dipahami pembeli awam:
+  1. Pilih **Komoditas & Pasar Tujuan** atau ketuk **Contoh Cepat** (`1-click preset`).
+  2. Isi **Jumlah & Satuan Jelas** (`kg`, `500g`, `250g`, `ons`, `liter`, `ikat`) serta **Harga Tawaran Penjual**, disertai pratinjau penyetaraan otomatis (`/kg` atau `/liter`).
+  3. Terima **Putusan Harga & Komparasi 4 Sumber** seketika: membandingkan **Harga Tawaran**, **Acuan Nasional HAP/HET Bapanas**, **Acuan Daerah · PIHPS BI**, serta **Pasar Termurah & Laporan Warga Setempat** lengkap dengan saran tawar aman, info kelangkaan pasar, dan tombol langsung **`Tanya PUNTEN AI`**.
+* **Tingkat Kepercayaan & Pembanding**:
   * Prioritas 1: **Median laporan warga terverifikasi** di pasar terpilih (`>= 2` laporan harga `APPROVED`), atau fallback median wilayah ➔ Tingkat Kepercayaan: **Tinggi**.
   * Prioritas 2: **Survei harian pasar terpilih** / rerata resmi PIHPS & Perumda PPJ ➔ Tingkat Kepercayaan: **Sedang**.
   * Prioritas 3: **Standarisasi Nasional HAP/HET Bapanas** terkalibrasi zonasi logistik ➔ Tingkat Kepercayaan: **Dasar/Regulasi**.
-* **Kartu Intelijen Pasar Setempat (`marketContext`)**: Menampilkan komoditas apa saja yang sedang dilaporkan mahal oleh warga (`> +10%`) dan peringatan kelangkaan komoditas dari pedagang pada pasar terpilih (misal pasar dekat Stasiun Bogor).
 * **Klasifikasi Status**:
   * Deviasi dalam rentang `[-10% s.d. +10%]`: **Wajar** (Hijau/Forest — sesuai acuan).
   * Deviasi `[+10% s.d. +25%]`: **Agak Mahal** (Amber — di atas acuan wajar).
   * Deviasi `> +25%`: **Terlalu Mahal** (Merah Chili — melampaui toleransi wajar).
-  * Deviasi `< -15%`: **Jauh Lebih Murah** (Lime/Biru — cek kesegaran mutu & timbangan).
-* **Konsultasi AI Multi-Sumber**: Tombol **`Tanya PUNTEN`** dan tautan langsung **`Lapor Harga / Kelangkaan di Pasar Ini`**.
+  * Deviasi `< -15%`: **Jauh Lebih Murah** (Lime/Hijau terang — cek kesegaran mutu & timbangan).
+* **Panel Tanya PUNTEN AI Terintegrasi**: Berada langsung di halaman `/cek-harga` bersama **Maskot 3D PUNTEN AI** yang bereaksi terhadap status hasil cek maupun respons AI.
 
 ### Modul 4: Halaman Tentang & Sumber Data (Fase A)
 * Pernyataan transparansi metodologi data dan penegasan posisi bahwa **PasarKu melengkapi PIHPS BI dan Panel Harga Bapanas**, bukan menggantikan fungsi pemantauannya.
@@ -128,9 +129,10 @@ Tiga lapis pembanding harga yang digunakan:
 * Halaman utama (`#heroSection`) menampilkan **Lorong Pasar 3D** 20 lapak interaktif yang lengkap dengan figur pedagang 3D prosedural generik (anonim tanpa menyebut nama kios atau pedagang individu) serta sudut pandang orang pertama memegang keranjang bambu, beradaptasi penuh pada Mode Siang/Subuh dan preferensi `prefers-reduced-motion`.
 * Halaman utama (`#unitPasarSection`) menghadirkan **Peta 3D 13 Unit Pasar Kota Bogor** berbasis **Mapbox GL JS v3** + **Three.js 3D Building Custom Layer**. Modal rincian pasar menampilkan penanda **Dekat Stasiun Bogor** (Kebon Kembang/Anyar, Devries, Merdeka), ringkasan **"Sedang Mahal Menurut Laporan Warga"**, dan **"Info Kelangkaan Pedagang"** lengkap dengan tombol **`Cek Harga di Pasar Ini`** dan **`Lapor Harga/Kelangkaan`**.
 
-### Modul 7: PUNTEN, Asisten AI Multi-Sumber & Tanya Jawab Harga
-* Seluruh tombol pemicu konsultasi AI di aplikasi memakai label seragam **`Tanya PUNTEN`**.
-* **PUNTEN** membandingkan **Acuan Nasional (HAP/HET Bapanas)**, **Acuan Daerah / Kota Bogor**, **Survei PIHPS / PPJ**, serta **Laporan Warga & Sinyal Kelangkaan Pedagang per pasar** (termasuk menjawab pertanyaan seperti *"Di pasar dekat Stasiun Bogor lagi mahal apa?"*), serta merender jawaban berformat **Markdown (`md`)** lengkap tanpa menggantikan fungsi pemantauan PIHPS.
+### Modul 7: PUNTEN AI, Maskot 3D Interaktif, & Asisten Belanja Multi-Sumber
+* Seluruh tombol pemicu konsultasi AI di aplikasi memakai label seragam **`Tanya PUNTEN`** dan menampilkan karakter **Maskot PUNTEN AI** (head bot atap tenda kios merah-krem bergaris, visor layar `#123B2B` bermata ekspresif hijau mint, headset jingga-cabai, dan mikrofon boom).
+* **PUNTEN AI** membandingkan **Acuan Nasional (HAP/HET Bapanas)**, **Acuan Daerah / Kota Bogor**, **Survei PIHPS / PPJ**, serta **Laporan Warga & Sinyal Kelangkaan Pedagang per pasar** (termasuk menjawab pertanyaan seperti *"Di pasar dekat Stasiun Bogor lagi mahal apa?"*), serta merender jawaban berformat **Markdown (`md`)** lengkap tanpa menggantikan fungsi pemantauan PIHPS.
+* **Maskot 3D Pojok Kanan Saat Scroll (`PuntenScrollMascot`)**: Apabila pengguna melakukan scroll eksplorasi dalam atau terlalu lama di halaman publik (di luar `/cek-harga` dan `/admin`), **Maskot 3D PUNTEN AI** muncul interaktif di pojok kanan bawah dengan gelembung tanya **"Lagi cari harga apa nih?"**; mengklik maskot atau gelembung langsung mengarahkan pengguna ke **`/cek-harga`**.
 
 ### Modul 8: Portal Admin Moderasi, Supabase CRUD, & Pengaturan AI + Peta Dinamis
 * **Integrasi Supabase PostgreSQL**: Seluruh CRUD komoditas, pasar tradisional, entri harga harian (`daily_prices`), moderasi laporan warga (`citizen_reports`), dan konfigurasi API tersimpan langsung di database Supabase.
@@ -140,9 +142,9 @@ Tiga lapis pembanding harga yang digunakan:
 * **CRUD Master Komoditas & Pasar Tradisional**: Pengelolaan lengkap komoditas dan pasar di seluruh koridor wilayah.
 * **Fast-Entry Entri Harga Resmi Harian**: Matriks input cepat harga survei harian per pasar yang langsung memperbarui data publik dan harga lapak 3D.
 
-### Modul 9: Slide-Over Drawer Konsultasi Harga PUNTEN (`/api/v1/assistant/chat`)
-* Menggantikan tombol Keranjang di Top Navbar dan CTA halaman dengan tombol seragam **`[ Tanya PUNTEN ]`** yang membuka **Slide-over Drawer** interaktif maupun halaman penuh `/rekomendasi-ai`.
-* Mendukung penuh rendering **Markdown** untuk tabel pembanding sumber, ringkasan poin, dan sorotan angka Rupiah. Grounded 100% pada data Supabase (`commodities`, `daily_prices`, `citizen_reports`).
+### Modul 9: Slide-Over Drawer Konsultasi Harga PUNTEN & Panel Terpadu (`/cek-harga#punten-panel`)
+* Menggantikan keranjang belanja terpisah dengan tombol seragam **`[ Tanya PUNTEN ]`** (membuka **Slide-over Drawer** interaktif dari halaman mana saja) serta panel komparasi AI terpadu di dalam `/cek-harga#punten-panel`.
+* Mendukung penuh rendering **Markdown** untuk tabel pembanding sumber, ringkasan poin, dan sorotan angka Rupiah, dipandu oleh **Maskot 3D PUNTEN AI** dan grounded 100% pada data Supabase (`commodities`, `daily_prices`, `citizen_reports`).
 
 ---
 

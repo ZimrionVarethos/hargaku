@@ -74,8 +74,10 @@ Dokumen ini adalah buku catatan "Jebakan Batman" (**Pitfall Vault**) proyek **Ha
   * Untuk grafik bilah interaktif: tampilkan ringkasan komoditas & harga aktif di **luar** wadah `overflow-x-auto`, sisakan ruang *headroom* eksplisit (`pt-16`) di atas area tinggi bilah, pasang tooltip tepat di atas bilah aktif (`bottom-full mb-2`) dengan perataan tepi (`left-0` untuk indeks awal, `right-0` untuk indeks akhir), dan gunakan trek `min-w-full w-max` agar garis `Rerata` ikut merentang penuh saat digulir.
 
 ### 5.2. Persistensi Konsultasi AI & Kompatibilitas SSR Next.js + Supabase Pooler
-- **Gejala A (State AI Terputus)**: Riwayat tanya jawab AI hilang saat pengguna berpindah dari `/rekomendasi-ai` ke `/cek-harga` atau membuka laci `AssistantDrawer`.
+- **Gejala A (State AI Terputus)**: Riwayat tanya jawab AI hilang saat pengguna berpindah antara `/cek-harga#punten-panel` (termasuk pengalihan dari `/rekomendasi-ai`) atau membuka laci `AssistantDrawer`.
   * *Solusi*: Pusatkan state di `AssistantProvider` (`src/lib/store/assistant-store.tsx`) pada `PublicLayoutWrapper` agar sinkron lintas halaman.
+- **Gejala B (`auto-scroll` Chat Menarik Halaman ke Bawah saat Buka `/cek-harga`)**: Memanggil `scrollIntoView` di luar kontainer chat memicu browser menggulir jendela utama melewati kalkulator Cek Harga ke `#punten-panel` saat mount.
+  * *Solusi*: Gunakan ref wadah chat (`chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight`) yang hanya aktif sesudah mount (`mountedRef`).
 - **Gejala B (`Failed to parse URL` saat `next build`)**: Ketika `NEXT_PUBLIC_USE_MOCK="false"`, Server Components di Node SSR mengeksekusi `fetch('/api/v1/...')` relatif saat build time.
   * *Solusi*: Di `src/lib/api/*.api.ts`, gunakan fallback baseline saat `IS_MOCK || typeof window === 'undefined'` serta `try/catch` defensif saat offline.
 - **Gejala C (`MaxClientsInSessionMode` Supabase di Production)**: Membuat instance `new Pool()` baru di setiap request produksi menghabiskan batas koneksi Session Pooler Supabase.

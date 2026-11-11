@@ -38,8 +38,8 @@ export function AssistantProvider({ children }: { children: ReactNode }) {
       timestamp: '06:00',
       content: `### Halo, saya PUNTEN!\n\nSaya asisten keputusan belanja **PasarKu** (pelengkap data **PIHPS BI** & **Panel Harga Bapanas**) untuk membandingkan:\n- **Acuan Nasional & Daerah** sesuai fase wilayah aktif\n- **Pasar Setempat & Dekat Stasiun** dari **Laporan Warga**\n- **Info Kelangkaan Stok** dari **Laporan Pedagang**\n\n> Tanyakan harga bahan pokok di lapak, takaran (250g/ons), atau komoditas yang sedang mahal dekat Stasiun Bogor.`,
       suggestedActions: [
-        { label: 'Cek Harga Wajar', href: '/cek-harga' },
-        { label: 'Komparasi Multi-Sumber', href: '/rekomendasi-ai' },
+        { label: 'Cek Harga & Komparasi AI', href: '/cek-harga' },
+        { label: 'Peta Pasar Daerah', href: '/peta' },
       ],
     },
   ]);

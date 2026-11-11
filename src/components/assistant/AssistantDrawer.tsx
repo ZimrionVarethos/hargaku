@@ -13,6 +13,7 @@ import { useAssistant } from '@/lib/store/assistant-store';
 import { useRegion } from '@/lib/store/region-store';
 import { DEFAULT_PROMPT_PRESETS } from '@/lib/assistant/assistant-presets';
 import { AiMessageBubble } from './AiMessageBubble';
+import { PuntenMascotAvatar } from './PuntenMascotAvatar';
 
 export function AssistantDrawer() {
   const {
@@ -66,8 +67,8 @@ export function AssistantDrawer() {
         <div className="w-screen max-w-lg bg-[var(--bg-paper)] border-l-2 border-[var(--border-ink)] shadow-2xl flex flex-col justify-between text-[var(--text-primary)]">
           <div className="px-4 sm:px-5 py-3.5 bg-[var(--bg-card)] border-b-2 border-[var(--border-ink)] flex items-center justify-between gap-2">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="relative w-10 h-10 rounded-xl bg-[#EEF773] border-2 border-[var(--border-ink)] shadow-[2px_2px_0px_var(--border-ink)] flex items-center justify-center text-[#132E20] font-bold text-base shrink-0">
-                P
+              <div className="relative w-10 h-10 rounded-xl bg-[var(--bg-paper)] border-2 border-[var(--border-ink)] shadow-[2px_2px_0px_var(--border-ink)] flex items-center justify-center shrink-0">
+                <PuntenMascotAvatar size={34} mood={isTyping ? 'thinking' : 'happy'} />
                 <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#15803D] border-2 border-[var(--bg-card)]" />
               </div>
               <div className="flex flex-col min-w-0">
@@ -83,13 +84,13 @@ export function AssistantDrawer() {
 
             <div className="flex items-center gap-1.5 shrink-0">
               <Link
-                href="/rekomendasi-ai"
+                href="/cek-harga#punten-panel"
                 onClick={closeAssistant}
                 className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-[var(--bg-muted)] hover:bg-[#EEF773] hover:text-[#132E20] border border-[var(--border-ink)] text-[var(--text-primary)] inline-flex items-center gap-1 transition-colors"
-                title="Buka tampilan layar penuh"
+                title="Buka Cek Harga & Komparasi AI Terpadu"
               >
                 <ArrowsOutSimple size={13} weight="bold" />
-                <span className="hidden sm:inline">Layar Penuh</span>
+                <span className="hidden sm:inline">Cek &amp; Komparasi</span>
               </Link>
               <button
                 type="button"
@@ -119,9 +120,7 @@ export function AssistantDrawer() {
 
             {isTyping && (
               <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border-2 border-[var(--border-ink)] w-fit shadow-xs">
-                <span className="w-5 h-5 rounded-md bg-[#EEF773] border border-[#132E20] text-[#132E20] text-[10px] font-bold flex items-center justify-center">
-                  P
-                </span>
+                <PuntenMascotAvatar size={24} mood="thinking" />
                 <span className="text-[11px] font-bold text-[var(--text-secondary)]">
                   PUNTEN sedang menganalisis data sumber...
                 </span>

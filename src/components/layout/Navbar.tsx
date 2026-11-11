@@ -14,7 +14,6 @@ const NAV_LINKS = [
   { href: '/cek-harga', label: 'Cek Harga' },
   { href: '/peta', label: 'Peta' },
   { href: '/lapor', label: 'Lapor' },
-  { href: '/rekomendasi-ai', label: 'Komparasi AI' },
 ];
 
 export function Navbar() {

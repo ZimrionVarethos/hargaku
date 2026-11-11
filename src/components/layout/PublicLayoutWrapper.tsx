@@ -9,6 +9,7 @@ import { AssistantProvider } from '@/lib/store/assistant-store';
 import { AdminStoreProvider } from '@/lib/store/admin-store';
 import { ThemeProvider } from '@/lib/store/theme-store';
 import { AssistantDrawer } from '@/components/assistant/AssistantDrawer';
+import { PuntenScrollMascot } from '@/components/assistant/PuntenScrollMascot';
 
 interface PublicLayoutWrapperProps {
   children: React.ReactNode;
@@ -33,6 +34,7 @@ export function PublicLayoutWrapper({ children }: PublicLayoutWrapperProps) {
                 <main className="flex-1">{children}</main>
                 <Footer />
                 <AssistantDrawer />
+                <PuntenScrollMascot />
               </>
             )}
           </AssistantProvider>
