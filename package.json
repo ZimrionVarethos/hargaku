@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types scripts/verify-test-matrix.mjs && node --experimental-strip-types scripts/verify-admin-store.mjs && node --experimental-strip-types scripts/verify-admin-auth.mjs"
+    "test": "node --experimental-strip-types scripts/verify-test-matrix.mjs && node --experimental-strip-types scripts/verify-admin-store.mjs && node --experimental-strip-types scripts/verify-admin-auth.mjs && node --experimental-strip-types scripts/verify-corridor-interaction.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

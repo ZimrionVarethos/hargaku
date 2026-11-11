@@ -30,8 +30,14 @@ export function disposeMarketCorridorScene(
     scene.traverse((obj) => {
       if (obj instanceof THREE.Mesh || obj instanceof THREE.InstancedMesh || obj instanceof THREE.Sprite) {
         if ('geometry' in obj && obj.geometry) obj.geometry.dispose();
-        if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose());
-        else if (obj.material) obj.material.dispose();
+        const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+        for (const m of mats) {
+          if (!m) continue;
+          if (m instanceof THREE.MeshStandardMaterial && m.userData?.disposeMap && m.map) {
+            m.map.dispose();
+          }
+          m.dispose();
+        }
       }
     });
   }

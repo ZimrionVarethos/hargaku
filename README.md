@@ -105,7 +105,7 @@ flowchart LR
       <td align="center"><strong>1</strong></td>
       <td><strong>Lorong 3D &amp; Indeks Harga</strong><br /><code>/</code> dan <code>/indeks-harga</code></td>
       <td>
-        Pengguna masuk melalui <strong>Lorong Pasar 3D WebGL</strong> (Three.js, 20 lapak interaktif + POV keranjang) atau meninjau <strong>Papan Acuan 10 Komoditas</strong> di Beranda. Menekan tombol <code>Detail Papan</code> atau ikon <code>Cari</code> membuka halaman <code>/indeks-harga</code> untuk mencari seluruh <strong>53+ komoditas pangan</strong>, menyaring kategori, serta mengganti fase wilayah di Navbar.
+        Pengguna masuk melalui <strong>Lorong Pasar 3D WebGL</strong> (Three.js, 20 lapak interaktif dengan POV tangan kiri memegang keranjang bambu berkapasitas hingga 7 barang yang mulai dari kosong, tangan kanan reaktif menjangkau &amp; mengambil komoditas saat diklik, klik item di dalam keranjang untuk mengeluarkannya tanpa membuka modal, navigasi keyboard &uarr; / &darr; untuk melangkah maju/mundur, &larr; / &rarr; atau Q / E untuk menengok 360&deg; bebas + tombol <code>Hadap Depan</code> / R, serta tata suara Web Audio API prosedural &amp; musik pentatonis otomatis aktif saat masuk) atau meninjau <strong>Papan Acuan 10 Komoditas</strong> di Beranda. Menekan tombol <code>Detail Papan</code> atau ikon <code>Cari</code> membuka halaman <code>/indeks-harga</code> untuk mencari seluruh <strong>53+ komoditas pangan</strong>, menyaring kategori, serta mengganti fase wilayah di Navbar.
       </td>
       <td>Acuan harga cepat sebelum berangkat belanja lintas wilayah dan perbandingan langsung dengan HAP/HET Nasional.</td>
     </tr>
@@ -227,7 +227,7 @@ flowchart LR
     <tr>
       <td><code>/</code></td>
       <td><strong>Beranda PasarKu</strong></td>
-      <td>Lorong Pasar 3D interaktif, Papan Acuan 10 Komoditas + tombol <code>Detail Papan</code>, Tanya Jawab singkat (3 pertanyaan), serta Peta 3D 13 Unit Pasar.</td>
+      <td>Lorong Pasar 3D interaktif (keranjang bambu tangan kiri mulai kosong &amp; klik komoditas di keranjang untuk dikeluarkan, animasi tangan kanan mengambil barang, navigasi jalan &uarr; / &darr;, tengok 360&deg; &larr; / &rarr; &amp; Q / E + recenter <code>Hadap Depan</code>, Web Audio API SFX &amp; BGM pentatonis instan dengan toggle suara HUD), Papan Acuan 10 Komoditas + tombol <code>Detail Papan</code>, Tanya Jawab singkat (3 pertanyaan), serta Peta 3D 13 Unit Pasar.</td>
     </tr>
     <tr>
       <td><code>/indeks-harga</code></td>
@@ -311,7 +311,7 @@ flowchart LR
     </tr>
     <tr>
       <td><strong>Grafis 3D &amp; Spasial</strong></td>
-      <td>Three.js WebGL (Lorong Pasar 3D, Maskot 3D PUNTEN, &amp; Custom Layer bangunan pasar 3D) terintegrasi bersama Mapbox GL JS v3.</td>
+      <td>Three.js WebGL (Lorong Pasar 3D 360&deg; dengan rig POV dua tangan, keranjang bambu interaktif kosong awal + klik keluar, tata suara prosedural Web Audio API langkah kaki / ambil / keluar / dentum &amp; musik pentatonis, Maskot 3D PUNTEN, &amp; Custom Layer bangunan pasar 3D) terintegrasi bersama Mapbox GL JS v3.</td>
     </tr>
     <tr>
       <td><strong>Backend &amp; Database</strong></td>
@@ -334,7 +334,7 @@ flowchart LR
 │   ├── lib/                  # Kalkulasi harga 3 lapis, fetcher API, koneksi pg DB, store context, seed &amp; data wilayah
 │   └── types/                # Kontrak TypeScript eksplisit (zero any)
 ├── supabase/schema.sql       # DDL PostgreSQL + Row Level Security (regions, commodities, markets, daily_prices, citizen_reports, system_settings)
-├── scripts/                  # Seeder Supabase UNNEST (init-supabase-db.mjs) dan suite uji otomatis (verify-*.mjs)
+├── scripts/                  # Seeder Supabase UNNEST (init-supabase-db.mjs) dan suite uji otomatis (verify-test-matrix.mjs, verify-admin-*.mjs, verify-corridor-interaction.mjs)
 ├── public/                   # Aset gambar &amp; ornamen lokal PasarKu
 ├── .env.example              # Template konfigurasi environment variables
 └── README.md                 # Dokumentasi proyek &amp; alur sistem</code></pre>
@@ -403,7 +403,7 @@ npm run dev
 
 ```bash
 npm run typecheck    # Verifikasi tipe TypeScript ketat
-npm test             # Jalankan suite uji formula harga 3 lapis, admin store, & auth
+npm test             # Jalankan suite uji formula harga 3 lapis, admin store, auth, & matematika interaksi lorong 3D
 npm run build        # Bangun output produksi Next.js (--webpack)
 ```
 
