@@ -114,7 +114,7 @@ export function PetaMarketRankTable({
 
                   <td className="py-3.5 px-4 text-[12px] text-[var(--text-secondary)]">
                     {m.alertHeadline ? (
-                      <span className="inline-block px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold">
+                      <span className="inline-block px-2 py-0.5 rounded bg-[var(--ochre-surface)] text-[var(--warning-ink)] text-[11px] font-bold">
                         {m.alertHeadline}
                       </span>
                     ) : (

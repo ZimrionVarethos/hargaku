@@ -223,24 +223,6 @@ html[data-theme="dark"] .pasarku-logo-plaque {
   }
 }
 
-.leaflet-container {
-  font-family: inherit;
-  background-color: var(--bg-paper);
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
-.leaflet-popup-content-wrapper {
-  background: var(--bg-card) !important;
-  color: var(--text-primary) !important;
-  border-radius: 12px !important;
-  box-shadow: var(--shadow-hard) !important;
-  border: 2px solid var(--border-ink) !important;
-  padding: 0 !important;
-}
-.leaflet-popup-content { margin: 10px 14px !important; line-height: 1.4 !important; }
-.leaflet-popup-tip { background: var(--bg-card) !important; border: 2px solid var(--border-ink) !important; }
-
 .footer-market-photo { filter: contrast(1.02) saturate(1.05); transition: filter 0.25s ease; }
 html[data-theme="dark"] .footer-market-photo { filter: brightness(0.74) contrast(1.08) saturate(0.92); }
 .footer-market-mask { -webkit-mask-image: none; mask-image: none; }
@@ -267,4 +249,9 @@ html[data-theme="dark"] .batik-mesh-layer { opacity: 0.14; }
 .batik-mesh-fade-mask {
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 85%, transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 85%, transparent 100%);
+}
+.peta-mapbox-stage .mapboxgl-ctrl-top-right,
+.peta-mapbox-stage .mapboxgl-ctrl-bottom-left,
+.peta-mapbox-stage .mapboxgl-ctrl-bottom-right {
+  z-index: 35;
 }

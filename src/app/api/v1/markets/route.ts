@@ -28,7 +28,8 @@ export async function GET(req: NextRequest) {
   try {
     const markets = await fetchMarketsFromDb();
     const mapped: Market[] = markets.filter((m) => m.isActive).map(mapAdminMarketToPublic);
-    const data = resolveRegionMarkets(mapped, region);
+    const resolved = resolveRegionMarkets(mapped, region);
+    const data = resolved.length > 0 ? resolved : resolveRegionMarkets(MOCK_MARKETS, region);
 
     return NextResponse.json({
       success: true,

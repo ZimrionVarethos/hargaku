@@ -1,11 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import {
-  NavigationArrow,
   ArrowSquareOut,
   ChatCircleDots,
+  Compass,
+  CubeFocus,
+  List,
+  MapTrifold,
+  NavigationArrow,
   Train,
   WarningCircle,
 } from '@phosphor-icons/react';
@@ -13,17 +18,14 @@ import { PetaMarketPrice } from './peta-data';
 import { useAssistant } from '@/lib/store/assistant-store';
 import { formatRupiah } from '@/lib/utils';
 
-const LeafletMarketMap = dynamic(
-  () => import('@/components/common/LeafletMarketMap'),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-full min-h-[460px] bg-[var(--bg-muted)] flex items-center justify-center text-[var(--text-muted)] text-[13px] font-bold animate-pulse">
-        Memuat Peta Spasial Pasar Tradisional...
-      </div>
-    ),
-  }
-);
+const MapboxMarketMap = dynamic(() => import('./MapboxMarketMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full bg-[var(--bg-stage)] flex items-center justify-center text-[#F9F3EE] text-[13px] font-bold animate-pulse">
+      Memuat Peta Spasial Mapbox 3D...
+    </div>
+  ),
+});
 
 interface Props {
   markets: PetaMarketPrice[];
@@ -32,16 +34,32 @@ interface Props {
   commodityName: string;
   commoditySlug: string;
   commodityUnit?: string;
+  regionName: string;
+  isMenuOpen: boolean;
+  onOpenMenu: () => void;
+  onEnableLightMode: () => void;
+  focusSeq: number;
+  onRequestFocusSelected: () => void;
 }
 
 export function PetaSpatialStage({
   markets,
   selectedMarketId,
   onSelectMarket,
+  commodityName,
   commoditySlug,
   commodityUnit = 'kg',
+  regionName,
+  isMenuOpen,
+  onOpenMenu,
+  onEnableLightMode,
+  focusSeq,
+  onRequestFocusSelected,
 }: Props) {
   const { openAssistant } = useAssistant();
+  const [orbitSeq, setOrbitSeq] = useState(0);
+  const [resetSeq, setResetSeq] = useState(0);
+
   const selectedMarket =
     markets.find((m) => m.marketId === selectedMarketId) || markets[0];
 
@@ -53,15 +71,8 @@ export function PetaSpatialStage({
     longitude: m.longitude,
     priceText: formatRupiah(m.price),
     status: m.status,
-    address: m.address,
+    nearStation: m.nearStation,
   }));
-
-  const mapCenter: [number, number] =
-    selectedMarket && selectedMarket.latitude
-      ? [selectedMarket.latitude, selectedMarket.longitude]
-      : markets[0] && markets[0].latitude
-      ? [markets[0].latitude, markets[0].longitude]
-      : [-6.597147, 106.806039];
 
   const handleAskMarket = () => {
     if (!selectedMarket) return;
@@ -71,35 +82,99 @@ export function PetaSpatialStage({
   };
 
   return (
-    <div className="relative w-full rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-ink)] overflow-hidden min-h-[560px] sm:min-h-[620px] flex flex-col justify-between p-3.5 sm:p-5 shadow-[var(--shadow-hard)]">
+    <div className="relative w-full rounded-2xl bg-[var(--bg-stage)] border-2 border-[var(--border-ink)] overflow-hidden h-[calc(100dvh-84px)] min-h-[540px] sm:min-h-[600px] max-h-[900px] flex flex-col justify-between p-3 sm:p-4 shadow-[var(--shadow-hard)]">
       <div className="absolute inset-0 z-0">
-        <LeafletMarketMap
+        <MapboxMarketMap
           markets={mapItems}
           activeMarketId={selectedMarketId}
           onSelectMarket={onSelectMarket}
-          center={mapCenter}
-          zoom={13}
+          onEnableLightMode={onEnableLightMode}
+          focusSeq={focusSeq}
+          orbitSeq={orbitSeq}
+          resetSeq={resetSeq}
           className="w-full h-full"
         />
       </div>
 
-      <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 bg-[var(--bg-card)]/95 backdrop-blur-md px-4 py-2.5 rounded-xl border border-[var(--border-ink)] shadow-sm max-w-fit">
-        <div className="flex items-center gap-2 text-[12px] text-[var(--text-secondary)]">
-          <span className="font-bold text-[var(--text-primary)]">Pantauan Spasial:</span>
-          <span>Pasar &amp; Sinyal Laporan Setempat</span>
+      <div className="relative z-10 pointer-events-none flex flex-col gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 pr-14 sm:pr-56">
+          <button
+            type="button"
+            onClick={onOpenMenu}
+            aria-expanded={isMenuOpen}
+            aria-controls="peta-hamburger-drawer"
+            aria-label="Buka menu filter dan daftar pasar"
+            className="pointer-events-auto market-btn-primary h-10 px-2.5 sm:px-3.5 text-[12px] font-bold inline-flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer"
+          >
+            <List size={17} weight="bold" aria-hidden="true" />
+            <span className="sm:hidden">Menu</span>
+            <span className="hidden sm:inline">Filter &amp; Pasar</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onOpenMenu}
+            className="pointer-events-auto h-10 px-2 sm:px-3 rounded-[10px] bg-[var(--bg-card)]/95 backdrop-blur-md border-2 border-[var(--border-ink)] text-[11px] sm:text-[12px] text-[var(--text-primary)] font-semibold shadow-[var(--shadow-hard-sm)] inline-flex items-center gap-1.5 sm:gap-2 hover:bg-[var(--bg-muted)] transition-colors min-w-0 cursor-pointer"
+          >
+            <span className="truncate font-bold">{commodityName}</span>
+            <span className="text-[var(--text-muted)] hidden md:inline">&middot;</span>
+            <span className="text-[var(--text-secondary)] truncate hidden md:inline">
+              {regionName}
+            </span>
+            <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[var(--forest-surface)] text-[var(--forest-ink)] border border-[var(--border-ink)] shrink-0">
+              {markets.length} Pasar
+            </span>
+          </button>
         </div>
-        <span className="text-[11px] font-bold text-[var(--forest-ink)] bg-[var(--forest-surface)] px-2 py-0.5 rounded-full border border-[var(--border-ink)]">
-          {markets.length} Unit Pasar
-        </span>
+
+        <div className="pointer-events-auto flex sm:hidden items-center gap-1.5 w-fit">
+          <button
+            type="button"
+            onClick={() => setOrbitSeq((n) => n + 1)}
+            className="market-btn-secondary h-8 px-2.5 text-[11px] font-bold inline-flex items-center gap-1"
+            title="Putar sudut pandang 3D"
+          >
+            <Compass size={13} weight="bold" />
+            <span>Putar 3D</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setResetSeq((n) => n + 1)}
+            className="market-btn-secondary h-8 px-2.5 text-[11px] font-bold inline-flex items-center gap-1"
+          >
+            <MapTrifold size={13} weight="bold" />
+            <span>Semua</span>
+          </button>
+        </div>
       </div>
 
-      <div className="pointer-events-none flex-1 min-h-[180px]" />
+      <div className="hidden sm:flex items-center gap-2 absolute top-4 right-14 z-10 pointer-events-auto">
+        <button
+          type="button"
+          onClick={() => setOrbitSeq((n) => n + 1)}
+          className="market-btn-secondary h-9 px-3 text-[11px] font-bold inline-flex items-center gap-1.5"
+          title="Putar sudut pandang 3D 45 derajat"
+        >
+          <Compass size={14} weight="bold" />
+          <span>Putar 3D</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setResetSeq((n) => n + 1)}
+          className="market-btn-secondary h-9 px-3 text-[11px] font-bold inline-flex items-center gap-1.5"
+        >
+          <MapTrifold size={14} weight="bold" />
+          <span>Semua Pasar</span>
+        </button>
+      </div>
+
+      <div className="pointer-events-none flex-1 min-h-[120px]" />
 
       {selectedMarket && (
-        <div className="relative z-10 market-card p-4 sm:p-5 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex flex-col gap-1.5 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[12px] font-bold text-[var(--text-muted)] uppercase tracking-wide">
+        <div className="relative z-10 pointer-events-auto mb-6 sm:mb-7 market-card bg-[var(--bg-card)]/95 backdrop-blur-md p-3.5 sm:p-4 shadow-lg flex flex-col lg:flex-row lg:items-center justify-between gap-3 w-full xl:max-w-[780px]">
+          <div className="flex flex-col gap-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wide">
                 {selectedMarket.district}
               </span>
               {selectedMarket.nearStation && (
@@ -109,22 +184,22 @@ export function PetaSpatialStage({
                 </span>
               )}
               {selectedMarket.alertHeadline && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] text-[10px] font-bold">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--ochre-surface)] text-[var(--warning-ink)] border border-[var(--border-subtle)] text-[10px] font-bold">
                   <WarningCircle size={11} weight="bold" />
                   <span>{selectedMarket.alertHeadline}</span>
                 </span>
               )}
             </div>
 
-            <div className="flex flex-wrap items-baseline gap-3">
-              <h2 className="text-[20px] sm:text-[22px] font-bold text-[var(--text-primary)] tracking-tight">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+              <h2 className="text-[17px] sm:text-[20px] font-bold text-[var(--text-primary)] tracking-tight">
                 {selectedMarket.name}
               </h2>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[22px] sm:text-[26px] font-extrabold text-[var(--forest-ink)] tabular-nums tracking-tight font-mono-num">
+              <div className="flex items-center gap-1">
+                <span className="text-[20px] sm:text-[23px] font-extrabold text-[var(--forest-ink)] tabular-nums tracking-tight font-mono-num">
                   {formatRupiah(selectedMarket.price)}
                 </span>
-                <span className="text-[13px] text-[var(--text-muted)]">/ {commodityUnit}</span>
+                <span className="text-[12px] text-[var(--text-muted)]">/ {commodityUnit}</span>
               </div>
             </div>
 
@@ -144,17 +219,25 @@ export function PetaSpatialStage({
                   Tinggi (+{selectedMarket.diffPercent}%)
                 </span>
               )}
-              <span className="text-[12px] text-[var(--text-muted)]">
+              <span className="text-[11px] text-[var(--text-muted)]">
                 &middot; {selectedMarket.reportsCount} Laporan Aktif
               </span>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[var(--border-subtle)]">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-[var(--border-subtle)]">
+            <button
+              type="button"
+              onClick={onRequestFocusSelected}
+              className="market-btn-secondary py-2 px-2.5 text-[11px] sm:text-[12px] font-bold inline-flex items-center gap-1.5 cursor-pointer"
+            >
+              <CubeFocus size={14} weight="bold" />
+              <span>Fokus</span>
+            </button>
             <button
               type="button"
               onClick={handleAskMarket}
-              className="market-btn-secondary py-2 px-3 text-[12px] font-bold inline-flex items-center gap-1.5 cursor-pointer"
+              className="market-btn-secondary py-2 px-2.5 text-[11px] sm:text-[12px] font-bold inline-flex items-center gap-1.5 cursor-pointer"
             >
               <ChatCircleDots size={14} weight="bold" />
               <span>Tanya PUNTEN</span>
@@ -163,14 +246,14 @@ export function PetaSpatialStage({
               href={selectedMarket.googleMapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="market-btn-secondary py-2 px-3 text-[12px] font-bold inline-flex items-center gap-1.5"
+              className="market-btn-secondary py-2 px-2.5 text-[11px] sm:text-[12px] font-bold inline-flex items-center gap-1.5"
             >
               <NavigationArrow size={14} weight="bold" />
               <span>Rute</span>
             </a>
             <Link
               href={`/cek-harga?market=${selectedMarket.marketId}&commodity=${commoditySlug}`}
-              className="market-btn-primary py-2 px-3.5 text-[12px] font-bold inline-flex items-center gap-1.5 no-underline"
+              className="market-btn-primary py-2 px-3 text-[11px] sm:text-[12px] font-bold inline-flex items-center gap-1.5 no-underline"
             >
               <span>Cek Harga</span>
               <ArrowSquareOut size={14} weight="bold" />

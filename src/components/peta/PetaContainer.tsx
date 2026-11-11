@@ -1,15 +1,20 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { List, MapTrifold } from '@phosphor-icons/react';
 import { PETA_COMMODITIES, PetaMarketPrice } from './peta-data';
-import { PetaFilterSidebar } from './PetaFilterSidebar';
 import { PetaSpatialStage } from './PetaSpatialStage';
 import { PetaMarketRankTable } from './PetaMarketRankTable';
+import { PetaHamburgerDrawer } from './PetaHamburgerDrawer';
 import { CommoditySummary } from '@/types';
 import { useRegion } from '@/lib/store/region-store';
 import { filterMarketsForRegion, getMarketsByRegion } from '@/lib/mock/markets.data';
 import { computeMarketInsights } from '@/lib/market-insights';
-import { findMatchingCommodity } from '@/lib/market-matching';
+import {
+  STATION_MARKET_LANDMARKS,
+  findMatchingCommodity,
+  normalizeMarketKey,
+} from '@/lib/market-matching';
 import { useLiveCatalog } from '@/lib/store/use-live-catalog';
 
 interface Props {
@@ -18,7 +23,8 @@ interface Props {
 
 export function PetaContainer({ initialCommodities }: Props) {
   const { selectedRegion } = useRegion();
-  const { commodities: liveCommodities, rawCommodities, rawMarkets, dailyPrices, reports } = useLiveCatalog();
+  const { commodities: liveCommodities, rawCommodities, rawMarkets, dailyPrices, reports } =
+    useLiveCatalog();
   const catalogCommodities = liveCommodities.length > 0 ? liveCommodities : initialCommodities;
   const [selectedCommodityId, setSelectedCommodityId] = useState<string>(() => {
     const preferred =
@@ -28,11 +34,35 @@ export function PetaContainer({ initialCommodities }: Props) {
   });
   const [selectedMarketId, setSelectedMarketId] = useState<string>('');
   const [isLightMode, setIsLightMode] = useState<boolean>(false);
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [focusSeq, setFocusSeq] = useState<number>(0);
 
   const currentRegionMarkets = useMemo(() => {
-    const filtered = filterMarketsForRegion(rawMarkets, selectedRegion.id);
-    if (filtered.length > 0) return filtered;
-    return getMarketsByRegion(selectedRegion.id);
+    const liveFiltered = filterMarketsForRegion(rawMarkets, selectedRegion.id);
+    const seedFiltered = getMarketsByRegion(selectedRegion.id);
+    const dedupedLive: typeof liveFiltered = [];
+    const seenCanonical = new Set<string>();
+
+    const sortedLive = [...liveFiltered].sort((a, b) => {
+      if (a.id === 'mkt_kebon_kembang') return -1;
+      if (b.id === 'mkt_kebon_kembang') return 1;
+      return 0;
+    });
+
+    for (const m of sortedLive) {
+      const canonical = normalizeMarketKey(m.id) || normalizeMarketKey(m.name) || m.id;
+      if (seenCanonical.has(canonical)) continue;
+      seenCanonical.add(canonical);
+      dedupedLive.push(m);
+    }
+
+    if (dedupedLive.length === 0) return seedFiltered;
+
+    const supplemented = seedFiltered.filter((s) => {
+      const canonical = normalizeMarketKey(s.id) || normalizeMarketKey(s.name) || s.id;
+      return !seenCanonical.has(canonical);
+    });
+    return [...dedupedLive, ...supplemented];
   }, [rawMarkets, selectedRegion.id]);
 
   const activeCom = useMemo(() => {
@@ -64,7 +94,8 @@ export function PetaContainer({ initialCommodities }: Props) {
         basePrice: selectedFromSidebar.hapHetPrice,
       };
     }
-    const fromFallback = PETA_COMMODITIES.find((c) => c.id === selectedCommodityId) || PETA_COMMODITIES[0];
+    const fromFallback =
+      PETA_COMMODITIES.find((c) => c.id === selectedCommodityId) || PETA_COMMODITIES[0];
     return {
       id: fromFallback.id,
       name: fromFallback.name,
@@ -74,7 +105,8 @@ export function PetaContainer({ initialCommodities }: Props) {
   }, [catalogCommodities, rawCommodities, selectedCommodityId]);
 
   const activeSidebarCommodityId =
-    catalogCommodities.find((c) => c.id === selectedCommodityId || c.slug === selectedCommodityId)?.id ||
+    catalogCommodities.find((c) => c.id === selectedCommodityId || c.slug === selectedCommodityId)
+      ?.id ||
     catalogCommodities[0]?.id ||
     selectedCommodityId;
 
@@ -86,7 +118,13 @@ export function PetaContainer({ initialCommodities }: Props) {
   const marketsWithPrice: PetaMarketPrice[] = useMemo(
     () =>
       currentRegionMarkets.map((info, idx) => {
-        const dailyRecord = dailyPrices[`${info.id}_${activeCom.id}`];
+        const canonicalId = normalizeMarketKey(info.id) || info.id;
+        const dailyRecord =
+          dailyPrices[`${info.id}_${activeCom.id}`] ||
+          dailyPrices[`${canonicalId}_${activeCom.id}`] ||
+          (canonicalId === 'mkt_kebon_kembang'
+            ? dailyPrices[`mkt_pasar_anyar_${activeCom.id}`]
+            : undefined);
         const livePrice = dailyRecord && dailyRecord.price > 0 ? dailyRecord.price : null;
 
         const variationMultiplier = idx === 0 ? 0.96 : idx === 1 ? 0.99 : idx === 2 ? 1.02 : 1.04;
@@ -104,7 +142,7 @@ export function PetaContainer({ initialCommodities }: Props) {
             : ('average' as const);
 
         const insights = computeMarketInsights({
-          marketId: info.id,
+          marketId: canonicalId,
           marketName: info.name,
           commodities: rawCommodities,
           markets: rawMarkets,
@@ -113,22 +151,23 @@ export function PetaContainer({ initialCommodities }: Props) {
           disparityIndex: selectedRegion.disparityIndex,
         });
 
+        const landmarkNote = info.landmarkNote || STATION_MARKET_LANDMARKS[canonicalId];
+        const nearStation = Boolean(info.nearStation || landmarkNote || insights.nearStation);
         const totalReports =
           insights.approvedPriceReportCount + insights.approvedShortageReportCount;
-        const alertHeadline =
-          insights.expensiveItems[0]
-            ? `${insights.expensiveItems[0].commodityName} +${insights.expensiveItems[0].diffPercent}%`
-            : insights.shortageAlerts[0]
-            ? `${insights.shortageAlerts[0].commodityName} (${insights.shortageAlerts[0].stockStatus})`
-            : undefined;
+        const alertHeadline = insights.expensiveItems[0]
+          ? `${insights.expensiveItems[0].commodityName} +${insights.expensiveItems[0].diffPercent}%`
+          : insights.shortageAlerts[0]
+          ? `${insights.shortageAlerts[0].commodityName} (${insights.shortageAlerts[0].stockStatus})`
+          : undefined;
 
         return {
           marketId: info.id,
           name: info.name,
           shortName: info.name.replace('Pasar ', '').split(' (')[0],
           district: info.district,
-          address: info.landmarkNote
-            ? `${info.district}, ${info.city} · ${info.landmarkNote}`
+          address: landmarkNote
+            ? `${info.district}, ${info.city} · ${landmarkNote}`
             : `${info.district}, ${info.city}`,
           latitude: info.latitude,
           longitude: info.longitude,
@@ -139,8 +178,8 @@ export function PetaContainer({ initialCommodities }: Props) {
           diffPercent,
           status,
           reportsCount: totalReports,
-          nearStation: insights.nearStation,
-          landmarkNote: insights.landmarkNote,
+          nearStation,
+          landmarkNote,
           expensiveItemsCount: insights.expensiveItems.length,
           shortageCount: insights.shortageAlerts.length,
           alertHeadline,
@@ -165,59 +204,86 @@ export function PetaContainer({ initialCommodities }: Props) {
     marketsWithPrice[0]?.marketId ||
     '';
 
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-      <div className="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-[96px]">
-        <PetaFilterSidebar
-          commodities={catalogCommodities}
-          selectedCommodityId={activeSidebarCommodityId}
-          onCommodityChange={setSelectedCommodityId}
-          isLightMode={isLightMode}
-          onToggleLightMode={() => setIsLightMode(!isLightMode)}
-        />
-      </div>
+  const handleSelectMarket = (marketId: string, shouldFly = false) => {
+    setSelectedMarketId(marketId);
+    if (shouldFly) {
+      setFocusSeq((n) => n + 1);
+    }
+  };
 
-      <div className="lg:col-span-8 xl:col-span-9 flex flex-col gap-6">
-        {!isLightMode ? (
-          <>
-            <PetaSpatialStage
-              markets={marketsWithPrice}
-              selectedMarketId={activeMarketId}
-              onSelectMarket={setSelectedMarketId}
-              commodityName={activeCom.name}
-              commoditySlug={activeCom.id}
-              commodityUnit={activeCom.unit}
-            />
-            <PetaMarketRankTable
-              markets={marketsWithPrice}
-              selectedMarketId={activeMarketId}
-              onSelectMarket={setSelectedMarketId}
-              commodityName={activeCom.name}
-              commodityUnit={activeCom.unit}
-            />
-          </>
-        ) : (
-          <>
-            <PetaMarketRankTable
-              markets={marketsWithPrice}
-              selectedMarketId={activeMarketId}
-              onSelectMarket={setSelectedMarketId}
-              commodityName={activeCom.name}
-              commodityUnit={activeCom.unit}
-            />
-            <div className="market-card p-4 bg-[var(--bg-card)] text-[13px] text-[var(--text-secondary)] flex items-center justify-between gap-3">
-              <span>Mode Ringan aktif untuk menghemat kuota dan mempermudah pembacaan data.</span>
+  return (
+    <div className="w-full">
+      {!isLightMode ? (
+        <PetaSpatialStage
+          markets={marketsWithPrice}
+          selectedMarketId={activeMarketId}
+          onSelectMarket={(id) => handleSelectMarket(id, false)}
+          commodityName={activeCom.name}
+          commoditySlug={activeCom.id}
+          commodityUnit={activeCom.unit}
+          regionName={selectedRegion.name}
+          isMenuOpen={isMenuOpen}
+          onOpenMenu={() => setIsMenuOpen(true)}
+          onEnableLightMode={() => setIsLightMode(true)}
+          focusSeq={focusSeq}
+          onRequestFocusSelected={() => setFocusSeq((n) => n + 1)}
+        />
+      ) : (
+        <div className="max-w-7xl mx-auto flex flex-col gap-4 py-2 sm:py-4">
+          <div className="market-card p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
               <button
                 type="button"
-                onClick={() => setIsLightMode(false)}
-                className="text-[12px] font-bold text-[var(--text-primary)] underline hover:no-underline cursor-pointer"
+                onClick={() => setIsMenuOpen(true)}
+                aria-expanded={isMenuOpen}
+                aria-controls="peta-hamburger-drawer"
+                className="market-btn-primary h-10 px-3.5 text-[12px] font-bold inline-flex items-center gap-2 cursor-pointer"
               >
-                Kembalikan Peta Visual
+                <List size={18} weight="bold" aria-hidden="true" />
+                <span>Filter &amp; Pasar</span>
               </button>
+              <span className="text-[13px] font-bold text-[var(--text-primary)]">
+                Mode Ringan &middot; {activeCom.name} ({selectedRegion.name})
+              </span>
             </div>
-          </>
-        )}
-      </div>
+
+            <button
+              type="button"
+              onClick={() => setIsLightMode(false)}
+              className="market-btn-secondary h-10 px-3.5 text-[12px] font-bold inline-flex items-center gap-2 cursor-pointer"
+            >
+              <MapTrifold size={15} weight="bold" />
+              <span>Kembalikan Peta Mapbox</span>
+            </button>
+          </div>
+
+          <PetaMarketRankTable
+            markets={marketsWithPrice}
+            selectedMarketId={activeMarketId}
+            onSelectMarket={(id) => handleSelectMarket(id, false)}
+            commodityName={activeCom.name}
+            commodityUnit={activeCom.unit}
+          />
+        </div>
+      )}
+
+      <PetaHamburgerDrawer
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        regionName={selectedRegion.name}
+        regionPhase={selectedRegion.phase || 1}
+        commodities={catalogCommodities}
+        selectedCommodityId={activeSidebarCommodityId}
+        onCommodityChange={setSelectedCommodityId}
+        commodityName={activeCom.name}
+        commodityUnit={activeCom.unit}
+        regionalAvgPrice={baseRegionalPrice}
+        markets={marketsWithPrice}
+        selectedMarketId={activeMarketId}
+        onSelectMarket={handleSelectMarket}
+        isLightMode={isLightMode}
+        onToggleLightMode={() => setIsLightMode((prev) => !prev)}
+      />
     </div>
   );
 }

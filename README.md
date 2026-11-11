@@ -31,7 +31,7 @@ Data resmi pemerintah (PIHPS Bank Indonesia dan Panel Harga Badan Pangan Nasiona
    * **Lapis 1 — Harga Acuan Resmi**: HAP/HET Badan Pangan Nasional terkalibrasi zonasi pulau.
    * **Lapis 2 — Rata-Rata Pasar Resmi**: Data survei harian pasar tradisional daerah (06:00 WIB).
    * **Lapis 3 — Laporan Partisipatif Warga**: Verifikasi harga riil di level lapak pasar dengan bukti foto teranonimasi (EXIF metadata GPS otomatis disanitasi di peramban).
-3. **Peta Harga Spasial & Komparasi Rerata Wilayah**: Peta interaktif Leaflet dan tabel komparasi peringkat dari yang paling hemat ke tertinggi tanpa data stok palsu/fiktif.
+3. **Peta Harga Spasial & Komparasi Rerata Wilayah**: Peta interaktif Mapbox GL JS v3 dengan menu drawer Hamburger (filter & peringkat pasar dari yang paling hemat ke tertinggi tanpa data stok palsu/fiktif).
 4. **Keranjang Belanja Multi-Wilayah & Bagikan WhatsApp**: Menghitung paket komparasi belanja mingguan antar pasar pada provinsi aktif, lengkap dengan tombol satu-klik ekspor format catatan belanja ke WhatsApp.
 
 ---
@@ -70,8 +70,8 @@ HargaKu/
 * **Bahasa**: TypeScript (Strict Mode, Zero `any`)
 * **Styling**: Tailwind CSS
 * **Database & ORM**: PostgreSQL via Prisma ORM
-* **Map Engine**: Leaflet / React-Leaflet
-* **Icons & UI**: Lucide React
+* **Map Engine**: Mapbox GL JS v3 + Three.js Custom Layer
+* **Icons & UI**: Phosphor Icons (`@phosphor-icons/react`)
 * **Dokumentasi & Standar**: Context7 MCP untuk verifikasi dokumentasi paket terkini
 
 ---
