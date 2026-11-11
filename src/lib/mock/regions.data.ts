@@ -14,7 +14,7 @@ export interface RolloutPhaseMeta {
 }
 
 export const ROLLOUT_PHASES: RolloutPhaseMeta[] = [
-  { phase: 1, label: 'Fase 1 · Kota Bogor', shortLabel: 'Kota Bogor', description: 'Pilot aktif 13 unit pasar rakyat Perumda PPJ Kota Bogor.' },
+  { phase: 1, label: 'Fase 1 · Kota Bogor', shortLabel: 'Kota Bogor', description: 'Pilot aktif 13 unit pasar rakyat di wilayah Kota Bogor.' },
   { phase: 2, label: 'Fase 2 · Jabodetabek', shortLabel: 'Jabodetabek', description: 'Ekspansi aglomerasi Jakarta, Bogor, Depok, Tangerang, dan Bekasi.' },
   { phase: 3, label: 'Fase 3 · Jawa Barat', shortLabel: 'Jawa Barat', description: 'Cakupan sentra produksi dan pasar rakyat seluruh Jawa Barat.' },
   { phase: 4, label: 'Fase 4 · Nasional', shortLabel: 'Nasional (21 Prov.)', description: 'Kalibrasi acuan pangan Bapanas di 21 provinsi dalam 6 koridor pulau.' },
@@ -31,7 +31,7 @@ export const ISLAND_TABS: IslandTab[] = [
 ];
 
 export const MOCK_REGIONS: Region[] = [
-  { id: 'reg_bogor', province: 'Jawa Barat', latitude: -6.597147, longitude: 106.806039, name: 'Kota Bogor', slug: 'kota-bogor', island: 'JAWA', islandName: 'Pulau Jawa', zone: 'ZONA_1', logisticsCostPct: 0, disparityIndex: 1.0, phase: 1, phaseLabel: 'Fase 1 · Kota Bogor', description: 'Pilot aktif 13 unit pasar Perumda Pasar Pakuan Jaya Kota Bogor.', isActive: true },
+  { id: 'reg_bogor', province: 'Jawa Barat', latitude: -6.597147, longitude: 106.806039, name: 'Kota Bogor', slug: 'kota-bogor', island: 'JAWA', islandName: 'Pulau Jawa', zone: 'ZONA_1', logisticsCostPct: 0, disparityIndex: 1.0, phase: 1, phaseLabel: 'Fase 1 · Kota Bogor', description: 'Pilot aktif 13 pasar rakyat di wilayah Kota Bogor.', isActive: true },
   { id: 'reg_bodebek', province: 'DKI Jakarta & Jawa Barat', latitude: -6.301652, longitude: 106.874428, name: 'Jabodetabek', slug: 'jabodetabek', island: 'JAWA', islandName: 'Pulau Jawa', zone: 'ZONA_1', logisticsCostPct: 1, disparityIndex: 1.01, phase: 2, phaseLabel: 'Fase 2 · Jabodetabek', description: 'Klaster aglomerasi konsumen dan pasar induk Jakarta, Bogor, Depok, Tangerang, Bekasi.', isActive: true },
   { id: 'reg_jakarta', province: 'DKI Jakarta', latitude: -6.208763, longitude: 106.845599, name: 'DKI Jakarta', slug: 'dki-jakarta', island: 'JAWA', islandName: 'Pulau Jawa', zone: 'ZONA_1', logisticsCostPct: 2, disparityIndex: 1.02, phase: 2, phaseLabel: 'Fase 2 · Jabodetabek', description: 'Metropolitan konsumen terbesar nasional dengan hub Pasar Induk Kramat Jati.', isActive: true },
   { id: 'reg_banten', province: 'Banten', latitude: -6.405817, longitude: 106.064018, name: 'Banten', slug: 'banten', island: 'JAWA', islandName: 'Pulau Jawa', zone: 'ZONA_1', logisticsCostPct: 1, disparityIndex: 1.01, phase: 2, phaseLabel: 'Fase 2 · Jabodetabek', description: 'Pintu gerbang Jawa-Sumatera via Pelabuhan Merak dan Tangerang Raya.', isActive: true },

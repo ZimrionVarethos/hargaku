@@ -61,3 +61,20 @@ webflow-icons-400-0.ttf
 # Redundant root images directory (clean assets are served from /public/images/)
 /images/
 .vercel
+
+# Internal AI instructions, planning docs, & hygiene scripts (keep local, do not push)
+/AGENTS.md
+/STATE.md
+/SKILL.md
+/design.md
+/palet.md
+/rule.md
+/HargaKu_Rangkuman_Ide.md
+/docs/
+/scripts/check-loc.mjs
+/scripts/find-em-dash.mjs
+/pasarku_bogor_harga_pasar_lebih_dekat.html
+/fonts/
+/public/fonts/clay.com/
+/public/images/hero-backdrop.jpg
+/public/images/peta-pasar-clay.jpg

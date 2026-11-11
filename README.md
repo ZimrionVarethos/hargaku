@@ -6,7 +6,7 @@
 
   <p>
     <img src="https://img.shields.io/badge/Kompetisi-Web%20In%20Action%20(MIA%202026)-A92717?style=flat-square" alt="Web In Action MIA 2026" />
-    <img src="https://img.shields.io/badge/Rollout-Fase%201%20Bogor%20(13%20Pasar)%20%E2%86%92%20Nasional-245034?style=flat-square" alt="Rollout 4 Fase" />
+    <img src="https://img.shields.io/badge/Rollout-Fase%201%20Bogor%20(13%20Pasar)%20s.d.%20Nasional-245034?style=flat-square" alt="Rollout 4 Fase" />
     <img src="https://img.shields.io/badge/Komoditas-53%2B%20Bahan%20Pangan-132E20?style=flat-square" alt="53+ Bahan Pangan" />
     <img src="https://img.shields.io/badge/Stack-Next.js%2016%20%7C%20TypeScript%20%7C%20Three.js%20%7C%20Mapbox%20v3-1E3127?style=flat-square" alt="Tech Stack" />
     <img src="https://img.shields.io/badge/Database-Supabase%20PostgreSQL%20(pg)-336791?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
@@ -103,7 +103,7 @@ flowchart LR
   <tbody>
     <tr>
       <td align="center"><strong>1</strong></td>
-      <td><strong>Lorong 3D &amp; Indeks Harga</strong><br /><code>/</code> &rarr; <code>/indeks-harga</code></td>
+      <td><strong>Lorong 3D &amp; Indeks Harga</strong><br /><code>/</code> dan <code>/indeks-harga</code></td>
       <td>
         Pengguna masuk melalui <strong>Lorong Pasar 3D WebGL</strong> (Three.js, 20 lapak interaktif + POV keranjang) atau meninjau <strong>Papan Acuan 10 Komoditas</strong> di Beranda. Menekan tombol <code>Detail Papan</code> atau ikon <code>Cari</code> membuka halaman <code>/indeks-harga</code> untuk mencari seluruh <strong>53+ komoditas pangan</strong>, menyaring kategori, serta mengganti fase wilayah di Navbar.
       </td>
@@ -237,7 +237,7 @@ flowchart LR
     <tr>
       <td><code>/cek-harga</code></td>
       <td><strong>Cek Harga &amp; PUNTEN AI</strong></td>
-      <td>Kalkulator Kartu Kasir Sederhana (takaran harian &rarr; selisih Rupiah) terintegrasi langsung dengan chat PUNTEN AI &amp; Maskot 3D. (Rute <code>/rekomendasi-ai</code> &amp; <code>/keranjang</code> otomatis diarahkan ke sini).</td>
+      <td>Kalkulator Kartu Kasir Sederhana (konversi takaran harian ke selisih Rupiah) terintegrasi langsung dengan chat PUNTEN AI &amp; Maskot 3D. (Rute <code>/rekomendasi-ai</code> &amp; <code>/keranjang</code> otomatis diarahkan ke sini).</td>
     </tr>
     <tr>
       <td><code>/peta</code></td>
@@ -334,11 +334,9 @@ flowchart LR
 │   ├── lib/                  # Kalkulasi harga 3 lapis, fetcher API, koneksi pg DB, store context, seed &amp; data wilayah
 │   └── types/                # Kontrak TypeScript eksplisit (zero any)
 ├── supabase/schema.sql       # DDL PostgreSQL + Row Level Security (regions, commodities, markets, daily_prices, citizen_reports, system_settings)
-├── scripts/                  # Seeder Supabase UNNEST (init-supabase-db.mjs), uji Test Matrix, LOC guard, &amp; em-dash check
-├── docs/                     # Cetak Biru Spesifikasi (PRD, SCHEMA, API_SPEC, DESIGN_SYSTEM, ENV_SPEC, PITFALLS, TEST_MATRIX, adr/)
+├── scripts/                  # Seeder Supabase UNNEST (init-supabase-db.mjs) dan suite uji otomatis (verify-*.mjs)
 ├── public/                   # Aset gambar &amp; ornamen lokal PasarKu
-├── AGENTS.md                 # Aturan konstitusi rekayasa &amp; gerbang spesifikasi
-├── STATE.md                  # Memori kerja sprint aktif
+├── .env.example              # Template konfigurasi environment variables
 └── README.md                 # Dokumentasi proyek &amp; alur sistem</code></pre>
   <table>
     <thead>
@@ -381,10 +379,11 @@ npm install
 cp .env.example .env.local
 ```
 
-<p>Sesuaikan variabel di <code>.env.local</code> (panduan lengkap tersedia di <a href="docs/ENV_SPEC.md"><code>docs/ENV_SPEC.md</code></a>):</p>
+<p>Sesuaikan variabel di <code>.env.local</code> berdasarkan template <a href=".env.example"><code>.env.example</code></a>:</p>
 <ul>
   <li><code>DATABASE_URL</code>, <code>NEXT_PUBLIC_SUPABASE_URL</code>, <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> (koneksi Supabase PostgreSQL)</li>
   <li><code>ADMIN_SESSION_SECRET</code> (string acak minimal 32 karakter untuk sesi <code>/admin</code>)</li>
+  <li><code>NEXT_PUBLIC_APP_URL</code>, <code>NEXT_PUBLIC_API_URL</code>, <code>NEXT_PUBLIC_USE_MOCK</code> (konfigurasi URL aplikasi &amp; fallback mode offline)</li>
   <li><code>GEMINI_API_KEY</code> &amp; <code>NEXT_PUBLIC_MAPBOX_TOKEN</code> (opsional sebagai cadangan jika belum diatur dari menu <strong>Integrasi AI &amp; Peta</strong> di <code>/admin</code>)</li>
 </ul>
 
@@ -411,15 +410,5 @@ npm run build        # Bangun output produksi Next.js (--webpack)
 <hr />
 
 <blockquote>
-  <strong>Catatan Integritas Data &amp; Privasi:</strong> Seluruh data simulasi untuk keperluan demonstrasi diberi keterangan visual <em>"Data simulasi untuk demo"</em>. PasarKu selalu mencantumkan rujukan sumber data resmi (Bapanas RI, PIHPS BI, Perumda PPJ Kota Bogor), membersihkan metadata EXIF dari foto bukti unggahan warga, serta mengagregasi sinyal stok pedagang di level pasar tanpa mengekspos nama kios individual.
+  <strong>Catatan Integritas Data &amp; Privasi:</strong> Seluruh data simulasi untuk keperluan demonstrasi diberi keterangan visual <em>"Data simulasi untuk demo"</em>. PasarKu selalu mencantumkan rujukan sumber data resmi (Bapanas RI &amp; PIHPS Bank Indonesia), membersihkan metadata EXIF dari foto bukti unggahan warga, serta mengagregasi sinyal stok pedagang di level pasar tanpa mengekspos nama kios individual.
 </blockquote>
-
-<h3>Dokumen Spesifikasi Proyek (Single Source of Truth)</h3>
-<ul>
-  <li><a href="docs/PRD.md">Product Requirements Document (PRD)</a></li>
-  <li><a href="docs/SCHEMA.md">Skema &amp; Relasi Database PostgreSQL</a></li>
-  <li><a href="docs/API_SPEC.md">Kontrak REST API</a></li>
-  <li><a href="docs/DESIGN_SYSTEM.md">Design System PasarKu &amp; Dual-Theme Tokens</a></li>
-  <li><a href="docs/TEST_MATRIX.md">Matriks Pengujian &amp; Definition of Done</a></li>
-  <li><a href="AGENTS.md">Konstitusi Rekayasa AI &amp; Router Dokumentasi</a></li>
-</ul>

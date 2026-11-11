@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { CaretDown, Check, GlobeHemisphereEast, MapPin } from '@phosphor-icons/react';
+import { CaretDown, Check, MagnifyingGlass, MapPin, X } from '@phosphor-icons/react';
 import { ROLLOUT_PHASES } from '@/lib/mock/regions.data';
 import { useRegion } from '@/lib/store/region-store';
 import type { Region, RolloutPhase } from '@/types';
@@ -80,42 +80,48 @@ export function RegionPhaseSwitcher({ compact = false }: { compact?: boolean }) 
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
         aria-label="Pilih Fase & Wilayah PasarKu"
-        className={`inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-ink)] bg-[var(--bg-muted)] hover:bg-[var(--bg-card)] text-[var(--text-primary)] font-bold transition-colors cursor-pointer ${
-          compact ? 'px-2.5 py-1.5 text-xs w-full justify-between' : 'px-2.5 py-1 text-xs'
+        className={`market-btn-secondary inline-flex items-center gap-1.5 font-bold cursor-pointer ${
+          compact
+            ? 'w-full justify-between px-3 py-2 text-xs min-h-[40px]'
+            : 'px-2.5 py-1.5 text-xs min-h-[38px] sm:min-h-[40px]'
         }`}
       >
         <span className="inline-flex items-center gap-1.5 min-w-0">
-          <MapPin size={13} weight="fill" className="text-[var(--accent-chili)] shrink-0" />
+          <MapPin size={14} weight="fill" className="text-[var(--accent-chili)] shrink-0" aria-hidden="true" />
           <span className="truncate max-w-[118px]">{selectedRegion.name}</span>
-          <span className="px-1.5 py-0.5 rounded bg-[var(--forest-surface)] text-[var(--forest-ink)] text-[10px] font-extrabold shrink-0">
+          <span className="px-1.5 py-0.5 rounded border border-[var(--border-ink)] bg-[var(--forest-surface)] text-[var(--forest-ink)] text-[10px] font-bold shrink-0">
             F{selectedRegion.phase || 1}
           </span>
         </span>
-        <CaretDown size={12} weight="bold" className="text-[var(--text-muted)] shrink-0" />
+        <CaretDown
+          size={12}
+          weight="bold"
+          aria-hidden="true"
+          className={`text-[var(--text-primary)] shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {open && (
         <div
           className={`${
-            compact ? 'relative mt-2 w-full' : 'absolute left-0 top-full mt-2 w-[min(92vw,390px)]'
-          } z-50 rounded-2xl border-2 border-[var(--border-ink)] bg-[var(--bg-card)] p-4 shadow-xl`}
+            compact ? 'relative mt-2 w-full' : 'absolute left-0 top-full mt-2 w-[min(92vw,410px)]'
+          } z-50 market-card bg-[var(--bg-card)] p-4 space-y-3`}
         >
-          <div className="flex items-start justify-between gap-2 pb-3 border-b border-[var(--border-subtle)]">
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[var(--accent-chili)]">
-                <GlobeHemisphereEast size={13} weight="bold" />
-                <span>Peta Skala 4 Fase</span>
-              </div>
+          <div className="flex items-start justify-between gap-2 pb-3 border-b-2 border-[var(--border-ink)]">
+            <div className="min-w-0">
+              <h3 className="text-[14px] font-bold text-[var(--text-primary)] leading-tight">
+                Cakupan Wilayah PasarKu
+              </h3>
               <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 leading-snug">
-                Bogor &rarr; Jabodetabek &rarr; Jawa Barat &rarr; Nasional (21 Provinsi)
+                Pilih skala pantauan dari tingkat kota hingga 21 provinsi nasional.
               </p>
             </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)] shrink-0">
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[var(--forest-surface)] text-[var(--forest-ink)] border border-[var(--border-ink)] font-mono-num shrink-0">
               {regionMarkets.length} pasar
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-1.5 my-3">
+          <div className="grid grid-cols-2 gap-2">
             {ROLLOUT_PHASES.map((p) => {
               const active = activePhase === p.phase;
               return (
@@ -123,32 +129,53 @@ export function RegionPhaseSwitcher({ compact = false }: { compact?: boolean }) 
                   key={p.phase}
                   type="button"
                   onClick={() => handleSelectPhase(p.phase)}
-                  className={`text-left px-2.5 py-2 rounded-xl border transition-colors cursor-pointer ${
+                  className={`text-left px-3 py-2 rounded-xl border-2 border-[var(--border-ink)] transition-colors cursor-pointer ${
                     active
-                      ? 'bg-[var(--forest-surface)] text-[var(--forest-ink)] border-[var(--forest-ink)] shadow-xs'
-                      : 'bg-[var(--bg-paper)] text-[var(--text-primary)] border-[var(--border-subtle)] hover:bg-[var(--bg-muted)]'
+                      ? 'bg-[var(--accent-chili)] text-white shadow-[var(--shadow-hard-sm)]'
+                      : 'bg-[var(--bg-paper)] text-[var(--text-primary)] hover:bg-[var(--bg-muted)]'
                   }`}
                 >
-                  <div className="text-[10px] font-extrabold opacity-80">FASE {p.phase}</div>
-                  <div className="text-[12px] font-bold truncate">{p.shortLabel}</div>
+                  <div className={`text-[10px] font-bold ${active ? 'text-white/90' : 'text-[var(--text-muted)]'}`}>
+                    Fase {p.phase}
+                  </div>
+                  <div className="text-xs font-bold truncate">{p.shortLabel}</div>
                 </button>
               );
             })}
           </div>
 
-          <p className="text-[11px] text-[var(--text-muted)] mb-2.5 leading-relaxed">
+          <div className="px-3 py-2 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)] leading-snug">
             {phaseMeta.description}
-          </p>
+          </div>
 
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari kota / provinsi (misal: Bogor, Bali, Papua)..."
-            className="w-full px-3 py-1.5 rounded-lg bg-[var(--bg-paper)] border border-[var(--border-ink)] text-xs text-[var(--text-primary)] focus:outline-none mb-2.5"
-          />
+          <div className="relative">
+            <MagnifyingGlass
+              size={14}
+              weight="bold"
+              aria-hidden="true"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+            />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari kota atau provinsi (Bogor, Bali, Papua)..."
+              aria-label="Cari kota atau provinsi"
+              className="w-full min-h-[40px] pl-9 pr-8 py-1.5 rounded-xl bg-[var(--bg-paper)] border-2 border-[var(--border-ink)] text-xs font-medium text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                aria-label="Hapus kata kunci wilayah"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-md inline-flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-muted)] cursor-pointer"
+              >
+                <X size={13} weight="bold" aria-hidden="true" />
+              </button>
+            )}
+          </div>
 
-          <div className="max-h-52 overflow-y-auto flex flex-col gap-1 pr-0.5">
+          <div className="rounded-xl border-2 border-[var(--border-ink)] bg-[var(--bg-paper)] max-h-48 overflow-y-auto divide-y divide-[var(--border-subtle)]">
             {visibleRegions.map((reg) => {
               const isSelected = selectedRegion.id === reg.id;
               return (
@@ -156,26 +183,28 @@ export function RegionPhaseSwitcher({ compact = false }: { compact?: boolean }) 
                   key={reg.id}
                   type="button"
                   onClick={() => handlePickRegion(reg)}
-                  className={`w-full text-left px-2.5 py-2 rounded-lg border flex items-center justify-between gap-2 transition-colors cursor-pointer ${
+                  className={`w-full text-left px-3 py-2.5 flex items-center justify-between gap-2 transition-colors cursor-pointer min-h-[44px] ${
                     isSelected
-                      ? 'bg-[var(--forest-surface)] border-[var(--border-ink)] text-[var(--text-primary)]'
-                      : 'bg-transparent border-transparent hover:bg-[var(--bg-muted)] text-[var(--text-primary)]'
+                      ? 'bg-[var(--forest-surface)] text-[var(--text-primary)]'
+                      : 'hover:bg-[var(--bg-muted)] text-[var(--text-primary)]'
                   }`}
                 >
                   <div className="min-w-0">
                     <div className="text-xs font-bold flex items-center gap-1.5 truncate">
                       <span>{reg.name}</span>
                       {reg.logisticsCostPct > 0 && (
-                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[var(--bg-muted)] text-[var(--text-secondary)]">
+                        <span className="text-[10px] font-mono-num font-bold px-1.5 py-0.5 rounded bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
                           +{reg.logisticsCostPct}%
                         </span>
                       )}
                     </div>
-                    <div className="text-[10px] text-[var(--text-muted)] truncate">
-                      {reg.phaseLabel} &bull; {reg.islandName}
+                    <div className="text-[11px] text-[var(--text-muted)] truncate">
+                      {reg.phaseLabel} &middot; {reg.islandName}
                     </div>
                   </div>
-                  {isSelected && <Check size={14} weight="bold" className="text-[var(--forest-ink)] shrink-0" />}
+                  {isSelected && (
+                    <Check size={14} weight="bold" className="text-[var(--forest-ink)] shrink-0" aria-hidden="true" />
+                  )}
                 </button>
               );
             })}

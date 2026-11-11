@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { ArrowSquareOut } from '@phosphor-icons/react';
 import { BogorCommodity } from '@/lib/data/bogor-commodities';
 import { useLiveBogorCommodities } from '@/lib/data/live-bogor-sync';
 import { CommoditySvg } from '@/lib/data/market-svgs';
@@ -138,9 +139,10 @@ export function PasarKuCommodityModal({ item, onClose, categoryAvg = 0 }: Props)
             href={resolvedItem.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-bold text-[var(--accent-chili)] hover:underline"
+            className="font-bold text-[var(--accent-chili)] hover:underline inline-flex items-center gap-1"
           >
-            Arsip PPJ &rarr;
+            <span>Rujukan Data</span>
+            <ArrowSquareOut size={13} weight="bold" aria-hidden="true" />
           </a>
         </div>
 

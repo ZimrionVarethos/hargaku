@@ -122,4 +122,4 @@ assert.ok(jabarMarkets.length > bogorMarkets.length);
 assert.ok(PIHPS_POSITIONING_NOTE.toLowerCase().includes('pihps'));
 console.log('✓ TC-PH-01 passed: 4-phase rollout hierarchy (Bogor=13, Jabodetabek, Jabar) & PIHPS framing');
 
-console.log('\nAll Test Cases in docs/TEST_MATRIX.md passed successfully 100%!');
+console.log('\nAll Price Logic, Admin Store & Market Insights test cases passed!');

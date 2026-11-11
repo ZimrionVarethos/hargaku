@@ -145,7 +145,7 @@ export function PasarKuSorotanSection() {
             </div>
 
             <div className="text-xs text-[var(--text-secondary)] leading-relaxed">
-              Skala bertahap: Fase 1 Kota Bogor &rarr; Fase 2 Jabodetabek &rarr; Fase 3 Jawa Barat &rarr; Fase 4 Nasional (21 Provinsi). Data rujukan: Bapanas RI, PIHPS BI, &amp; Perumda PPJ.
+              Cakupan berjenjang dari Kota Bogor, Jabodetabek, Jawa Barat, hingga Nasional (21 Provinsi). Data rujukan: Bapanas RI, PIHPS BI, serta survei pasar rakyat setempat.
             </div>
           </div>
 

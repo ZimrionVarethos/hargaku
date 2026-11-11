@@ -98,7 +98,7 @@ export function AboutMethodologySection() {
             HargaKu menerapkan <strong className="text-[var(--text-primary)]">Median &amp; Deteksi MAD</strong>:
           </p>
           <div className="p-3 bg-[var(--bg-card)] rounded-lg border border-[var(--border-subtle)] font-mono text-[12px] text-[var(--text-primary)] overflow-x-auto">
-            MAD = median(|x_i - median(X)|) &rarr; Batas Toleransi Anomali: deviasi &gt; 3 x MAD atau deviasi &gt; 300% HAP otomatis ditandai
+            MAD = median(|x_i - median(X)|) | Batas Toleransi Anomali: deviasi &gt; 3 x MAD atau deviasi &gt; 300% HAP otomatis ditandai
           </div>
         </div>
 
