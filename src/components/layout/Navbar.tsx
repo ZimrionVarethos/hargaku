@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
-import { ChatCircleDots, Moon, Sun } from '@phosphor-icons/react';
+import { usePathname } from 'next/navigation';
+import { ChatCircleDots, MagnifyingGlass, Moon, Sun } from '@phosphor-icons/react';
 import { useAssistant } from '@/lib/store/assistant-store';
 import { useTheme } from '@/lib/store/theme-store';
 import { RegionPhaseSwitcher } from './RegionPhaseSwitcher';
+import { GlobalSearchModal } from './GlobalSearchModal';
 
 const NAV_LINKS = [
   { href: '/', label: 'Beranda' },
@@ -21,20 +22,24 @@ export function Navbar() {
   const { openAssistant } = useAssistant();
   const { theme, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
 
-  const handleQuickSearch = () => {
-    const input =
-      document.getElementById('indeksSearchInput') ||
-      document.getElementById('heroSearchInput');
-    if (input) {
-      input.focus();
-      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-    router.push('/indeks-harga?focus=search');
-  };
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    };
+    const onOpenSearch = () => setSearchOpen(true);
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('pasarku:open-search', onOpenSearch);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('pasarku:open-search', onOpenSearch);
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--bg-paper)]/95 backdrop-blur-xs border-b-2 border-[var(--border-ink)] transition-colors">
@@ -80,14 +85,11 @@ export function Navbar() {
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             type="button"
-            onClick={handleQuickSearch}
-            aria-label="Fokus ke pencarian komoditas"
-            className="market-btn-secondary px-2.5 sm:px-3 py-1.5 text-xs min-h-[38px] sm:min-h-[40px] inline-flex items-center gap-1.5"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Buka pencarian seluruh situs PasarKu"
+            className="market-btn-secondary px-2.5 sm:px-3 py-1.5 text-xs min-h-[38px] sm:min-h-[40px] inline-flex items-center gap-1.5 cursor-pointer"
           >
-            <svg aria-hidden="true" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <circle cx="11" cy="11" r="7" />
-              <line x1="20" y1="20" x2="16.2" y2="16.2" />
-            </svg>
+            <MagnifyingGlass size={15} weight="bold" aria-hidden="true" />
             <span className="hidden sm:inline">Cari</span>
           </button>
 
@@ -155,6 +157,8 @@ export function Navbar() {
           </div>
         </div>
       )}
+
+      <GlobalSearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }

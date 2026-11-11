@@ -40,6 +40,10 @@ export function IndeksHargaContainer() {
   const [selectedModalCommodity, setSelectedModalCommodity] = useState<BogorCommodity | null>(null);
 
   useEffect(() => {
+    setSearchQuery(queryParam);
+  }, [queryParam]);
+
+  useEffect(() => {
     if (focusParam === 'search' && searchInputRef.current) {
       searchInputRef.current.focus();
     }

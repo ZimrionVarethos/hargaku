@@ -8,8 +8,17 @@ import {
   findMentionedMarket,
   normalizeQuantityPrice,
 } from '../src/lib/market-insights.ts';
-import { filterMarketsForRegion } from '../src/lib/mock/markets.data.ts';
+import { filterMarketsForRegion, MOCK_MARKETS } from '../src/lib/mock/markets.data.ts';
+import { MOCK_REGIONS } from '../src/lib/mock/regions.data.ts';
+import { BOGOR_COMMODITIES } from '../src/lib/data/bogor-commodities.ts';
+import { MOCK_COMMODITY_SUMMARIES } from '../src/lib/mock/commodities.data.ts';
 import { INITIAL_ADMIN_STATE } from '../src/lib/store/admin-seed.ts';
+import {
+  escapeSqlLike,
+  isSafeInternalHref,
+  sanitizeSearchQuery,
+} from '../src/lib/search/search-security.ts';
+import { searchSiteContent } from '../src/lib/search/site-search.ts';
 
 const layers = {
   lapis1HapHet: 57000,
@@ -122,4 +131,98 @@ assert.ok(jabarMarkets.length > bogorMarkets.length);
 assert.ok(PIHPS_POSITIONING_NOTE.toLowerCase().includes('pihps'));
 console.log('✓ TC-PH-01 passed: 4-phase rollout hierarchy (Bogor=13, Jabodetabek, Jabar) & PIHPS framing');
 
-console.log('\nAll Price Logic, Admin Store & Market Insights test cases passed!');
+const xssCleaned = sanitizeSearchQuery('<script>alert(1)</script>   cabai--/* */');
+assert.equal(xssCleaned.includes('<'), false);
+assert.equal(xssCleaned.includes('>'), false);
+assert.equal(xssCleaned.includes(';'), false);
+assert.equal(xssCleaned.includes('--'), false);
+assert.ok(xssCleaned.includes('cabai'));
+
+const longQuery = 'a'.repeat(150);
+assert.equal(sanitizeSearchQuery(longQuery).length, 80);
+assert.equal(escapeSqlLike('100%_test\\x'), '100\\%\\_test\\\\x');
+assert.equal(isSafeInternalHref('/indeks-harga?q=Bayam'), true);
+assert.equal(isSafeInternalHref('/cek-harga#punten-panel'), true);
+assert.equal(isSafeInternalHref('https://evil.test/phish'), false);
+assert.equal(isSafeInternalHref('//evil.test/phish'), false);
+assert.equal(isSafeInternalHref('javascript:alert(1)'), false);
+
+const bayamResults = searchSiteContent({
+  query: 'bayam',
+  region: MOCK_REGIONS[0],
+  regions: MOCK_REGIONS,
+  bogorCommodities: BOGOR_COMMODITIES,
+  catalogCommodities: MOCK_COMMODITY_SUMMARIES,
+  markets: MOCK_MARKETS,
+});
+assert.ok(bayamResults.items.some((i) => i.kind === 'COMMODITY' && i.title === 'Bayam'));
+
+const cabeSynonymResults = searchSiteContent({
+  query: 'cabe rawit',
+  region: MOCK_REGIONS[0],
+  regions: MOCK_REGIONS,
+  bogorCommodities: BOGOR_COMMODITIES,
+  catalogCommodities: MOCK_COMMODITY_SUMMARIES,
+  markets: MOCK_MARKETS,
+});
+assert.ok(
+  cabeSynonymResults.items.some(
+    (i) => i.kind === 'COMMODITY' && i.title.toLowerCase().includes('rawit') && i.badgeLabel === 'Cabai & Bawang'
+  )
+);
+
+const cabaiCleanResults = searchSiteContent({
+  query: 'cabai',
+  region: MOCK_REGIONS[0],
+  regions: MOCK_REGIONS,
+  bogorCommodities: BOGOR_COMMODITIES,
+  catalogCommodities: MOCK_COMMODITY_SUMMARIES,
+  markets: MOCK_MARKETS,
+});
+assert.equal(cabaiCleanResults.counts.REGION, 0);
+assert.ok(cabaiCleanResults.counts.COMMODITY >= 5);
+
+const stasiunLongCorpusResults = searchSiteContent({
+  query: 'stasiun',
+  region: MOCK_REGIONS[0],
+  regions: MOCK_REGIONS,
+  bogorCommodities: BOGOR_COMMODITIES,
+  catalogCommodities: MOCK_COMMODITY_SUMMARIES,
+  markets: MOCK_MARKETS,
+});
+assert.ok(stasiunLongCorpusResults.counts.MARKET >= 4);
+assert.ok(stasiunLongCorpusResults.items.some((i) => i.title.includes('Kebon Kembang')));
+assert.ok(stasiunLongCorpusResults.items.some((i) => i.kind === 'PAGE' && i.href === '/peta'));
+
+const stationResults = searchSiteContent({
+  query: 'dekat stasiun',
+  region: MOCK_REGIONS[0],
+  regions: MOCK_REGIONS,
+  bogorCommodities: BOGOR_COMMODITIES,
+  catalogCommodities: MOCK_COMMODITY_SUMMARIES,
+  markets: MOCK_MARKETS,
+});
+assert.ok(stationResults.counts.MARKET >= 3);
+
+const siteFeatureResults = searchSiteContent({
+  query: 'lapor kelangkaan',
+  region: MOCK_REGIONS[0],
+  regions: MOCK_REGIONS,
+  bogorCommodities: BOGOR_COMMODITIES,
+  catalogCommodities: MOCK_COMMODITY_SUMMARIES,
+  markets: MOCK_MARKETS,
+});
+assert.ok(siteFeatureResults.items.some((i) => i.kind === 'PAGE' && i.href === '/lapor'));
+
+const regionResults = searchSiteContent({
+  query: 'jawa barat',
+  region: MOCK_REGIONS[0],
+  regions: MOCK_REGIONS,
+  bogorCommodities: BOGOR_COMMODITIES,
+  catalogCommodities: MOCK_COMMODITY_SUMMARIES,
+  markets: MOCK_MARKETS,
+});
+assert.ok(regionResults.items.some((i) => i.kind === 'REGION' && i.regionId === 'reg_jabar'));
+console.log('✓ TC-GS-01 passed: Global Search sanitization, LIKE escaping, safe hrefs, synonyms & 4-category accuracy');
+
+console.log('\nAll Price Logic, Admin Store, Market Insights & Global Search test cases passed!');

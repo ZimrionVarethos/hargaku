@@ -1,4 +1,4 @@
-import { CommoditySummary, CommodityDetail } from '@/types';
+import type { CommoditySummary, CommodityDetail } from '../../types/index.ts';
 
 export const MOCK_COMMODITY_SUMMARIES: CommoditySummary[] = [
   {

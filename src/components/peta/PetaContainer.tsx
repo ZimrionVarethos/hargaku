@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { List, MapTrifold } from '@phosphor-icons/react';
 import { PETA_COMMODITIES, PetaMarketPrice } from './peta-data';
 import { PetaSpatialStage } from './PetaSpatialStage';
@@ -8,62 +8,84 @@ import { PetaMarketRankTable } from './PetaMarketRankTable';
 import { PetaHamburgerDrawer } from './PetaHamburgerDrawer';
 import { CommoditySummary } from '@/types';
 import { useRegion } from '@/lib/store/region-store';
-import { filterMarketsForRegion, getMarketsByRegion } from '@/lib/mock/markets.data';
-import { computeMarketInsights } from '@/lib/market-insights';
-import {
-  STATION_MARKET_LANDMARKS,
-  findMatchingCommodity,
-  normalizeMarketKey,
-} from '@/lib/market-matching';
+import { MOCK_MARKETS } from '@/lib/mock/markets.data';
+import { findMatchingCommodity, normalizeMarketKey } from '@/lib/market-matching';
 import { useLiveCatalog } from '@/lib/store/use-live-catalog';
+import { buildPetaMarketPrices, buildRegionMarketsList } from './peta-market-builder';
 
 interface Props {
   initialCommodities: CommoditySummary[];
+  initialMarketId?: string;
+  initialCommoditySlug?: string;
+  initialRegionSlug?: string;
 }
 
-export function PetaContainer({ initialCommodities }: Props) {
-  const { selectedRegion } = useRegion();
+export function PetaContainer({
+  initialCommodities,
+  initialMarketId,
+  initialCommoditySlug,
+  initialRegionSlug,
+}: Props) {
+  const { selectedRegion, allRegions, setSelectedRegion } = useRegion();
   const { commodities: liveCommodities, rawCommodities, rawMarkets, dailyPrices, reports } =
     useLiveCatalog();
   const catalogCommodities = liveCommodities.length > 0 ? liveCommodities : initialCommodities;
   const [selectedCommodityId, setSelectedCommodityId] = useState<string>(() => {
+    if (initialCommoditySlug) {
+      const targetCom = catalogCommodities.find(
+        (c) => c.slug === initialCommoditySlug || c.id === initialCommoditySlug
+      );
+      if (targetCom) return targetCom.id;
+    }
     const preferred =
       catalogCommodities.find((c) => c.slug === 'cabai-rawit-merah' || c.id === 'cabai-rawit-merah') ||
       catalogCommodities[0];
     return preferred?.id || PETA_COMMODITIES[0].id;
   });
-  const [selectedMarketId, setSelectedMarketId] = useState<string>('');
+  const [selectedMarketId, setSelectedMarketId] = useState<string>(initialMarketId || '');
   const [isLightMode, setIsLightMode] = useState<boolean>(false);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [focusSeq, setFocusSeq] = useState<number>(0);
+  const [focusSeq, setFocusSeq] = useState<number>(initialMarketId ? 1 : 0);
+  const syncedDeepLinkRef = useRef<string>('');
 
-  const currentRegionMarkets = useMemo(() => {
-    const liveFiltered = filterMarketsForRegion(rawMarkets, selectedRegion.id);
-    const seedFiltered = getMarketsByRegion(selectedRegion.id);
-    const dedupedLive: typeof liveFiltered = [];
-    const seenCanonical = new Set<string>();
+  useEffect(() => {
+    const deepKey = `${initialRegionSlug || ''}|${initialMarketId || ''}`;
+    if (!initialRegionSlug && !initialMarketId) return;
+    if (syncedDeepLinkRef.current === deepKey) return;
+    syncedDeepLinkRef.current = deepKey;
 
-    const sortedLive = [...liveFiltered].sort((a, b) => {
-      if (a.id === 'mkt_kebon_kembang') return -1;
-      if (b.id === 'mkt_kebon_kembang') return 1;
-      return 0;
-    });
-
-    for (const m of sortedLive) {
-      const canonical = normalizeMarketKey(m.id) || normalizeMarketKey(m.name) || m.id;
-      if (seenCanonical.has(canonical)) continue;
-      seenCanonical.add(canonical);
-      dedupedLive.push(m);
+    if (initialRegionSlug) {
+      const targetReg = allRegions.find(
+        (r) => r.id === initialRegionSlug || r.slug === initialRegionSlug
+      );
+      if (targetReg && targetReg.id !== selectedRegion.id) {
+        setSelectedRegion(targetReg);
+      }
+    } else if (initialMarketId) {
+      const marketPool = rawMarkets.length > 0 ? rawMarkets : MOCK_MARKETS;
+      const targetMkt = marketPool.find(
+        (m) =>
+          m.id === initialMarketId ||
+          normalizeMarketKey(m.id) === normalizeMarketKey(initialMarketId)
+      );
+      if (targetMkt?.regionId) {
+        const targetReg = allRegions.find((r) => r.id === targetMkt.regionId);
+        if (targetReg && targetReg.id !== selectedRegion.id) {
+          setSelectedRegion(targetReg);
+        }
+      }
     }
 
-    if (dedupedLive.length === 0) return seedFiltered;
+    if (initialMarketId) {
+      setSelectedMarketId(initialMarketId);
+      setFocusSeq((n) => n + 1);
+    }
+  }, [initialRegionSlug, initialMarketId, allRegions, rawMarkets, selectedRegion.id, setSelectedRegion]);
 
-    const supplemented = seedFiltered.filter((s) => {
-      const canonical = normalizeMarketKey(s.id) || normalizeMarketKey(s.name) || s.id;
-      return !seenCanonical.has(canonical);
-    });
-    return [...dedupedLive, ...supplemented];
-  }, [rawMarkets, selectedRegion.id]);
+  const currentRegionMarkets = useMemo(
+    () => buildRegionMarketsList(rawMarkets, selectedRegion.id),
+    [rawMarkets, selectedRegion.id]
+  );
 
   const activeCom = useMemo(() => {
     const selectedFromSidebar = catalogCommodities.find(
@@ -117,75 +139,15 @@ export function PetaContainer({ initialCommodities }: Props) {
 
   const marketsWithPrice: PetaMarketPrice[] = useMemo(
     () =>
-      currentRegionMarkets.map((info, idx) => {
-        const canonicalId = normalizeMarketKey(info.id) || info.id;
-        const dailyRecord =
-          dailyPrices[`${info.id}_${activeCom.id}`] ||
-          dailyPrices[`${canonicalId}_${activeCom.id}`] ||
-          (canonicalId === 'mkt_kebon_kembang'
-            ? dailyPrices[`mkt_pasar_anyar_${activeCom.id}`]
-            : undefined);
-        const livePrice = dailyRecord && dailyRecord.price > 0 ? dailyRecord.price : null;
-
-        const variationMultiplier = idx === 0 ? 0.96 : idx === 1 ? 0.99 : idx === 2 ? 1.02 : 1.04;
-        const computedPrice =
-          livePrice || Math.round((baseRegionalPrice * variationMultiplier) / 100) * 100;
-        const diffPercent =
-          baseRegionalPrice > 0
-            ? Math.round(((computedPrice - baseRegionalPrice) / baseRegionalPrice) * 1000) / 10
-            : 0;
-        const status =
-          diffPercent < -2
-            ? ('cheaper' as const)
-            : diffPercent > 2
-            ? ('expensive' as const)
-            : ('average' as const);
-
-        const insights = computeMarketInsights({
-          marketId: canonicalId,
-          marketName: info.name,
-          commodities: rawCommodities,
-          markets: rawMarkets,
-          dailyPrices,
-          reports,
-          disparityIndex: selectedRegion.disparityIndex,
-        });
-
-        const landmarkNote = info.landmarkNote || STATION_MARKET_LANDMARKS[canonicalId];
-        const nearStation = Boolean(info.nearStation || landmarkNote || insights.nearStation);
-        const totalReports =
-          insights.approvedPriceReportCount + insights.approvedShortageReportCount;
-        const alertHeadline = insights.expensiveItems[0]
-          ? `${insights.expensiveItems[0].commodityName} +${insights.expensiveItems[0].diffPercent}%`
-          : insights.shortageAlerts[0]
-          ? `${insights.shortageAlerts[0].commodityName} (${insights.shortageAlerts[0].stockStatus})`
-          : undefined;
-
-        return {
-          marketId: info.id,
-          name: info.name,
-          shortName: info.name.replace('Pasar ', '').split(' (')[0],
-          district: info.district,
-          address: landmarkNote
-            ? `${info.district}, ${info.city} · ${landmarkNote}`
-            : `${info.district}, ${info.city}`,
-          latitude: info.latitude,
-          longitude: info.longitude,
-          xPercent: 50,
-          yPercent: 50,
-          price: computedPrice,
-          regionalAvgPrice: baseRegionalPrice,
-          diffPercent,
-          status,
-          reportsCount: totalReports,
-          nearStation,
-          landmarkNote,
-          expensiveItemsCount: insights.expensiveItems.length,
-          shortageCount: insights.shortageAlerts.length,
-          alertHeadline,
-          lastUpdated: '06:00 WIB',
-          googleMapsUrl: `https://maps.google.com/?q=${encodeURIComponent(`${info.name} ${info.city}`)}`,
-        };
+      buildPetaMarketPrices({
+        markets: currentRegionMarkets,
+        dailyPrices,
+        commodityId: activeCom.id,
+        baseRegionalPrice,
+        rawCommodities,
+        rawMarkets,
+        reports,
+        selectedRegion,
       }),
     [
       currentRegionMarkets,
@@ -195,7 +157,7 @@ export function PetaContainer({ initialCommodities }: Props) {
       rawCommodities,
       rawMarkets,
       reports,
-      selectedRegion.disparityIndex,
+      selectedRegion,
     ]
   );
 

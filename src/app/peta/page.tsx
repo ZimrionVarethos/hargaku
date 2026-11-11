@@ -8,12 +8,26 @@ export const metadata: Metadata = {
     'Peta interaktif Mapbox sebaran harga komoditas pangan pokok di pasar-pasar tradisional Indonesia terkalibrasi daerah.',
 };
 
-export default async function PetaPage() {
+interface Props {
+  searchParams?: Promise<{
+    market?: string;
+    commodity?: string;
+    region?: string;
+  }>;
+}
+
+export default async function PetaPage({ searchParams }: Props) {
+  const resolved = searchParams ? await searchParams : {};
   const commodities = await fetchCommodities();
 
   return (
     <div className="w-full px-2 sm:px-4 lg:px-6 py-2 sm:py-3">
-      <PetaContainer initialCommodities={commodities} />
+      <PetaContainer
+        initialCommodities={commodities}
+        initialMarketId={resolved.market}
+        initialCommoditySlug={resolved.commodity}
+        initialRegionSlug={resolved.region}
+      />
     </div>
   );
 }
