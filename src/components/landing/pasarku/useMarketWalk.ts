@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { STALL_ZONE_META, getZoneIndexByWalkProgress } from '@/lib/data/market-stalls';
+import { computeSteppedWalkProgress } from './three/three-corridor-math';
 
 export function useMarketWalk() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -71,7 +72,14 @@ export function useMarketWalk() {
   const scrollToMarket = useCallback(() => {
     const m = getMetrics();
     if (!m) return;
-    window.scrollTo({ top: m.top + m.totalScrollable * 0.132, behavior: 'smooth' });
+    const startY = window.scrollY;
+    const targetY = m.top + m.totalScrollable * 0.132;
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
+    setTimeout(() => {
+      if (Math.abs(window.scrollY - startY) < 6 && Math.abs(targetY - startY) > 40) {
+        window.scrollTo({ top: targetY, behavior: 'instant' });
+      }
+    }, 180);
   }, [getMetrics]);
 
   const scrollToEntrance = useCallback(() => {
@@ -98,6 +106,21 @@ export function useMarketWalk() {
     window.scrollTo({ top: m.top + m.totalScrollable * targetProgress, behavior: 'smooth' });
   }, [getMetrics]);
 
+  const stepWalk = useCallback((direction: 1 | -1) => {
+    if (!containerRef.current) return;
+    const m = getMetrics();
+    if (!m || m.totalScrollable <= 0) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const stickyEl = containerRef.current.firstElementChild as HTMLElement | null;
+    const stickyTop = stickyEl ? parseFloat(getComputedStyle(stickyEl).top) || 0 : 0;
+    const scrolled = stickyTop - rect.top;
+    const curProgress = Math.max(0, Math.min(1, scrolled / m.totalScrollable));
+    const curWp = curProgress > 0.11 ? Math.max(0, Math.min(1, (curProgress - 0.11) / 0.86)) : 0;
+    const nextWp = computeSteppedWalkProgress(curWp, direction);
+    const targetProgress = 0.11 + nextWp * 0.86;
+    window.scrollTo({ top: m.top + m.totalScrollable * targetProgress, behavior: 'instant' });
+  }, [getMetrics]);
+
   return {
     containerRef,
     scrollProgress,
@@ -109,5 +132,6 @@ export function useMarketWalk() {
     scrollToEntrance,
     scrollToStall,
     scrollToZ,
+    stepWalk,
   };
 }

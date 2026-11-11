@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, type KeyboardEvent } from 'react';
-import { ArrowLeft, Footprints, MagnifyingGlass, X } from '@phosphor-icons/react';
+import { ArrowLeft, Footprints, MagnifyingGlass, SpeakerHigh, SpeakerSlash, X } from '@phosphor-icons/react';
 import { BogorCommodity } from '@/lib/data/bogor-commodities';
 import { LorongSearchDropdown } from './LorongSearchDropdown';
 
@@ -9,6 +9,9 @@ interface Props {
   walkMeters: number;
   searchQuery: string;
   matches: BogorCommodity[];
+  isSoundEnabled: boolean;
+  isAudioRunning?: boolean;
+  onToggleSound: () => void;
   onSearchChange: (q: string) => void;
   onSelectMatch: (item: BogorCommodity) => void;
   onOpenFilteredDrawer: () => void;
@@ -19,6 +22,9 @@ export function LorongWalkHud({
   walkMeters,
   searchQuery,
   matches,
+  isSoundEnabled,
+  isAudioRunning = true,
+  onToggleSound,
   onSearchChange,
   onSelectMatch,
   onOpenFilteredDrawer,
@@ -86,6 +92,36 @@ export function LorongWalkHud({
               di lorong pasar
             </span>
           </div>
+
+          <button
+            type="button"
+            data-sound-toggle="true"
+            onClick={onToggleSound}
+            aria-pressed={isSoundEnabled && isAudioRunning}
+            aria-label={
+              !isSoundEnabled
+                ? 'Nyalakan efek suara dan musik lorong pasar'
+                : !isAudioRunning
+                  ? 'Putar efek suara dan musik lorong pasar'
+                  : 'Matikan efek suara dan musik lorong pasar'
+            }
+            className={`h-9 px-2.5 sm:px-3 rounded-lg border text-xs font-bold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer transition-colors ${
+              !isSoundEnabled
+                ? 'bg-[var(--bg-card)]/90 hover:bg-[var(--bg-muted)] text-[var(--text-muted)] border-[var(--border-ink)]'
+                : !isAudioRunning
+                  ? 'bg-[#B47B38] hover:bg-[#99662C] text-white border-[#132E20]/35 shadow-xs'
+                  : 'bg-[#245034] hover:bg-[#1E422B] text-[#FEF08A] border-[#132E20]/30 shadow-xs'
+            }`}
+          >
+            {isSoundEnabled ? (
+              <SpeakerHigh size={15} weight="bold" aria-hidden="true" />
+            ) : (
+              <SpeakerSlash size={15} weight="bold" aria-hidden="true" />
+            )}
+            <span className="hidden sm:inline">
+              {!isSoundEnabled ? 'Bisu' : !isAudioRunning ? 'Putar Suara' : 'Suara Aktif'}
+            </span>
+          </button>
         </div>
 
         <div className="w-full sm:w-72 md:w-80 relative shrink-0">

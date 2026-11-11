@@ -1,8 +1,7 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/banner-dark.png" />
-  <img src="docs/images/banner.png" alt="PasarKu — Alat Bantu Keputusan Harga Pangan Rakyat" width="100%" />
+  <img src="public/images/pasarku/banner.png" alt="PasarKu — Alat Bantu Keputusan Harga Pangan Rakyat" width="100%" />
 </picture>
 
 <br />
@@ -32,10 +31,9 @@
 
 Dibuat untuk kompetisi **Web In Action (MIA 2026)**. Pilot di **Kota Bogor** (13 pasar Perumda Pasar Pakuan Jaya), dirancang berkembang ke Jabodetabek, Jawa Barat, hingga nasional lintas 6 koridor pulau.
 
-<!-- Thumbnail video demo: ganti GANTI_LINK_DEMO dengan link YouTube/Drive -->
 <p align="center">
   <a href="GANTI_LINK_DEMO">
-    <img src="docs/images/demo-thumbnail.png" alt="Tonton demo PasarKu" width="720" />
+    <img src="public/images/pasarku/demo.png" alt="Tonton demo PasarKu" width="720" />
   </a>
 </p>
 
@@ -44,7 +42,6 @@ Dibuat untuk kompetisi **Web In Action (MIA 2026)**. Pilot di **Kota Bogor** (13
 | Data resmi (PIHPS, Bapanas) per kg, belanja warga per ons atau ikat | Kalkulator takaran mengubah satuan ke Rupiah riil dan rentang tawar |
 | Pembeli tak tahu tawaran pedagang wajar atau tidak | Mesin 3 lapis menilai kewajaran harga sebelum transaksi |
 | Kelangkaan stok terlambat diketahui warga | Sinyal stok anonim langsung dari pedagang |
-| Warga takut lokasi rumah terlacak lewat foto laporan | EXIF dan GPS dibersihkan di browser sebelum upload |
 
 ---
 
@@ -57,7 +54,7 @@ Dibuat untuk kompetisi **Web In Action (MIA 2026)**. Pilot di **Kota Bogor** (13
       <br /><sub><b>Beranda</b> · hero dan papan acuan cepat</sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/images/screenshots/lorong-3d.png" alt="Lorong Pasar 3D" />
+      <img src="docs/images/screenshots/lorong.png" alt="Lorong Pasar 3D" />
       <br /><sub><b>Lorong Pasar 3D</b> · POV dua tangan</sub>
     </td>
   </tr>
@@ -89,14 +86,12 @@ Dibuat untuk kompetisi **Web In Action (MIA 2026)**. Pilot di **Kota Bogor** (13
 
 | # | Fitur | Cara kerja singkat | Manfaat |
 | :-: | :-- | :-- | :-- |
-| 1 | **Lorong Pasar 3D** | Simulasi Three.js menyusuri 20 lapak, lengkap tata suara prosedural | Belanja pasar yang interaktif dan edukatif |
-| 2 | **Indeks 53+ Komoditas** | Katalog dengan 5 kategori, pencarian, dan pembanding HAP/HET | Tahu acuan resmi sebelum berangkat |
-| 3 | **Cek Harga + PUNTEN AI** | Takaran dan harga tawaran dinilai, chatbot Gemini siap bantu menawar | Keputusan di depan lapak dalam hitungan detik |
-| 4 | **Peta Spasial 3D** | Mapbox GL JS v3 dengan 13 pasar, peringkat harga, dan sinyal kelangkaan | Menemukan pasar terdekat yang harganya wajar |
-| 5 | **Lapor Dua Arah Anonim** | Warga lapor harga, pedagang lapor stok, anomali dicek dengan MAD > 25% | Data komunitas akurat dan privasi terjaga |
-| 6 | **Konsol Admin** | Moderasi laporan, entri survei harian, CRUD master, konfigurasi dinamis | Data publik terjaga tanpa redeploy |
+| 1 | **Bandingkan** | Liat rataan harga nasional | Tahu acuan resmi sebelum berangkat |
+| 2 | **Cek Harga** | Takaran dan harga tawaran dinilai, chatbot siap bantu menganalisis | Keputusan di depan lapak dalam hitungan detik |
+| 3 | **Lapor Dua Arah Anonim** | Warga lapor harga, pedagang lapor stok, anomali dicek dengan MAD > 25% | Data komunitas akurat dan privasi terjaga |
+| 4 | **Konsol Admin** | Moderasi laporan, entri survei harian, CRUD master, konfigurasi dinamis | Data publik terjaga tanpa redeploy |
 
-**Detail tambahan yang sering ditanyakan:**
+**Detail tambahan:**
 
 | Fitur | Rincian |
 | :-- | :-- |
@@ -233,24 +228,8 @@ Fungsi `evaluatePrice` membandingkan harga tawaran dengan tiga acuan, berurutan 
 | Privasi | Sanitasi EXIF/GPS di klien, sinyal stok diagregasi per pasar tanpa nama kios |
 
 <details>
-<summary><b>Struktur folder & skema 6 tabel PostgreSQL</b></summary>
 
 <br />
-
-```text
-PasarKu/
-├── src/
-│   ├── app/          # Rute App Router + API /api/v1/*
-│   ├── components/   # landing/pasarku, indeks, price, peta, lapor, assistant, admin, ornament
-│   ├── lib/          # Logika 3 lapis, fetcher, koneksi pg, store, seed data & wilayah
-│   └── types/        # Kontrak tipe TypeScript (zero any)
-├── supabase/schema.sql   # DDL + Row Level Security
-├── scripts/              # Seeder UNNEST & suite uji otomatis
-├── docs/images/          # Banner, thumbnail, screenshot README
-├── public/               # Aset gambar, ikon, ornamen
-├── .env.example
-└── README.md
-```
 
 | Tabel | Peran |
 | :-- | :-- |
@@ -299,5 +278,3 @@ npm run build       # build produksi Next.js (--webpack)
 ```
 
 ---
-
-> **Catatan Integritas Data & Privasi:** Seluruh data simulasi untuk demonstrasi diberi penanda visual yang transparan. PasarKu mencantumkan rujukan sumber resmi (Bapanas RI & PIHPS Bank Indonesia), membersihkan metadata EXIF GPS di sisi browser, dan mengagregasi sinyal stok di level pasar tanpa mengekspos identitas kios perseorangan.

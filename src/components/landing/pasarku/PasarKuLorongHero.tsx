@@ -16,6 +16,11 @@ import { LorongWalkHud } from './LorongWalkHud';
 import { LorongThreeMarketAlley } from './LorongThreeMarketAlley';
 import { LorongBottomBar } from './LorongBottomBar';
 import { LorongCommodityDrawer } from './LorongCommodityDrawer';
+import {
+  CorridorAudioHandle,
+  createCorridorAudioController,
+} from './three/three-corridor-audio';
+import { resolveCorridorKeyAction } from './three/three-corridor-math';
 
 interface Props {
   onSelectCommodity: (item: BogorCommodity) => void;
@@ -33,6 +38,7 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
     scrollToEntrance,
     scrollToStall,
     scrollToZ,
+    stepWalk,
   } = useMarketWalk();
   const { canvasRef } = useHeroAnimation(scrollProgress < 0.22);
 
@@ -40,10 +46,108 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
   const [drawerFilter, setDrawerFilter] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isInViewport, setIsInViewport] = useState(true);
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [isAudioRunning, setIsAudioRunning] = useState(false);
+  const [corridorAudio, setCorridorAudio] = useState<CorridorAudioHandle | null>(null);
+  const corridorAudioRef = useRef<CorridorAudioHandle | null>(null);
   const [highlightedLabel, setHighlightedLabel] = useState<string | null>(null);
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const liveCommodities = useLiveBogorCommodities();
   const stalls = useMemo(() => getMarketStalls(liveCommodities), [liveCommodities]);
+
+  useEffect(() => {
+    const controller = createCorridorAudioController();
+    let initialSound = true;
+    try {
+      if (window.localStorage.getItem('pasarku_corridor_sound') === 'off') {
+        initialSound = false;
+      }
+    } catch {}
+    setIsSoundEnabled(initialSound);
+    controller.setMuted(!initialSound);
+    controller.onStateChange((running) => setIsAudioRunning(running));
+    corridorAudioRef.current = controller;
+    setCorridorAudio(controller);
+    return () => {
+      controller.onStateChange(null);
+      controller.dispose();
+      corridorAudioRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!corridorAudio) return;
+    corridorAudio.setMuted(!isSoundEnabled);
+  }, [corridorAudio, isSoundEnabled]);
+
+  const zoomFactor = Math.min(3.5, 1 + scrollProgress * 14);
+  const wingLeftTranslateX = Math.min(140, scrollProgress * 580);
+  const wingRightTranslateX = Math.min(140, scrollProgress * 580);
+  const heroTextOpacity = Math.max(0, 1 - scrollProgress * 12);
+  const marketAlleyOpacity = Math.min(1, Math.max(0, (scrollProgress - 0.05) * 18));
+
+  const exitBloomOpacity = walkProgress > 0.85 ? Math.min(1, (walkProgress - 0.85) / 0.12) : 0;
+  const hudOpacity = Math.max(0, 1 - exitBloomOpacity * 1.5);
+
+  useEffect(() => {
+    if (!corridorAudio) return;
+    const syncVisibility = () => {
+      const visible = typeof document === 'undefined' ? true : !document.hidden;
+      corridorAudio.setActive(isInsideMarket && isInViewport && visible && exitBloomOpacity <= 0.85);
+    };
+    syncVisibility();
+    document.addEventListener('visibilitychange', syncVisibility);
+    return () => document.removeEventListener('visibilitychange', syncVisibility);
+  }, [corridorAudio, isInsideMarket, isInViewport, exitBloomOpacity]);
+
+  const handleToggleSound = useCallback(async () => {
+    const handle = corridorAudioRef.current ?? corridorAudio;
+    if (!isSoundEnabled) {
+      try {
+        window.localStorage.setItem('pasarku_corridor_sound', 'on');
+      } catch {}
+      setIsSoundEnabled(true);
+      handle?.setMuted(false);
+      await handle?.unlock();
+      return;
+    }
+    if (handle && !handle.isRunning()) {
+      handle.setMuted(false);
+      const unlocked = await handle.unlock();
+      if (unlocked) return;
+    }
+    try {
+      window.localStorage.setItem('pasarku_corridor_sound', 'off');
+    } catch {}
+    setIsSoundEnabled(false);
+    handle?.setMuted(true);
+  }, [corridorAudio, isSoundEnabled]);
+
+  useEffect(() => {
+    const handle = corridorAudioRef.current ?? corridorAudio;
+    if (!handle || !isInsideMarket || !isSoundEnabled || isAudioRunning) return;
+    const handleFirstGesture = (e: Event) => {
+      const target = e.target as Element | null;
+      if (target?.closest?.('[data-sound-toggle="true"]')) return;
+      void handle.unlock();
+    };
+    window.addEventListener('pointerdown', handleFirstGesture, { capture: true, passive: true });
+    window.addEventListener('keydown', handleFirstGesture, { capture: true, passive: true });
+    window.addEventListener('click', handleFirstGesture, { capture: true, passive: true });
+    window.addEventListener('touchstart', handleFirstGesture, { capture: true, passive: true });
+    return () => {
+      window.removeEventListener('pointerdown', handleFirstGesture, true);
+      window.removeEventListener('keydown', handleFirstGesture, true);
+      window.removeEventListener('click', handleFirstGesture, true);
+      window.removeEventListener('touchstart', handleFirstGesture, true);
+    };
+  }, [corridorAudio, isInsideMarket, isSoundEnabled, isAudioRunning]);
+
+  const handleEnterMarket = useCallback(() => {
+    const handle = corridorAudioRef.current ?? corridorAudio;
+    if (isSoundEnabled) void handle?.unlock();
+    scrollToMarket();
+  }, [corridorAudio, isSoundEnabled, scrollToMarket]);
 
   const searchMatches = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -75,22 +179,24 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
   useEffect(() => {
     if (!isInsideMarket) return;
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isDrawerOpen) {
+        setIsDrawerOpen(false);
+        return;
+      }
+      if (isDrawerOpen || document.querySelector('[role="dialog"]')) return;
       const activeTag = document.activeElement?.tagName?.toLowerCase();
       if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') return;
 
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      const action = resolveCorridorKeyAction(e.key);
+      if (action?.type === 'walk') {
         e.preventDefault();
-        scrollToStall(Math.min(stalls.length - 1, activeStallIndex + 1));
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        scrollToStall(Math.max(0, activeStallIndex - 1));
-      } else if (e.key === 'Escape' && isDrawerOpen) {
-        setIsDrawerOpen(false);
+        if (isSoundEnabled) void corridorAudio?.unlock();
+        stepWalk(action.direction);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isInsideMarket, activeStallIndex, stalls.length, scrollToStall, isDrawerOpen]);
+  }, [isInsideMarket, isDrawerOpen, isSoundEnabled, corridorAudio, stepWalk]);
 
   const showHighlightBanner = useCallback((label: string) => {
     if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
@@ -121,15 +227,6 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
     setIsDrawerOpen(true);
   }, [searchQuery]);
 
-  const zoomFactor = Math.min(3.5, 1 + scrollProgress * 14);
-  const wingLeftTranslateX = Math.min(140, scrollProgress * 580);
-  const wingRightTranslateX = Math.min(140, scrollProgress * 580);
-  const heroTextOpacity = Math.max(0, 1 - scrollProgress * 12);
-  const marketAlleyOpacity = Math.min(1, Math.max(0, (scrollProgress - 0.05) * 18));
-
-  const exitBloomOpacity = walkProgress > 0.85 ? Math.min(1, (walkProgress - 0.85) / 0.12) : 0;
-  const hudOpacity = Math.max(0, 1 - exitBloomOpacity * 1.5);
-
   const scrollToNextSection = () => {
     const el = document.getElementById('sorotanSection');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -154,7 +251,7 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
             wingRightTranslateX={wingRightTranslateX}
             heroTextOpacity={heroTextOpacity}
             scrollProgress={scrollProgress}
-            onEnterMarket={scrollToMarket}
+            onEnterMarket={handleEnterMarket}
           />
         </div>
 
@@ -171,6 +268,8 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
               walkProgress={walkProgress}
               walkMeters={walkMeters}
               isActive={isInsideMarket && isInViewport}
+              audio={corridorAudio}
+              isSoundEnabled={isSoundEnabled}
               highlightedLabel={highlightedLabel}
               onSelectCommodity={onSelectCommodity}
             />
@@ -184,6 +283,9 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
               walkMeters={walkMeters}
               searchQuery={searchQuery}
               matches={searchMatches}
+              isSoundEnabled={isSoundEnabled}
+              isAudioRunning={isAudioRunning}
+              onToggleSound={handleToggleSound}
               onSearchChange={setSearchQuery}
               onSelectMatch={handleSelectSearchMatch}
               onOpenFilteredDrawer={handleOpenFilteredDrawer}
@@ -198,8 +300,12 @@ export function PasarKuLorongHero({ onSelectCommodity }: Props) {
             <LorongBottomBar
               stalls={stalls}
               activeStallIndex={activeStallIndex}
-              onSelectStall={scrollToStall}
+              onSelectStall={(idx) => {
+                if (isSoundEnabled) void corridorAudio?.unlock();
+                scrollToStall(idx);
+              }}
               onToggleDrawer={() => {
+                if (isSoundEnabled) void corridorAudio?.unlock();
                 setDrawerFilter('');
                 setIsDrawerOpen((prev) => !prev);
               }}

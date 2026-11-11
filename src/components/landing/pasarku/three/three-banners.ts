@@ -51,14 +51,20 @@ export function createMarketBanners(
       map: signTex,
       roughness: 0.75,
       metalness: 0.05,
-      side: THREE.DoubleSide,
     });
-    const signMesh = new THREE.Mesh(signGeo, signMat);
+    const signHolder = new THREE.Group();
     const signX = isL ? 1.48 : -1.48;
     const signZ = c.zStart + 0.85;
-    signMesh.position.set(signX, 2.2, signZ);
-    signMesh.rotation.y = Math.PI + (isL ? 0.18 : -0.18);
-    group.add(signMesh);
+    signHolder.position.set(signX, 2.2, signZ);
+    signHolder.rotation.y = Math.PI + (isL ? 0.18 : -0.18);
+
+    const frontSign = new THREE.Mesh(signGeo, signMat);
+    frontSign.position.z = 0.006;
+    const backSign = new THREE.Mesh(signGeo, signMat);
+    backSign.position.z = -0.006;
+    backSign.rotation.y = Math.PI;
+    signHolder.add(frontSign, backSign);
+    group.add(signHolder);
     entries.push({ comp: c, w: 320, h: 152, compact: true, mat: signMat });
 
     dummy.position.set(signX - 0.3, 2.9, signZ);

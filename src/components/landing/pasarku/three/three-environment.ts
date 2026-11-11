@@ -226,6 +226,52 @@ export function createMarketEnvironment(
   bulbInst.instanceMatrix.needsUpdate = true;
   envGroup.add(cordInst, bulbInst);
 
+  const gateZ = -3.4;
+  const gateGroup = new THREE.Group();
+  const postGeo = new THREE.BoxGeometry(0.16, 3.25, 0.16);
+  const beamGeo = new THREE.BoxGeometry(3.26, 0.22, 0.18);
+  const leftPost = new THREE.Mesh(postGeo, trussMat);
+  leftPost.position.set(-1.55, 1.625, gateZ);
+  const rightPost = new THREE.Mesh(postGeo, trussMat);
+  rightPost.position.set(1.55, 1.625, gateZ);
+  const lintelBeam = new THREE.Mesh(beamGeo, trussMat);
+  lintelBeam.position.set(0, 3.16, gateZ);
+
+  const gateBoardCanvas = document.createElement('canvas');
+  gateBoardCanvas.width = 512;
+  gateBoardCanvas.height = 128;
+  const gCtx = gateBoardCanvas.getContext('2d');
+  if (gCtx) {
+    gCtx.fillStyle = '#132E20';
+    gCtx.fillRect(0, 0, 512, 128);
+    gCtx.strokeStyle = '#E8DFD3';
+    gCtx.lineWidth = 6;
+    gCtx.strokeRect(5, 5, 502, 118);
+    gCtx.fillStyle = '#FEF08A';
+    gCtx.font = 'bold 34px Ubuntu, sans-serif';
+    gCtx.textAlign = 'center';
+    gCtx.fillText('GERBANG MASUK PASAR', 256, 58);
+    gCtx.fillStyle = '#E8DFD3';
+    gCtx.font = 'bold 20px Ubuntu, sans-serif';
+    gCtx.fillText('Geser layar untuk melihat sekitar', 256, 94);
+  }
+  const gateSignTex = new THREE.CanvasTexture(gateBoardCanvas);
+  gateSignTex.colorSpace = THREE.SRGBColorSpace;
+  const gateSignMat = new THREE.MeshStandardMaterial({ map: gateSignTex, roughness: 0.72 });
+  gateSignMat.userData.disposeMap = true;
+  const gateSign = new THREE.Mesh(new THREE.PlaneGeometry(2.45, 0.62), gateSignMat);
+  gateSign.position.set(0, 2.7, gateZ + 0.1);
+
+  const gateCrestLeft = new THREE.Mesh(new THREE.BoxGeometry(1.75, 0.12, 0.2), redMat);
+  gateCrestLeft.position.set(-0.8, 3.45, gateZ);
+  gateCrestLeft.rotation.z = 0.24;
+  const gateCrestRight = new THREE.Mesh(new THREE.BoxGeometry(1.75, 0.12, 0.2), whiteMat);
+  gateCrestRight.position.set(0.8, 3.45, gateZ);
+  gateCrestRight.rotation.z = -0.24;
+
+  gateGroup.add(leftPost, rightPost, lintelBeam, gateSign, gateCrestLeft, gateCrestRight);
+  envGroup.add(gateGroup);
+
   scene.add(envGroup);
 
   const setTheme = (dark: boolean) => {
