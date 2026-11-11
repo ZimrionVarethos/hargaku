@@ -19,8 +19,6 @@
   <img src="https://img.shields.io/badge/AI%20Assistant-Google%20Gemini%20Flash-4285F4?style=flat-square&logo=google&logoColor=white" alt="Google Gemini" />
 </p>
 
-[Sekilas](#sekilas-proyek) · [Galeri](#galeri) · [Fitur](#fitur-utama) · [System Flow](#system-flow) · [Lorong 3D](#lorong-pasar-3d) · [Mesin 3 Lapis](#mesin-evaluasi-3-lapis) · [Rute & API](#rute-halaman--api) · [Arsitektur](#arsitektur-teknis) · [Instalasi](#menjalankan-secara-lokal)
-
 </div>
 
 ---
@@ -32,7 +30,7 @@
 Dibuat untuk kompetisi **Web In Action (MIA 2026)**. Pilot di **Kota Bogor** (13 pasar Perumda Pasar Pakuan Jaya), dirancang berkembang ke Jabodetabek, Jawa Barat, hingga nasional lintas 6 koridor pulau.
 
 <p align="center">
-  <a href="GANTI_LINK_DEMO">
+  <a href="https://drive.google.com/file/d/1DhB5TQdo5tJ4BamoYhdxRmnyjDT_v92h/view">
     <img src="public/images/pasarku/demo.png" alt="Tonton demo PasarKu" width="720" />
   </a>
 </p>
@@ -45,40 +43,6 @@ Dibuat untuk kompetisi **Web In Action (MIA 2026)**. Pilot di **Kota Bogor** (13
 
 ---
 
-## Galeri
-
-<table>
-  <tr>
-    <td align="center" width="50%">
-      <img src="docs/images/screenshots/beranda.png" alt="Beranda PasarKu" />
-      <br /><sub><b>Beranda</b> · hero dan papan acuan cepat</sub>
-    </td>
-    <td align="center" width="50%">
-      <img src="docs/images/screenshots/lorong.png" alt="Lorong Pasar 3D" />
-      <br /><sub><b>Lorong Pasar 3D</b> · POV dua tangan</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="50%">
-      <img src="docs/images/screenshots/cek-harga.png" alt="Cek Harga dan PUNTEN AI" />
-      <br /><sub><b>Cek Harga</b> · kalkulator takaran + PUNTEN AI</sub>
-    </td>
-    <td align="center" width="50%">
-      <img src="docs/images/screenshots/peta.png" alt="Peta Spasial 13 Pasar Bogor" />
-      <br /><sub><b>Peta Spasial</b> · 13 pasar Bogor</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="50%">
-      <img src="docs/images/screenshots/lapor.png" alt="Lapor Harga Warga" />
-      <br /><sub><b>Lapor</b> · jalur warga dan pedagang</sub>
-    </td>
-    <td align="center" width="50%">
-      <img src="docs/images/screenshots/admin.png" alt="Konsol Moderasi Admin" />
-      <br /><sub><b>Admin</b> · moderasi dan konfigurasi</sub>
-    </td>
-  </tr>
-</table>
 
 ---
 
