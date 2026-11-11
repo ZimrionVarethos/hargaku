@@ -30,7 +30,7 @@
 Dibuat untuk kompetisi **Web In Action (MIA 2026)**. Pilot di **Kota Bogor** (13 pasar Perumda Pasar Pakuan Jaya), dirancang berkembang ke Jabodetabek, Jawa Barat, hingga nasional lintas 6 koridor pulau.
 
 <p align="center">
-  <a href="https://drive.google.com/file/d/1DhB5TQdo5tJ4BamoYhdxRmnyjDT_v92h/view">
+  <a href="https://youtu.be/w9_tMACGRUw">
     <img src="public/images/pasarku/demo.png" alt="Tonton demo PasarKu" width="720" />
   </a>
 </p>
